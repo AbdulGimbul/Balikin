@@ -17,13 +17,16 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 import balikin.composeapp.generated.resources.Res
 import balikin.composeapp.generated.resources.compose_multiplatform
 import dev.balikin.poject.features.front_page.presentation.OnboardingScreen
+import dev.balikin.poject.ui.theme.ManropeTypography
 
 @Composable
 @Preview
 fun App() {
     var showOnboarding by rememberSaveable { mutableStateOf(true) }
 
-    MaterialTheme {
+    MaterialTheme(
+        typography = ManropeTypography()
+    ) {
         if (showOnboarding) {
             OnboardingScreen(onFinish = { showOnboarding = false })
         } else {
