@@ -1,23 +1,13 @@
 package dev.balikin.poject
 
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import org.jetbrains.compose.resources.painterResource
-import org.jetbrains.compose.ui.tooling.preview.Preview
-
-import balikin.composeapp.generated.resources.Res
-import balikin.composeapp.generated.resources.compose_multiplatform
-import dev.balikin.poject.features.front_page.presentation.OnboardingScreen
+import dev.balikin.poject.features.front_page.presentation.OnBoardingScreen
+import dev.balikin.poject.features.front_page.presentation.OnBoardingViewModel
 import dev.balikin.poject.ui.theme.ManropeTypography
+import org.jetbrains.compose.ui.tooling.preview.Preview
 
 @Composable
 @Preview
@@ -28,25 +18,10 @@ fun App() {
         typography = ManropeTypography()
     ) {
         if (showOnboarding) {
-            OnboardingScreen(onFinish = { showOnboarding = false })
+            OnBoardingScreen(viewModel = OnBoardingViewModel())
         } else {
             // Your main app content
             Text("Main App Content")
         }
     }
-//    MaterialTheme {
-//        var showContent by remember { mutableStateOf(false) }
-//        Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
-//            Button(onClick = { showContent = !showContent }) {
-//                Text("Click me!")
-//            }
-//            AnimatedVisibility(showContent) {
-//                val greeting = remember { Greeting().greet() }
-//                Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
-//                    Image(painterResource(Res.drawable.compose_multiplatform), null)
-//                    Text("Compose: $greeting")
-//                }
-//            }
-//        }
-//    }
 }
