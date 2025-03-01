@@ -18,8 +18,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -40,6 +38,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import balikin.composeapp.generated.resources.Res
 import balikin.composeapp.generated.resources.balikin_logo
 import balikin.composeapp.generated.resources.bg_onboarding
+import dev.balikin.poject.ui.components.DefaultButton
 import dev.balikin.poject.ui.theme.primary_blue
 import dev.balikin.poject.ui.theme.primary_text
 import dev.balikin.poject.ui.theme.secondary_text
@@ -186,7 +185,8 @@ fun Onboarding(uiState: OnBoardingUiState, onEvent: (OnBoardingUiEvent) -> Unit)
                 }
             }
 
-            Button(
+            DefaultButton(
+                text = if (uiState.isLastPage) "Get Started" else "Next",
                 onClick = {
                     if (pagerState.currentPage < pagerState.pageCount - 1) {
                         coroutineScope.launch {
@@ -196,23 +196,14 @@ fun Onboarding(uiState: OnBoardingUiState, onEvent: (OnBoardingUiEvent) -> Unit)
 //                        onFinish()
                     }
                 },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 24.dp, 16.dp),
                 colors = ButtonDefaults.buttonColors(
                     containerColor = if (uiState.isLastPage) primary_blue else Color.White,
                     contentColor = if (uiState.isLastPage) Color.White else primary_blue
                 ),
-                shape = RoundedCornerShape(10.dp),
-            ) {
-                Text(
-                    text = if (uiState.isLastPage) "Get Started" else "Next",
-                    style = MaterialTheme.typography.titleMedium.copy(
-                        fontWeight = FontWeight.Bold
-                    ),
-                    modifier = Modifier.padding(vertical = 6.dp)
-                )
-            }
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 24.dp, 16.dp),
+            )
 
             if (uiState.isLastPage) {
                 Row(

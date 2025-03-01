@@ -1,16 +1,18 @@
 package dev.balikin.poject.features.front_page.presentation
 
 import androidx.lifecycle.ViewModel
-import dev.balikin.poject.features.front_page.data.OnBoardingData
+import dev.balikin.poject.features.front_page.data.OnBoardingRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 
-class OnBoardingViewModel : ViewModel() {
+class OnBoardingViewModel(
+    private val repository: OnBoardingRepository
+) : ViewModel() {
     private val _uiState = MutableStateFlow(OnBoardingUiState())
     val uiState: StateFlow<OnBoardingUiState> = _uiState
 
-    val pages = OnBoardingData.onBoardingDatas
+    val pages = repository.getOnboardingDatas()
 
     init {
         _uiState.update { it.copy(pages = pages) }

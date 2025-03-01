@@ -3,7 +3,6 @@ package dev.balikin.poject.ui.theme
 import androidx.compose.material3.Typography
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import balikin.composeapp.generated.resources.Manrope_Bold
 import balikin.composeapp.generated.resources.Manrope_ExtraBold
@@ -22,8 +21,11 @@ fun ManropeFontFamily() = FontFamily(
     Font(Res.font.Manrope_ExtraBold, FontWeight.ExtraBold),
     Font(Res.font.Manrope_ExtraLight, FontWeight.ExtraLight),
     Font(Res.font.Manrope_Light, FontWeight.Light),
+    Font(Res.font.Manrope_Regular, FontWeight.Normal),
     Font(Res.font.Manrope_Medium, FontWeight.Medium),
     Font(Res.font.Manrope_SemiBold, FontWeight.SemiBold),
+    Font(Res.font.Manrope_Bold, FontWeight.Bold),
+    Font(Res.font.Manrope_ExtraBold, FontWeight.ExtraBold)
 )
 
 @Composable
