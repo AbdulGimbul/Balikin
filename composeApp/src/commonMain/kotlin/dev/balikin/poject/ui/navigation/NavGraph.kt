@@ -50,17 +50,26 @@ fun NavHostContent(
 ) {
     NavHost(
         navController = navController,
-        startDestination = Screen.Login.route,
+        startDestination = Screen.OnBoarding.route,
         modifier = Modifier.padding(innerPadding)
     ) {
         composable(Screen.Login.route) {
-            LoginScreen(viewModel = koinViewModel<LoginViewModel>())
+            LoginScreen(
+                viewModel = koinViewModel<LoginViewModel>(),
+                navController = navController
+            )
         }
         composable(Screen.Register.route) {
-            RegisterScreen(viewModel = koinViewModel<RegisterViewModel>())
+            RegisterScreen(
+                viewModel = koinViewModel<RegisterViewModel>(),
+                navController = navController
+            )
         }
         composable(Screen.OnBoarding.route) {
-            OnBoardingScreen(viewModel = koinViewModel<OnBoardingViewModel>())
+            OnBoardingScreen(
+                viewModel = koinViewModel<OnBoardingViewModel>(),
+                navController = navController
+            )
         }
         composable(Screen.Home.route) {
 

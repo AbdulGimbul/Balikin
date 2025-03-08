@@ -31,6 +31,7 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.NavController
 import balikin.composeapp.generated.resources.Res
 import balikin.composeapp.generated.resources.balikin_logo
 import dev.balikin.poject.ui.components.DefaultButton
@@ -38,24 +39,29 @@ import dev.balikin.poject.ui.components.DefaultTextField
 import dev.balikin.poject.ui.components.LoginRegisterRow
 import dev.balikin.poject.ui.components.OrDivider
 import dev.balikin.poject.ui.components.WithGoogleButton
+import dev.balikin.poject.ui.navigation.Screen
 import dev.balikin.poject.ui.theme.primary_blue
 import dev.balikin.poject.ui.theme.secondary_text
 import org.jetbrains.compose.resources.painterResource
 
 @Composable
-fun RegisterScreen(viewModel: RegisterViewModel) {
+fun RegisterScreen(viewModel: RegisterViewModel, navController: NavController) {
     val uiState = viewModel.uiState.collectAsStateWithLifecycle()
 
     Register(
         uiState = uiState.value,
-        onEvent = viewModel::onEvent
+        onEvent = viewModel::onEvent,
+        moveToLogin = {
+            navController.navigate(Screen.Login.route)
+        }
     )
 }
 
 @Composable
 fun Register(
     uiState: RegisterUiState,
-    onEvent: (RegisterUiEvent) -> Unit
+    onEvent: (RegisterUiEvent) -> Unit,
+    moveToLogin: () -> Unit
 ) {
     Column(
         modifier = Modifier.fillMaxSize()
@@ -124,10 +130,10 @@ fun Register(
             onClick = {}
         )
         LoginRegisterRow(
-            onSignInClick = {},
+            actionClick = { moveToLogin() },
             text = "Sudah mempunyai akun? ",
             textAction = "Sign in",
-            modifier = Modifier.fillMaxWidth().padding(top = 8.dp)
+            modifier = Modifier.fillMaxWidth().padding(top = 24.dp)
         )
     }
 }

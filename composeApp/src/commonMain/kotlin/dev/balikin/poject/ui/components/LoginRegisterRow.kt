@@ -11,7 +11,7 @@ import dev.balikin.poject.ui.theme.primary_blue
 
 @Composable
 fun LoginRegisterRow(
-    onSignInClick: () -> Unit,
+    actionClick: () -> Unit,
     modifier: Modifier = Modifier,
     text: String,
     textAction: String
@@ -25,7 +25,7 @@ fun LoginRegisterRow(
         Text(
             text = textAction,
             color = primary_blue,
-            modifier = Modifier.clickable { onSignInClick() }
+            modifier = Modifier.clickable { actionClick() }
         )
     }
 }

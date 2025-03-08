@@ -25,6 +25,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.NavController
 import balikin.composeapp.generated.resources.Res
 import balikin.composeapp.generated.resources.balikin_logo
 import dev.balikin.poject.ui.components.DefaultButton
@@ -32,24 +33,29 @@ import dev.balikin.poject.ui.components.DefaultTextField
 import dev.balikin.poject.ui.components.LoginRegisterRow
 import dev.balikin.poject.ui.components.OrDivider
 import dev.balikin.poject.ui.components.WithGoogleButton
+import dev.balikin.poject.ui.navigation.Screen
 import dev.balikin.poject.ui.theme.primary_blue
 import dev.balikin.poject.ui.theme.secondary_text
 import org.jetbrains.compose.resources.painterResource
 
 @Composable
-fun LoginScreen(viewModel: LoginViewModel) {
+fun LoginScreen(viewModel: LoginViewModel, navController: NavController) {
     val uiState = viewModel.uiState.collectAsStateWithLifecycle()
 
     Login(
         uiState = uiState.value,
-        onEvent = viewModel::onEvent
+        onEvent = viewModel::onEvent,
+        moveToRegister = {
+            navController.navigate(Screen.Register.route)
+        }
     )
 }
 
 @Composable
 fun Login(
     uiState: LoginUiState,
-    onEvent: (LoginUiEvent) -> Unit
+    onEvent: (LoginUiEvent) -> Unit,
+    moveToRegister: () -> Unit
 ) {
     Column(
         modifier = Modifier.fillMaxSize()
@@ -109,10 +115,10 @@ fun Login(
             buttonText = "Continue with Google"
         )
         LoginRegisterRow(
-            onSignInClick = {},
+            actionClick = { moveToRegister() },
             text = "Belum mempunyai akun? ",
             textAction = "Create account",
-            modifier = Modifier.fillMaxWidth().padding(top = 8.dp)
+            modifier = Modifier.fillMaxWidth().padding(top = 24.dp)
         )
     }
 }
@@ -135,7 +141,7 @@ fun RememberMe(
         Text(
             text = "Remember me",
             color = secondary_text,
-            fontWeight = FontWeight.SemiBold,
+            style = MaterialTheme.typography.bodyMedium,
             fontSize = 14.sp
         )
 
