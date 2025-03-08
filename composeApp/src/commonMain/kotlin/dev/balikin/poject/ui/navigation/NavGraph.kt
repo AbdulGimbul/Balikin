@@ -14,8 +14,15 @@ import dev.balikin.poject.features.auth.presentation.login.LoginScreen
 import dev.balikin.poject.features.auth.presentation.login.LoginViewModel
 import dev.balikin.poject.features.auth.presentation.register.RegisterScreen
 import dev.balikin.poject.features.auth.presentation.register.RegisterViewModel
+import dev.balikin.poject.features.auth.presentation.forgot_password.ForgotPasswordScreen
+import dev.balikin.poject.features.auth.presentation.forgot_password.ForgotPasswordViewModel
+import dev.balikin.poject.features.auth.presentation.reset_password.ResetPasswordScreen
+import dev.balikin.poject.features.auth.presentation.reset_password.ResetPasswordViewModel
+import dev.balikin.poject.features.auth.presentation.set_password.SetNewPasswordScreen
+import dev.balikin.poject.features.auth.presentation.set_password.SetNewPasswordViewModel
 import dev.balikin.poject.features.front_page.presentation.OnBoardingScreen
 import dev.balikin.poject.features.front_page.presentation.OnBoardingViewModel
+import dev.balikin.poject.features.home.presentation.HomeScreen
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
@@ -50,7 +57,7 @@ fun NavHostContent(
 ) {
     NavHost(
         navController = navController,
-        startDestination = Screen.OnBoarding.route,
+        startDestination = Screen.ResetPassword.route,
         modifier = Modifier.padding(innerPadding)
     ) {
         composable(Screen.Login.route) {
@@ -72,7 +79,25 @@ fun NavHostContent(
             )
         }
         composable(Screen.Home.route) {
-
+            HomeScreen()
+        }
+        composable(Screen.ForgotPassword.route) {
+            ForgotPasswordScreen(
+                viewModel = ForgotPasswordViewModel(),
+                navController = navController
+            )
+        }
+        composable(Screen.ResetPassword.route) {
+            ResetPasswordScreen(
+                viewModel = ResetPasswordViewModel(),
+                navController = navController
+            )
+        }
+        composable(Screen.SetNewPassword.route) {
+            SetNewPasswordScreen(
+                viewModel = SetNewPasswordViewModel(),
+                navController = navController
+            )
         }
     }
 }

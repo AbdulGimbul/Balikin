@@ -17,13 +17,15 @@ fun DefaultButton(
     text: String,
     onClick: () -> Unit,
     colors: ButtonColors = ButtonDefaults.buttonColors(),
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true
 ) {
     Button(
         onClick = onClick,
         colors = colors,
         shape = RoundedCornerShape(10.dp),
-        modifier = modifier
+        modifier = modifier,
+        enabled = enabled
     ) {
         Text(
             text = text,
