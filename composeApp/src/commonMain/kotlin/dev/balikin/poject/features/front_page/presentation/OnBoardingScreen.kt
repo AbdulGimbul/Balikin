@@ -1,5 +1,10 @@
 package dev.balikin.poject.features.front_page.presentation
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -63,8 +68,8 @@ fun OnBoardingScreen(viewModel: OnBoardingViewModel, navController: NavControlle
                 }
             }
         },
-        moveToRegister = {
-            navController.navigate(Screen.Register.route) {
+        moveToHome = {
+            navController.navigate(Screen.Home.route) {
                 popUpTo(Screen.OnBoarding.route) {
                     inclusive = true
                 }
@@ -78,12 +83,11 @@ fun Onboarding(
     uiState: OnBoardingUiState,
     onEvent: (OnBoardingUiEvent) -> Unit,
     moveToLogin: () -> Unit,
-    moveToRegister: () -> Unit
+    moveToHome: () -> Unit
 ) {
 
     val pagerState = rememberPagerState(pageCount = { uiState.pages.size })
     val coroutineScope = rememberCoroutineScope()
-    val browserHelper = getBrowserHelper()
 
     LaunchedEffect(uiState.currentPage) {
         if (pagerState.currentPage != uiState.currentPage) {
@@ -106,7 +110,10 @@ fun Onboarding(
                 )
         )
 
-        if (uiState.isLastPage) {
+        AnimatedVisibility(
+            visible = uiState.isLastPage,
+            enter = fadeIn()
+        ) {
             Image(
                 painter = painterResource(Res.drawable.bg_onboarding),
                 contentDescription = null,
@@ -221,7 +228,7 @@ fun Onboarding(
                                 pagerState.animateScrollToPage(pagerState.currentPage + 1)
                             }
                         } else {
-                            moveToRegister()
+                            moveToHome()
                         }
                     },
                     colors = ButtonDefaults.buttonColors(

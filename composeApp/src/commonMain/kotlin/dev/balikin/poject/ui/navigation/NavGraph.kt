@@ -124,7 +124,7 @@ fun NavHostContent(
 ) {
     NavHost(
         navController = navController,
-        startDestination = Screen.Home.route,
+        startDestination = Screen.OnBoarding.route,
         modifier = Modifier.padding(innerPadding)
     ) {
         composable(Screen.Login.route) {
