@@ -10,29 +10,55 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.outlined.AccountCircle
 import androidx.compose.material.icons.outlined.Add
+import androidx.compose.material.icons.outlined.CalendarMonth
 import androidx.compose.material.icons.outlined.History
 import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.Payments
-import androidx.compose.material3.FabPosition
-import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.DatePicker
+import androidx.compose.material3.DatePickerDialog
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.MenuAnchorType
+import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.rememberDatePickerState
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
@@ -52,14 +78,30 @@ import dev.balikin.poject.features.auth.presentation.set_password.SetNewPassword
 import dev.balikin.poject.features.front_page.presentation.OnBoardingScreen
 import dev.balikin.poject.features.front_page.presentation.OnBoardingViewModel
 import dev.balikin.poject.features.home.presentation.HomeScreen
+import dev.balikin.poject.ui.components.DefaultButton
 import dev.balikin.poject.ui.theme.grey
 import dev.balikin.poject.ui.theme.primary_blue
+import dev.balikin.poject.utils.formattedDate
 import org.koin.compose.viewmodel.koinViewModel
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SetupNavHost(navController: NavHostController) {
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
+    val sheetState = rememberModalBottomSheetState()
+    var showBottomSheet by remember { mutableStateOf(true) }
+
+    ModalBottomSheet(
+        onDismissRequest = { showBottomSheet = false },
+        sheetState = sheetState,
+    ) {
+        if (showBottomSheet) {
+            AddTransactionBottomSheet(
+                onSaveClicked = { showBottomSheet = false }
+            )
+        }
+    }
 
     Scaffold(
         bottomBar = {
@@ -70,7 +112,7 @@ fun SetupNavHost(navController: NavHostController) {
                     Screen.Profile.route,
                 )
             ) {
-                BottomBarWithFab(navController)
+                BottomBarWithFab(navController, onFabClick = { showBottomSheet = true })
             }
         },
     ) { innerPadding ->
@@ -136,7 +178,8 @@ fun NavHostContent(
 @Composable
 private fun BottomBarWithFab(
     navController: NavHostController,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onFabClick: () -> Unit
 ) {
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
@@ -178,20 +221,20 @@ private fun BottomBarWithFab(
                 .align(Alignment.TopCenter)
                 .offset(y = 6.dp)
                 .size(56.dp)
-            .background(
-                color = primary_blue,
-                shape = CircleShape
-            )
-            .clickable { /* Handle FAB click */ },
-        contentAlignment = Alignment.Center
+                .background(
+                    color = primary_blue,
+                    shape = CircleShape
+                )
+                .clickable { onFabClick() },
+            contentAlignment = Alignment.Center
         ) {
-        Icon(
-            imageVector = Icons.Outlined.Add,
-            contentDescription = null,
-            tint = Color.White,
-            modifier = Modifier.size(24.dp)
-        )
-    }
+            Icon(
+                imageVector = Icons.Outlined.Add,
+                contentDescription = null,
+                tint = Color.White,
+                modifier = Modifier.size(24.dp)
+            )
+        }
     }
 }
 
@@ -220,6 +263,172 @@ fun BottomBarItem(
         )
     }
 }
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun AddTransactionBottomSheet(onSaveClicked: () -> Unit = {}) {
+    var name by remember { mutableStateOf("Irfan Nur I") }
+    val transactionTypes = listOf("Utang", "Piutang")
+    var expanded by remember { mutableStateOf(false) }
+    var selectedType by remember { mutableStateOf("Utang") }
+    var amount by remember { mutableStateOf("450.000") }
+    var date by remember { mutableStateOf("") }
+    var note by remember { mutableStateOf("Bekas beli burung") }
+    var showDatePicker by remember { mutableStateOf(false) }
+
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+    ) {
+        Text(
+            "Tambah Transaksi Utang Piutang",
+            modifier = Modifier.fillMaxWidth(),
+            textAlign = TextAlign.Center,
+            style = MaterialTheme.typography.titleLarge
+        )
+        HorizontalDivider(modifier = Modifier.padding(top = 16.dp))
+        Column(
+            modifier = Modifier
+                .padding(24.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            OutlinedTextField(
+                value = name,
+                onValueChange = { name = it },
+                label = { RequiredLabel("Nama") },
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                ExposedDropdownMenuBox(
+                    expanded = expanded,
+                    onExpandedChange = { expanded = !expanded },
+                    modifier = Modifier.weight(1f)
+                ) {
+                    OutlinedTextField(
+                        value = selectedType,
+                        onValueChange = { /* no-op: changes come from menu selection */ },
+                        label = { RequiredLabel("Jenis Transaksi") },
+                        modifier = Modifier
+                            .menuAnchor(type = MenuAnchorType.PrimaryEditable),
+                        readOnly = true,
+                        trailingIcon = {
+                            ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
+                        },
+                        colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors()
+                    )
+
+                    ExposedDropdownMenu(
+                        expanded = expanded,
+                        onDismissRequest = { expanded = false }
+                    ) {
+                        transactionTypes.forEach { type ->
+                            DropdownMenuItem(
+                                text = { Text(type) },
+                                onClick = {
+                                    selectedType = type
+                                    expanded = false
+                                }
+                            )
+                        }
+                    }
+                }
+
+                OutlinedTextField(
+                    value = amount,
+                    onValueChange = { amount = it },
+                    label = { RequiredLabel("Amount") },
+                    modifier = Modifier.weight(1f)
+                )
+
+            }
+
+            OutlinedTextField(
+                value = date,
+                onValueChange = { date = it },
+                label = { RequiredLabel("Tanggal") },
+                modifier = Modifier.fillMaxWidth(),
+                trailingIcon = {
+                    IconButton(onClick = { showDatePicker = true }) {
+                        Icon(
+                            imageVector = Icons.Outlined.CalendarMonth,
+                            contentDescription = "Select date"
+                        )
+                    }
+                },
+                placeholder = { Text("dd/mm/yyyy") }
+            )
+
+            if (showDatePicker) {
+                DatePickerModal(
+                    onDateSelected = { date = formattedDate(it ?: 0) },
+                    onDismiss = { showDatePicker = false }
+                )
+            }
+
+            OutlinedTextField(
+                value = note,
+                onValueChange = { note = it },
+                label = { Text("Keterangan") },
+                modifier = Modifier.fillMaxWidth(),
+                singleLine = false,
+                maxLines = 3
+            )
+
+            DefaultButton(
+                onClick = onSaveClicked,
+                modifier = Modifier.fillMaxWidth(),
+                text = "Simpan"
+            )
+        }
+    }
+}
+
+@Composable
+fun RequiredLabel(label: String) {
+    // Use an AnnotatedString to color only the asterisk
+    Text(
+        buildAnnotatedString {
+            append(label)
+            append(" ")
+            withStyle(style = SpanStyle(color = Color.Red)) {
+                append("*")
+            }
+        }
+    )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun DatePickerModal(
+    onDateSelected: (Long?) -> Unit,
+    onDismiss: () -> Unit
+) {
+    val datePickerState = rememberDatePickerState()
+
+    DatePickerDialog(
+        onDismissRequest = onDismiss,
+        confirmButton = {
+            TextButton(onClick = {
+                onDateSelected(datePickerState.selectedDateMillis)
+                onDismiss()
+            }) {
+                Text("OK")
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text("Cancel")
+            }
+        }
+    ) {
+        DatePicker(state = datePickerState)
+    }
+}
+
 
 val navigationItems = listOf(
     BottomNavItem(

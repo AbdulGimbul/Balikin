@@ -19,6 +19,7 @@ navigationCompose = "2.8.0-alpha11"
 ktor = "3.1.0"
 koin = "4.0.0"
 materialNavigation = "1.7.0-beta02"
+kotlinxDatetime = "0.6.1"
 
 [libraries]
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
@@ -49,6 +50,8 @@ koin-compose-viewmodel-navigation = { module = "io.insert-koin:koin-compose-view
 koin-android = { module = "io.insert-koin:koin-android", version.ref = "koin" }
 koin-androidx-compose = { module = "io.insert-koin:koin-androidx-compose", version.ref = "koin" }
 material-navigation = { module = "org.jetbrains.compose.material:material-navigation", version.ref = "materialNavigation" }
+datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "kotlinxDatetime" }
+
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }

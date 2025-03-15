@@ -59,6 +59,7 @@ kotlin {
             implementation(libs.koin.compose.viewmodel)
             implementation(libs.koin.compose.viewmodel.navigation)
             implementation(libs.bundles.ktor)
+            implementation(libs.datetime)
         }
         nativeMain.dependencies {
             implementation(libs.ktor.client.darwin)
