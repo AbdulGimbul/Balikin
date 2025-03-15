@@ -13,12 +13,14 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowForwardIos
 import androidx.compose.material.icons.outlined.Settings
-import androidx.compose.material3.Card
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -33,13 +35,23 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import balikin.composeapp.generated.resources.Res
 import balikin.composeapp.generated.resources.agus
+import balikin.composeapp.generated.resources.balikin_white
+import balikin.composeapp.generated.resources.chip
+import balikin.composeapp.generated.resources.money_wings
+import dev.balikin.poject.ui.theme.green
+import dev.balikin.poject.ui.theme.primary_blue
 import dev.balikin.poject.ui.theme.primary_text
+import dev.balikin.poject.ui.theme.red
 import dev.balikin.poject.ui.theme.secondary_text
 import org.jetbrains.compose.resources.painterResource
 
@@ -58,14 +70,14 @@ fun HomeScreen() {
             date = "17 Agustus ● 12.22 PM",
             note = "bekas bell baras Ng",
             amount = "Rp. 99.000",
-            type = "Plutang"
+            type = "Piutang"
         ),
         Transaction(
             name = "Winggar Waharjut",
             date = "17 Agustus ● 12.22 PM",
             note = "bekas bell baras Ng",
             amount = "Rp. 43.000",
-            type = "Plutang"
+            type = "Piutang"
         )
     )
 
@@ -119,12 +131,49 @@ fun HomeScreen() {
 
         Spacer(Modifier.height(24.dp))
 
-        // Recent Transactions
+        Row(
+            modifier = Modifier.background(
+                color = primary_blue.copy(alpha = 0.15f),
+                shape = RoundedCornerShape(10.dp)
+            ).clip(RoundedCornerShape(10.dp))
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth().padding(16.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween,
+            ) {
+                Image(
+                    painter = painterResource(Res.drawable.money_wings),
+                    contentDescription = null,
+                    modifier = Modifier.size(40.dp)
+                )
+                Text(
+                    text = "Lorem ipsum dolor sit ametoridi massali consectetur massa.",
+                    modifier = Modifier
+                        .weight(1f) // Added weight modifier
+                        .padding(horizontal = 16.dp), // Added horizontal padding
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis
+                )
+                IconButton(
+                    onClick = {},
+                ) {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.ArrowForwardIos,
+                        contentDescription = null,
+                        tint = primary_blue
+                    )
+                }
+            }
+        }
+
+        Spacer(modifier = Modifier.height(32.dp))
+
         Text(
             text = "Transaksi Terbaru",
             fontSize = 20.sp,
             fontWeight = FontWeight.Bold,
-            modifier = Modifier.padding(bottom = 16.dp)
+            modifier = Modifier.padding(bottom = 24.dp)
         )
 
         LazyColumn(
@@ -136,7 +185,6 @@ fun HomeScreen() {
         }
     }
 }
-
 
 @Composable
 fun DebtCard(
@@ -162,43 +210,65 @@ fun DebtCard(
     ) {
         Column(
             modifier = Modifier.padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            Text(
-                text = "Total Utang",
-                color = Color.White,
-                style = MaterialTheme.typography.labelLarge
-            )
-            Text(
-                text = totalDebt,
-                color = Color.White,
-                style = MaterialTheme.typography.headlineMedium,
-                fontWeight = FontWeight.Bold
-            )
+            Row {
+                Column {
+                    Text(
+                        text = "Total Utang",
+                        color = Color.White,
+                        style = MaterialTheme.typography.labelLarge
+                    )
+                    Text(
+                        text = totalDebt,
+                        color = Color.White,
+                        style = MaterialTheme.typography.headlineMedium,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
+                Spacer(modifier = Modifier.weight(1f))
+                Image(
+                    painter = painterResource(Res.drawable.chip),
+                    contentDescription = null,
+                    modifier = Modifier.size(40.dp)
+                )
+            }
+            Spacer(modifier = Modifier.height(48.dp))
             Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(Color.White, shape = RoundedCornerShape(50)),
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.Bottom,
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                tabs.forEach { tab ->
-                    Box(
-                        modifier = Modifier
-                            .weight(1f)
-                            .clip(RoundedCornerShape(50))
-                            .background(if (tab == selectedTab) Color(0xFF7B61FF) else Color.Transparent)
-                            .clickable { onTabSelected(tab) }
-                            .padding(vertical = 8.dp),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text(
-                            text = tab,
-                            color = if (tab == selectedTab) Color.White else Color.Gray,
-                            fontWeight = FontWeight.Bold,
-                            textAlign = TextAlign.Center
-                        )
+                Row(
+                    modifier = Modifier
+                        .background(Color.White, shape = RoundedCornerShape(50))
+                        .weight(1f)
+                        .padding(vertical = 2.dp, horizontal = 2.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    tabs.forEach { tab ->
+                        Box(
+                            modifier = Modifier
+                                .weight(1f)
+                                .clip(RoundedCornerShape(50))
+                                .background(if (tab == selectedTab) primary_blue else Color.Transparent)
+                                .clickable { onTabSelected(tab) }
+                                .padding(vertical = 8.dp, horizontal = 12.dp),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text(
+                                text = tab,
+                                color = if (tab == selectedTab) Color.White else Color.Gray,
+                                fontWeight = FontWeight.Bold,
+                                textAlign = TextAlign.Center
+                            )
+                        }
                     }
                 }
+                Spacer(modifier = Modifier.weight(0.7f))
+                Image(
+                    painter = painterResource(Res.drawable.balikin_white),
+                    contentDescription = "Balikin Logo"
+                )
             }
         }
     }
@@ -207,14 +277,17 @@ fun DebtCard(
 
 @Composable
 private fun TransactionItem(transaction: Transaction) {
-    Card {
+    Column {
         Row(
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
+                .fillMaxWidth(),
+            verticalAlignment = Alignment.Top,
         ) {
+            Image(
+                painter = painterResource(Res.drawable.agus), contentDescription = null,
+                modifier = Modifier.size(40.dp),
+            )
+            Spacer(modifier = Modifier.width(12.dp))
             Column {
                 Text(
                     text = transaction.name,
@@ -226,13 +299,19 @@ private fun TransactionItem(transaction: Transaction) {
                     color = Color.Gray,
                     fontSize = 14.sp
                 )
+                val noteText = buildAnnotatedString {
+                    withStyle(style = SpanStyle(fontWeight = FontWeight.SemiBold)) {
+                        append("Note: ")
+                    }
+                    append(transaction.note)
+                }
                 Text(
-                    text = "Note: ${transaction.note}",
+                    text = noteText,
                     color = Color.Gray,
                     fontSize = 14.sp
                 )
             }
-
+            Spacer(modifier = Modifier.weight(1f))
             Column(horizontalAlignment = Alignment.End) {
                 Text(
                     text = transaction.amount,
@@ -241,11 +320,13 @@ private fun TransactionItem(transaction: Transaction) {
                 )
                 Text(
                     text = transaction.type,
-                    color = Color.Gray,
+                    color = if (transaction.type == "Utang") red else green,
                     fontSize = 14.sp
                 )
             }
         }
+        Spacer(modifier = Modifier.height(8.dp))
+        HorizontalDivider()
     }
 }
 
