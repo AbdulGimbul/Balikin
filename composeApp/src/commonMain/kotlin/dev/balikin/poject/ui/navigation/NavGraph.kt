@@ -10,23 +10,18 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.outlined.AccountCircle
 import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material.icons.outlined.CalendarMonth
 import androidx.compose.material.icons.outlined.History
 import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.Payments
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.DropdownMenuItem
@@ -55,8 +50,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
@@ -90,18 +83,7 @@ fun SetupNavHost(navController: NavHostController) {
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
     val sheetState = rememberModalBottomSheetState()
-    var showBottomSheet by remember { mutableStateOf(true) }
-
-    ModalBottomSheet(
-        onDismissRequest = { showBottomSheet = false },
-        sheetState = sheetState,
-    ) {
-        if (showBottomSheet) {
-            AddTransactionBottomSheet(
-                onSaveClicked = { showBottomSheet = false }
-            )
-        }
-    }
+    var showBottomSheet by remember { mutableStateOf(false) }
 
     Scaffold(
         bottomBar = {
@@ -116,10 +98,22 @@ fun SetupNavHost(navController: NavHostController) {
             }
         },
     ) { innerPadding ->
-        NavHostContent(
-            navController = navController,
-            innerPadding = innerPadding,
-        )
+        Box {
+            NavHostContent(
+                navController = navController,
+                innerPadding = innerPadding,
+            )
+            if (showBottomSheet) {
+                ModalBottomSheet(
+                    onDismissRequest = { showBottomSheet = false },
+                    sheetState = sheetState,
+                ) {
+                    AddTransactionBottomSheet(
+                        onSaveClicked = { showBottomSheet = false }
+                    )
+                }
+            }
+        }
     }
 }
 
