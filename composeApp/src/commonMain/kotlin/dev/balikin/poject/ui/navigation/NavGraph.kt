@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -22,12 +23,15 @@ import androidx.compose.material.icons.outlined.CalendarMonth
 import androidx.compose.material.icons.outlined.History
 import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.Payments
+import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.FloatingActionButtonDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -41,6 +45,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -73,6 +78,7 @@ import dev.balikin.poject.features.front_page.presentation.OnBoardingViewModel
 import dev.balikin.poject.features.home.presentation.HomeScreen
 import dev.balikin.poject.ui.components.DefaultButton
 import dev.balikin.poject.ui.theme.grey
+import dev.balikin.poject.ui.theme.grey2
 import dev.balikin.poject.ui.theme.primary_blue
 import dev.balikin.poject.utils.formattedDate
 import org.koin.compose.viewmodel.koinViewModel
@@ -82,7 +88,9 @@ import org.koin.compose.viewmodel.koinViewModel
 fun SetupNavHost(navController: NavHostController) {
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
-    val sheetState = rememberModalBottomSheetState()
+    val sheetState = rememberModalBottomSheetState(
+        skipPartiallyExpanded = true
+    )
     var showBottomSheet by remember { mutableStateOf(false) }
 
     Scaffold(
@@ -178,30 +186,30 @@ private fun BottomBarWithFab(
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
 
-    Box(modifier = modifier.height(80.dp)) {
-        HorizontalDivider(color = grey, thickness = 0.5.dp)
+    Box(
+        modifier = modifier
+            .height(80.dp)
+            .navigationBarsPadding()
+    ) {
+        HorizontalDivider(
+            color = MaterialTheme.colorScheme.outlineVariant,
+            thickness = 0.5.dp
+        )
+
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(56.dp),
+                .height(64.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // Left side items
-            navigationItems.take(2).forEach { item ->
-                BottomBarItem(
-                    item = item,
-                    selected = currentRoute == item.screen.route,
-                    onClick = { navController.navigate(item.screen.route) }
-                )
-            }
+            navigationItems.forEachIndexed { index, item ->
+                if (index == 2) {  // Position before the FAB spacer
+                    Spacer(Modifier.weight(1f))
+                }
 
-            // Right side spacer for FAB area
-            Spacer(modifier = Modifier.weight(1f))
-
-            // Right side items
-            navigationItems.drop(2).forEach { item ->
                 BottomBarItem(
+                    modifier = Modifier.weight(1f),
                     item = item,
                     selected = currentRoute == item.screen.route,
                     onClick = { navController.navigate(item.screen.route) }
@@ -210,23 +218,18 @@ private fun BottomBarWithFab(
         }
 
         // Centered FAB
-        Box(
+        FloatingActionButton(
+            onClick = onFabClick,
             modifier = Modifier
                 .align(Alignment.TopCenter)
-                .offset(y = 6.dp)
-                .size(56.dp)
-                .background(
-                    color = primary_blue,
-                    shape = CircleShape
-                )
-                .clickable { onFabClick() },
-            contentAlignment = Alignment.Center
+                .offset(y = 4.dp),
+            shape = CircleShape,
+            containerColor = primary_blue,
+            contentColor = Color.White
         ) {
             Icon(
                 imageVector = Icons.Outlined.Add,
-                contentDescription = null,
-                tint = Color.White,
-                modifier = Modifier.size(24.dp)
+                contentDescription = "Add Transaction"
             )
         }
     }
@@ -234,29 +237,44 @@ private fun BottomBarWithFab(
 
 @Composable
 fun BottomBarItem(
+    modifier: Modifier = Modifier,  // Receive modifier as parameter
     item: BottomNavItem,
     selected: Boolean,
     onClick: () -> Unit
 ) {
-    Column(
-        modifier = Modifier
-            .width(80.dp)
-            .clickable(onClick = onClick)
-            .padding(8.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
+    val contentColor = if (selected) {
+        primary_blue
+    } else {
+        grey2
+    }
+
+    Box(
+        modifier = modifier
+            .height(64.dp)
+            .clickable(
+                onClick = onClick
+            ),
+        contentAlignment = Alignment.Center
     ) {
-        Icon(
-            imageVector = item.icon,
-            contentDescription = item.title,
-            tint = if (selected) primary_blue else Color.Gray
-        )
-        Text(
-            text = item.title,
-            color = if (selected) primary_blue else Color.Gray,
-            fontSize = 12.sp
-        )
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            Icon(
+                imageVector = item.icon,
+                contentDescription = item.title,
+                tint = contentColor
+            )
+            Spacer(Modifier.height(4.dp))
+            Text(
+                text = item.title,
+                style = MaterialTheme.typography.labelSmall,
+                color = contentColor
+            )
+        }
     }
 }
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

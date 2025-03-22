@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -35,6 +36,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
@@ -46,9 +48,11 @@ import androidx.compose.ui.unit.sp
 import balikin.composeapp.generated.resources.Res
 import balikin.composeapp.generated.resources.agus
 import balikin.composeapp.generated.resources.balikin_white
+import balikin.composeapp.generated.resources.bg_card
 import balikin.composeapp.generated.resources.chip
 import balikin.composeapp.generated.resources.money_wings
 import dev.balikin.poject.ui.theme.green
+import dev.balikin.poject.ui.theme.grey2
 import dev.balikin.poject.ui.theme.primary_blue
 import dev.balikin.poject.ui.theme.primary_text
 import dev.balikin.poject.ui.theme.red
@@ -193,23 +197,36 @@ fun DebtCard(
     onTabSelected: (String) -> Unit
 ) {
     val tabs = listOf("Utang", "Piutang")
-    Row(
+
+    Box(
         modifier = Modifier
             .fillMaxWidth()
+            .aspectRatio(16f / 9f)
             .clip(RoundedCornerShape(10.dp))
-            .background(
-                brush = Brush.linearGradient(
-                    listOf(
-                        Color(0xFF5865F2),
-                        Color(0xFF907EFD),
-                        Color(0XFF926BFF)
-                    )
-                ),
-                shape = RoundedCornerShape(10.dp)
-            ),
     ) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(
+                    brush = Brush.linearGradient(
+                        colors = listOf(
+                            Color(0xFF5865F2),
+                            Color(0xFF907EFD),
+                            Color(0XFF926BFF)
+                        )
+                    )
+                )
+        )
+
+        Image(
+            painter = painterResource(Res.drawable.bg_card),
+            contentDescription = null,
+            contentScale = ContentScale.Crop,
+            modifier = Modifier.fillMaxSize()
+        )
+
         Column(
-            modifier = Modifier.padding(16.dp),
+            modifier = Modifier.padding(18.dp).fillMaxSize(),
         ) {
             Row {
                 Column {
@@ -232,7 +249,7 @@ fun DebtCard(
                     modifier = Modifier.size(40.dp)
                 )
             }
-            Spacer(modifier = Modifier.height(48.dp))
+            Spacer(modifier = Modifier.weight(1f))
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.Bottom,
@@ -241,14 +258,12 @@ fun DebtCard(
                 Row(
                     modifier = Modifier
                         .background(Color.White, shape = RoundedCornerShape(50))
-                        .weight(1f)
                         .padding(vertical = 2.dp, horizontal = 2.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     tabs.forEach { tab ->
                         Box(
                             modifier = Modifier
-                                .weight(1f)
                                 .clip(RoundedCornerShape(50))
                                 .background(if (tab == selectedTab) primary_blue else Color.Transparent)
                                 .clickable { onTabSelected(tab) }
@@ -257,17 +272,19 @@ fun DebtCard(
                         ) {
                             Text(
                                 text = tab,
-                                color = if (tab == selectedTab) Color.White else Color.Gray,
-                                fontWeight = FontWeight.Bold,
-                                textAlign = TextAlign.Center
+                                color = if (tab == selectedTab) Color.White else grey2,
+                                textAlign = TextAlign.Center,
+                                fontWeight = FontWeight.SemiBold,
+                                modifier = Modifier.padding(horizontal = 6.dp)
                             )
                         }
                     }
                 }
-                Spacer(modifier = Modifier.weight(0.7f))
                 Image(
                     painter = painterResource(Res.drawable.balikin_white),
-                    contentDescription = "Balikin Logo"
+                    contentDescription = "Balikin Logo",
+                    alignment = Alignment.BottomCenter,
+                    modifier = Modifier.size(64.dp)
                 )
             }
         }
