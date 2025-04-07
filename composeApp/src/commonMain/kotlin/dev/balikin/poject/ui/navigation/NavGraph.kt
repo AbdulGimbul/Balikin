@@ -76,8 +76,9 @@ import dev.balikin.poject.features.auth.presentation.set_password.SetNewPassword
 import dev.balikin.poject.features.front_page.presentation.OnBoardingScreen
 import dev.balikin.poject.features.front_page.presentation.OnBoardingViewModel
 import dev.balikin.poject.features.home.presentation.HomeScreen
+import dev.balikin.poject.features.transaction.presentation.TransactionScreen
+import dev.balikin.poject.features.transaction.presentation.filter.FilterScreen
 import dev.balikin.poject.ui.components.DefaultButton
-import dev.balikin.poject.ui.theme.grey
 import dev.balikin.poject.ui.theme.grey2
 import dev.balikin.poject.ui.theme.primary_blue
 import dev.balikin.poject.utils.formattedDate
@@ -132,7 +133,7 @@ fun NavHostContent(
 ) {
     NavHost(
         navController = navController,
-        startDestination = Screen.OnBoarding.route,
+        startDestination = Screen.FilterTrans.route,
         modifier = Modifier.padding(innerPadding)
     ) {
         composable(Screen.Login.route) {
@@ -173,6 +174,12 @@ fun NavHostContent(
                 viewModel = SetNewPasswordViewModel(),
                 navController = navController
             )
+        }
+        composable(Screen.Transaction.route) {
+            TransactionScreen()
+        }
+        composable(Screen.FilterTrans.route) {
+            FilterScreen()
         }
     }
 }
