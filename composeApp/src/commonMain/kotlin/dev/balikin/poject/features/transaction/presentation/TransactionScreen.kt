@@ -44,6 +44,7 @@ import androidx.compose.ui.unit.dp
 import balikin.composeapp.generated.resources.Res
 import balikin.composeapp.generated.resources.agus
 import balikin.composeapp.generated.resources.trans_piutang
+import dev.balikin.poject.ui.components.FilterButton
 import dev.balikin.poject.ui.theme.grey2
 import dev.balikin.poject.ui.theme.primary
 import dev.balikin.poject.ui.theme.primary_text
@@ -115,29 +116,6 @@ fun TransactionScreen() {
                 }
             }
         }
-    }
-}
-
-
-@Composable
-fun FilterButton(
-    onClick: () -> Unit
-) {
-    OutlinedButton(
-        onClick = onClick,
-        shape = RoundedCornerShape(10.dp),
-        modifier = Modifier.height(56.dp)
-    ) {
-        Icon(
-            imageVector = Icons.Filled.FilterList,
-            contentDescription = "Filter",
-            tint = primary
-        )
-        Spacer(modifier = Modifier.width(6.dp))
-        Text(
-            text = "Filter",
-            color = primary
-        )
     }
 }
 

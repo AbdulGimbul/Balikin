@@ -67,6 +67,7 @@ import dev.balikin.poject.features.auth.presentation.forgot_password.ForgotPassw
 import dev.balikin.poject.features.auth.presentation.forgot_password.ForgotPasswordViewModel
 import dev.balikin.poject.features.auth.presentation.login.LoginScreen
 import dev.balikin.poject.features.auth.presentation.login.LoginViewModel
+import dev.balikin.poject.features.auth.presentation.profile.ProfileScreen
 import dev.balikin.poject.features.auth.presentation.register.RegisterScreen
 import dev.balikin.poject.features.auth.presentation.register.RegisterViewModel
 import dev.balikin.poject.features.auth.presentation.reset_password.ResetPasswordScreen
@@ -77,8 +78,8 @@ import dev.balikin.poject.features.front_page.presentation.OnBoardingScreen
 import dev.balikin.poject.features.front_page.presentation.OnBoardingViewModel
 import dev.balikin.poject.features.home.presentation.HomeScreen
 import dev.balikin.poject.features.transaction.presentation.TransactionScreen
-import dev.balikin.poject.features.transaction.presentation.filter.FilterScreen
 import dev.balikin.poject.ui.components.DefaultButton
+import dev.balikin.poject.ui.components.FilterScreen
 import dev.balikin.poject.ui.theme.grey2
 import dev.balikin.poject.ui.theme.primary_blue
 import dev.balikin.poject.utils.formattedDate
@@ -133,7 +134,7 @@ fun NavHostContent(
 ) {
     NavHost(
         navController = navController,
-        startDestination = Screen.FilterTrans.route,
+        startDestination = Screen.Profile.route,
         modifier = Modifier.padding(innerPadding)
     ) {
         composable(Screen.Login.route) {
@@ -180,6 +181,9 @@ fun NavHostContent(
         }
         composable(Screen.FilterTrans.route) {
             FilterScreen()
+        }
+        composable(Screen.Profile.route) {
+            ProfileScreen()
         }
     }
 }

@@ -51,6 +51,9 @@ import balikin.composeapp.generated.resources.balikin_white
 import balikin.composeapp.generated.resources.bg_card
 import balikin.composeapp.generated.resources.chip
 import balikin.composeapp.generated.resources.money_wings
+import dev.balikin.poject.features.transaction.data.Transaction
+import dev.balikin.poject.features.transaction.data.dummyTransactions
+import dev.balikin.poject.ui.components.TransactionItem
 import dev.balikin.poject.ui.theme.green
 import dev.balikin.poject.ui.theme.grey2
 import dev.balikin.poject.ui.theme.primary_blue
@@ -61,29 +64,6 @@ import org.jetbrains.compose.resources.painterResource
 
 @Composable
 fun HomeScreen() {
-    val transactions = listOf(
-        Transaction(
-            name = "Ilham Ardiansyah",
-            date = "17 Agustus ● 12.22 PM",
-            note = "bekas bell baras Ng",
-            amount = "Rp. 459.000",
-            type = "Utang"
-        ),
-        Transaction(
-            name = "Irsan Ramadhan",
-            date = "17 Agustus ● 12.22 PM",
-            note = "bekas bell baras Ng",
-            amount = "Rp. 99.000",
-            type = "Piutang"
-        ),
-        Transaction(
-            name = "Winggar Waharjut",
-            date = "17 Agustus ● 12.22 PM",
-            note = "bekas bell baras Ng",
-            amount = "Rp. 43.000",
-            type = "Piutang"
-        )
-    )
 
     Column(
         modifier = Modifier
@@ -183,7 +163,7 @@ fun HomeScreen() {
         LazyColumn(
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            items(transactions) { transaction ->
+            items(dummyTransactions) { transaction ->
                 TransactionItem(transaction)
             }
         }
@@ -290,67 +270,3 @@ fun DebtCard(
         }
     }
 }
-
-
-@Composable
-private fun TransactionItem(transaction: Transaction) {
-    Column {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth(),
-            verticalAlignment = Alignment.Top,
-        ) {
-            Image(
-                painter = painterResource(Res.drawable.agus), contentDescription = null,
-                modifier = Modifier.size(40.dp),
-            )
-            Spacer(modifier = Modifier.width(12.dp))
-            Column {
-                Text(
-                    text = transaction.name,
-                    fontWeight = FontWeight.Medium,
-                    fontSize = 16.sp
-                )
-                Text(
-                    text = transaction.date,
-                    color = Color.Gray,
-                    fontSize = 14.sp
-                )
-                val noteText = buildAnnotatedString {
-                    withStyle(style = SpanStyle(fontWeight = FontWeight.SemiBold)) {
-                        append("Note: ")
-                    }
-                    append(transaction.note)
-                }
-                Text(
-                    text = noteText,
-                    color = Color.Gray,
-                    fontSize = 14.sp
-                )
-            }
-            Spacer(modifier = Modifier.weight(1f))
-            Column(horizontalAlignment = Alignment.End) {
-                Text(
-                    text = transaction.amount,
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 16.sp
-                )
-                Text(
-                    text = transaction.type,
-                    color = if (transaction.type == "Utang") red else green,
-                    fontSize = 14.sp
-                )
-            }
-        }
-        Spacer(modifier = Modifier.height(8.dp))
-        HorizontalDivider()
-    }
-}
-
-data class Transaction(
-    val name: String,
-    val date: String,
-    val note: String,
-    val amount: String,
-    val type: String
-)

@@ -1,4 +1,4 @@
-package dev.balikin.poject.features.transaction.presentation.filter
+package dev.balikin.poject.ui.components
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -34,7 +34,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import dev.balikin.poject.ui.components.DefaultButton
 import dev.balikin.poject.ui.theme.primary
 import kotlinx.datetime.Clock
 import kotlinx.datetime.DatePeriod
@@ -43,7 +42,6 @@ import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.minus
 import kotlinx.datetime.toLocalDateTime
-
 
 @Composable
 fun FilterScreen() {
