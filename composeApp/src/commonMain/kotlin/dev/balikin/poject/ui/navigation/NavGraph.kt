@@ -188,104 +188,6 @@ fun NavHostContent(
     }
 }
 
-@Composable
-private fun BottomBarWithFab(
-    navController: NavHostController,
-    modifier: Modifier = Modifier,
-    onFabClick: () -> Unit
-) {
-    val navBackStackEntry by navController.currentBackStackEntryAsState()
-    val currentRoute = navBackStackEntry?.destination?.route
-
-    Box(
-        modifier = modifier
-            .height(80.dp)
-            .navigationBarsPadding()
-    ) {
-        HorizontalDivider(
-            color = MaterialTheme.colorScheme.outlineVariant,
-            thickness = 0.5.dp
-        )
-
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(64.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            navigationItems.forEachIndexed { index, item ->
-                if (index == 2) {  // Position before the FAB spacer
-                    Spacer(Modifier.weight(1f))
-                }
-
-                BottomBarItem(
-                    modifier = Modifier.weight(1f),
-                    item = item,
-                    selected = currentRoute == item.screen.route,
-                    onClick = { navController.navigate(item.screen.route) }
-                )
-            }
-        }
-
-        // Centered FAB
-        FloatingActionButton(
-            onClick = onFabClick,
-            modifier = Modifier
-                .align(Alignment.TopCenter)
-                .offset(y = 4.dp),
-            shape = CircleShape,
-            containerColor = primary_blue,
-            contentColor = Color.White
-        ) {
-            Icon(
-                imageVector = Icons.Outlined.Add,
-                contentDescription = "Add Transaction"
-            )
-        }
-    }
-}
-
-@Composable
-fun BottomBarItem(
-    modifier: Modifier = Modifier,  // Receive modifier as parameter
-    item: BottomNavItem,
-    selected: Boolean,
-    onClick: () -> Unit
-) {
-    val contentColor = if (selected) {
-        primary_blue
-    } else {
-        grey2
-    }
-
-    Box(
-        modifier = modifier
-            .height(64.dp)
-            .clickable(
-                onClick = onClick
-            ),
-        contentAlignment = Alignment.Center
-    ) {
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
-        ) {
-            Icon(
-                imageVector = item.icon,
-                contentDescription = item.title,
-                tint = contentColor
-            )
-            Spacer(Modifier.height(4.dp))
-            Text(
-                text = item.title,
-                style = MaterialTheme.typography.labelSmall,
-                color = contentColor
-            )
-        }
-    }
-}
-
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -453,25 +355,25 @@ fun DatePickerModal(
 }
 
 
-val navigationItems = listOf(
-    BottomNavItem(
-        title = "Home",
-        icon = Icons.Outlined.Home,
-        screen = Screen.Home
-    ),
-    BottomNavItem(
-        title = "Transaksi",
-        icon = Icons.Outlined.Payments,
-        screen = Screen.Transaction
-    ),
-    BottomNavItem(
-        title = "History",
-        icon = Icons.Outlined.History,
-        screen = Screen.History
-    ),
-    BottomNavItem(
-        title = "Profile",
-        icon = Icons.Outlined.AccountCircle,
-        screen = Screen.Profile
-    )
-)
+//val navigationItems = listOf(
+//    BottomNavItem(
+//        title = "Home",
+//        icon = Icons.Outlined.Home,
+//        screen = Screen.Home
+//    ),
+//    BottomNavItem(
+//        title = "Transaksi",
+//        icon = Icons.Outlined.Payments,
+//        screen = Screen.Transaction
+//    ),
+//    BottomNavItem(
+//        title = "History",
+//        icon = Icons.Outlined.History,
+//        screen = Screen.History
+//    ),
+//    BottomNavItem(
+//        title = "Profile",
+//        icon = Icons.Outlined.AccountCircle,
+//        screen = Screen.Profile
+//    )
+//)
