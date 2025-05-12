@@ -1,37 +1,20 @@
 package dev.balikin.poject.ui.navigation
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.navigationBarsPadding
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.AccountCircle
-import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material.icons.outlined.CalendarMonth
-import androidx.compose.material.icons.outlined.History
-import androidx.compose.material.icons.outlined.Home
-import androidx.compose.material.icons.outlined.Payments
-import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
-import androidx.compose.material3.FloatingActionButton
-import androidx.compose.material3.FloatingActionButtonDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -45,12 +28,10 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.SpanStyle
@@ -58,7 +39,6 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -77,12 +57,18 @@ import dev.balikin.poject.features.auth.presentation.set_password.SetNewPassword
 import dev.balikin.poject.features.front_page.presentation.OnBoardingScreen
 import dev.balikin.poject.features.front_page.presentation.OnBoardingViewModel
 import dev.balikin.poject.features.home.presentation.HomeScreen
+import dev.balikin.poject.features.home.presentation.HomeViewModel
 import dev.balikin.poject.features.transaction.presentation.TransactionScreen
+import dev.balikin.poject.features.transaction.presentation.TransactionViewModel
 import dev.balikin.poject.ui.components.DefaultButton
 import dev.balikin.poject.ui.components.FilterScreen
-import dev.balikin.poject.ui.theme.grey2
-import dev.balikin.poject.ui.theme.primary_blue
 import dev.balikin.poject.utils.formattedDate
+import kotlinx.datetime.Clock
+import kotlinx.datetime.Instant
+import kotlinx.datetime.LocalDateTime
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toInstant
+import kotlinx.datetime.toLocalDateTime
 import org.koin.compose.viewmodel.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -94,6 +80,7 @@ fun SetupNavHost(navController: NavHostController) {
         skipPartiallyExpanded = true
     )
     var showBottomSheet by remember { mutableStateOf(false) }
+    val homeViewModel: HomeViewModel = koinViewModel()
 
     Scaffold(
         bottomBar = {
@@ -112,6 +99,7 @@ fun SetupNavHost(navController: NavHostController) {
             NavHostContent(
                 navController = navController,
                 innerPadding = innerPadding,
+                homeViewModel = homeViewModel
             )
             if (showBottomSheet) {
                 ModalBottomSheet(
@@ -119,7 +107,10 @@ fun SetupNavHost(navController: NavHostController) {
                     sheetState = sheetState,
                 ) {
                     AddTransactionBottomSheet(
-                        onSaveClicked = { showBottomSheet = false }
+                        viewModel = homeViewModel,
+                        onSaveClicked = {
+                            showBottomSheet = false
+                        }
                     )
                 }
             }
@@ -131,6 +122,7 @@ fun SetupNavHost(navController: NavHostController) {
 fun NavHostContent(
     navController: NavHostController,
     innerPadding: PaddingValues,
+    homeViewModel: HomeViewModel
 ) {
     NavHost(
         navController = navController,
@@ -156,7 +148,7 @@ fun NavHostContent(
             )
         }
         composable(Screen.Home.route) {
-            HomeScreen()
+            HomeScreen(viewModel = homeViewModel)
         }
         composable(Screen.ForgotPassword.route) {
             ForgotPasswordScreen(
@@ -191,14 +183,17 @@ fun NavHostContent(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun AddTransactionBottomSheet(onSaveClicked: () -> Unit = {}) {
-    var name by remember { mutableStateOf("Irfan Nur I") }
+private fun AddTransactionBottomSheet(
+    viewModel: HomeViewModel,
+    onSaveClicked: () -> Unit = {}
+) {
+    var name by remember { mutableStateOf("") }
     val transactionTypes = listOf("Utang", "Piutang")
     var expanded by remember { mutableStateOf(false) }
     var selectedType by remember { mutableStateOf("Utang") }
-    var amount by remember { mutableStateOf("450.000") }
+    var amount by remember { mutableStateOf("") }
     var date by remember { mutableStateOf("") }
-    var note by remember { mutableStateOf("Bekas beli burung") }
+    var note by remember { mutableStateOf("") }
     var showDatePicker by remember { mutableStateOf(false) }
 
     Column(
@@ -272,8 +267,9 @@ private fun AddTransactionBottomSheet(onSaveClicked: () -> Unit = {}) {
             }
 
             OutlinedTextField(
-                value = date,
+                value = formattedDate(date),
                 onValueChange = { date = it },
+                readOnly = true,
                 label = { RequiredLabel("Tanggal") },
                 modifier = Modifier.fillMaxWidth(),
                 trailingIcon = {
@@ -289,7 +285,15 @@ private fun AddTransactionBottomSheet(onSaveClicked: () -> Unit = {}) {
 
             if (showDatePicker) {
                 DatePickerModal(
-                    onDateSelected = { date = formattedDate(it ?: 0) },
+                    onDateSelected = { millis ->
+                        val localDate = millis?.let { Instant.fromEpochMilliseconds(it) }
+                            ?.toLocalDateTime(TimeZone.currentSystemDefault())?.date
+                        val currentTime = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).time
+
+                        val combined = localDate?.let { LocalDateTime(it, currentTime) }
+
+                        date = combined?.toString() ?: ""
+                    },
                     onDismiss = { showDatePicker = false }
                 )
             }
@@ -304,7 +308,16 @@ private fun AddTransactionBottomSheet(onSaveClicked: () -> Unit = {}) {
             )
 
             DefaultButton(
-                onClick = onSaveClicked,
+                onClick = {
+                    viewModel.addTransaction(
+                        name = name,
+                        date = date,
+                        note = note,
+                        amount = amount,
+                        type = selectedType
+                    )
+                    onSaveClicked()
+                },
                 modifier = Modifier.fillMaxWidth(),
                 text = "Simpan"
             )

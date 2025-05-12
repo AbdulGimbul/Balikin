@@ -4,6 +4,8 @@ import android.content.Context
 import android.content.Intent
 import dev.balikin.poject.MyApplication
 import androidx.core.net.toUri
+import java.text.NumberFormat
+import java.util.Locale
 
 class AndroidBrowserHelper(private val context: Context) : BrowserHelper {
     override fun openBrowser(url: String) {
@@ -15,3 +17,11 @@ class AndroidBrowserHelper(private val context: Context) : BrowserHelper {
 }
 
 actual fun getBrowserHelper(): BrowserHelper = AndroidBrowserHelper(MyApplication.appContext)
+
+actual fun currencyFormat(
+    amount: Double
+): String {
+    val indonesiaLocale = Locale("in", "ID")
+    val format = NumberFormat.getCurrencyInstance(indonesiaLocale)
+    return format.format(amount)
+}

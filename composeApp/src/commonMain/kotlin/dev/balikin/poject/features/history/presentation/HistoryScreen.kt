@@ -26,7 +26,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import dev.balikin.poject.features.transaction.data.dummyTransactions
 import dev.balikin.poject.ui.components.FilterButton
 import dev.balikin.poject.ui.components.TransactionItem
 import dev.balikin.poject.ui.theme.primary_text
@@ -82,9 +81,9 @@ fun HistoryScreen() {
             LazyColumn(
                 modifier = Modifier.padding(top = 16.dp)
             ) {
-                items(dummyTransactions) { trans ->
-                    TransactionItem(trans)
-                }
+//                items(dummyTransactions) { trans ->
+//                    TransactionItem(trans)
+//                }
             }
         }
     }

@@ -8,7 +8,11 @@ fun initKoin(config: KoinAppDeclaration? = null) {
         config?.invoke(this)
         modules(
             provideOnBoardingRepositoryModule,
-            provideAuthRepositoryModule
+            provideAuthRepositoryModule,
+            provideTransactionRepositoryModule,
+            provideHomeRepositoryModule,
+            provideLocalStorageModule,
+            platformModule
         )
     }
 }

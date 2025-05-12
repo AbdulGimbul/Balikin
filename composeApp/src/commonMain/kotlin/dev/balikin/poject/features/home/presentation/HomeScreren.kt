@@ -14,56 +14,70 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowForwardIos
 import androidx.compose.material.icons.outlined.Settings
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import balikin.composeapp.generated.resources.Res
 import balikin.composeapp.generated.resources.agus
 import balikin.composeapp.generated.resources.balikin_white
 import balikin.composeapp.generated.resources.bg_card
 import balikin.composeapp.generated.resources.chip
 import balikin.composeapp.generated.resources.money_wings
-import dev.balikin.poject.features.transaction.data.Transaction
-import dev.balikin.poject.features.transaction.data.dummyTransactions
+import dev.balikin.poject.features.transaction.data.TransactionType
 import dev.balikin.poject.ui.components.TransactionItem
-import dev.balikin.poject.ui.theme.green
 import dev.balikin.poject.ui.theme.grey2
 import dev.balikin.poject.ui.theme.primary_blue
 import dev.balikin.poject.ui.theme.primary_text
-import dev.balikin.poject.ui.theme.red
 import dev.balikin.poject.ui.theme.secondary_text
+import dev.balikin.poject.utils.currencyFormat
 import org.jetbrains.compose.resources.painterResource
 
 @Composable
-fun HomeScreen() {
+fun HomeScreen(viewModel: HomeViewModel) {
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+    Home(
+        uiState = uiState,
+        onEvent = viewModel::onEvent
+    )
+}
+
+@Composable
+fun Home(
+    uiState: HomeUiState,
+    onEvent: (HomeUiEvent) -> Unit
+) {
+
+    LaunchedEffect(uiState.selectedTab) {
+        val type = when (uiState.selectedTab.lowercase()) {
+            "utang" -> TransactionType.Utang
+            "piutang" -> TransactionType.Piutang
+            else -> TransactionType.Utang
+        }
+        onEvent(HomeUiEvent.LoadTotalAmountByType(type))
+    }
 
     Column(
         modifier = Modifier
@@ -106,11 +120,10 @@ fun HomeScreen() {
 
         Spacer(Modifier.height(24.dp))
 
-        var selectedTab by remember { mutableStateOf("Utang") }
         DebtCard(
-            totalDebt = "Rp. 897.900",
-            selectedTab = selectedTab,
-            onTabSelected = { selectedTab = it }
+            totalDebt = currencyFormat(uiState.totalAmount),
+            selectedTab = uiState.selectedTab,
+            onTabSelected = { onEvent(HomeUiEvent.OnToggleSelected(it)) }
         )
 
         Spacer(Modifier.height(24.dp))
@@ -163,7 +176,7 @@ fun HomeScreen() {
         LazyColumn(
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            items(dummyTransactions) { transaction ->
+            items(uiState.latestTransactions) { transaction ->
                 TransactionItem(transaction)
             }
         }
