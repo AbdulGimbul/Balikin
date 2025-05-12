@@ -27,7 +27,7 @@ import dev.balikin.poject.features.transaction.data.TransactionType
 import dev.balikin.poject.ui.theme.green
 import dev.balikin.poject.ui.theme.red
 import dev.balikin.poject.utils.currencyFormat
-import dev.balikin.poject.utils.formatDueDate
+import dev.balikin.poject.utils.formatDateCreated
 import org.jetbrains.compose.resources.painterResource
 
 @Composable
@@ -50,7 +50,7 @@ fun TransactionItem(transaction: TransactionEntity) {
                     fontSize = 16.sp
                 )
                 Text(
-                    text = formatDueDate(transaction.dueDate),
+                    text = formatDateCreated(transaction.createdAt),
                     color = Color.Gray,
                     fontSize = 14.sp
                 )
@@ -74,7 +74,7 @@ fun TransactionItem(transaction: TransactionEntity) {
                     fontSize = 16.sp
                 )
                 Text(
-                    text = transaction.type.toString(),
+                    text = transaction.type.name,
                     color = if (transaction.type == TransactionType.Utang) red else green,
                     fontSize = 14.sp
                 )

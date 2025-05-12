@@ -5,26 +5,27 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dev.balikin.poject.features.transaction.data.TransactionEntity
 import dev.balikin.poject.features.transaction.data.TransactionRepository
-import dev.balikin.poject.features.transaction.data.TransactionType
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import kotlinx.datetime.Clock
-import kotlinx.datetime.LocalDateTime
-import kotlinx.datetime.LocalDateTime.Companion
-import kotlinx.datetime.TimeZone
-import kotlinx.datetime.toLocalDateTime
 
 class TransactionViewModel(
     private val transactionRepository: TransactionRepository
 ) : ViewModel() {
 
-    private val _transactions = mutableStateListOf<TransactionEntity>()
+    private val _uiState = MutableStateFlow(TransactionUiState())
+    val uiState = _uiState.asStateFlow()
 
     init {
+        getAllTransactions()
+    }
+
+    fun getAllTransactions() {
         viewModelScope.launch {
-            transactionRepository.getAllTransactions().collect { newList ->
-                _transactions.clear()
-                _transactions.addAll(newList)
-            }
+            transactionRepository.getAllTransactions()
+                .collect { transactions ->
+                    _uiState.value = _uiState.value.copy(transactions = transactions)
+                }
         }
     }
 }

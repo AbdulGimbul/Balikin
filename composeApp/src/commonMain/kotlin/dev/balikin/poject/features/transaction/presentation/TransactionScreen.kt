@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
@@ -41,6 +42,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import balikin.composeapp.generated.resources.Res
 import balikin.composeapp.generated.resources.agus
 import balikin.composeapp.generated.resources.trans_piutang
@@ -50,9 +52,26 @@ import dev.balikin.poject.ui.theme.primary
 import dev.balikin.poject.ui.theme.primary_text
 import dev.balikin.poject.ui.theme.secondary_text
 import org.jetbrains.compose.resources.painterResource
+import androidx.compose.runtime.getValue
+import dev.balikin.poject.features.transaction.data.TransactionEntity
+import dev.balikin.poject.utils.currencyFormat
+import dev.balikin.poject.utils.formatDateCreated
+import dev.balikin.poject.utils.formattedDate
 
 @Composable
-fun TransactionScreen() {
+fun TransactionScreen(
+    viewModel: TransactionViewModel
+) {
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    Transaction(
+        uiState = uiState
+    )
+}
+
+@Composable
+fun Transaction(
+    uiState: TransactionUiState,
+) {
     Column(
         modifier = Modifier.fillMaxWidth()
     ) {
@@ -101,13 +120,9 @@ fun TransactionScreen() {
             LazyColumn(
                 modifier = Modifier.padding(top = 16.dp)
             ) {
-                items(10) {
+                items (uiState.transactions) { transaction ->
                     BillCard(
-                        name = "Winggar Waharjut",
-                        date = "17 Agustus",
-                        time = "12.22 PM",
-                        piutangAmount = "Rp.87.000",
-                        dueDate = "22 Dec 2025",
+                        transaction = transaction,
                         onTagihClick = { /* TODO: Handle tagih action */ },
                         modifier = Modifier
                             .fillMaxWidth()
@@ -121,11 +136,7 @@ fun TransactionScreen() {
 
 @Composable
 fun BillCard(
-    name: String,
-    date: String,
-    time: String,
-    piutangAmount: String,
-    dueDate: String,
+    transaction: TransactionEntity,
     onTagihClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -154,13 +165,13 @@ fun BillCard(
 
                 Column {
                     Text(
-                        text = name,
+                        text = transaction.name,
                         style = MaterialTheme.typography.titleMedium.copy(
                             fontWeight = FontWeight.SemiBold
                         )
                     )
                     Text(
-                        text = "$date ● $time",
+                        text = formatDateCreated(transaction.createdAt),
                         style = MaterialTheme.typography.bodyMedium.copy(
                             color = secondary_text
                         )
@@ -202,7 +213,7 @@ fun BillCard(
                             )
                         )
                         Text(
-                            text = piutangAmount,
+                            text = currencyFormat(transaction.amount.toDouble()),
                             style = MaterialTheme.typography.titleMedium.copy(
                                 fontWeight = FontWeight.SemiBold
                             )
@@ -219,7 +230,7 @@ fun BillCard(
                             )
                         )
                         Text(
-                            text = dueDate,
+                            text = formattedDate(transaction.dueDate.toString()),
                             style = MaterialTheme.typography.titleMedium.copy(
                                 fontWeight = FontWeight.SemiBold
                             )

@@ -1,9 +1,7 @@
 package dev.balikin.poject.utils
 
 import kotlinx.datetime.Clock
-import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDateTime
-import kotlinx.datetime.Month
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 
@@ -40,7 +38,7 @@ fun getCurrentFormattedDateTime(): String {
     return "$day $month $year, $hour:$minute WIB"
 }
 
-fun formatDueDate(dateTime: LocalDateTime): String {
+fun formatDateCreated(dateTime: LocalDateTime): String {
     val day = dateTime.dayOfMonth
     val month = formatMonthIndo(dateTime.monthNumber)
     val time = formatTimeTo12Hour(dateTime.hour, dateTime.minute)

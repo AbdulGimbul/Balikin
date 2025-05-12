@@ -169,7 +169,7 @@ fun NavHostContent(
             )
         }
         composable(Screen.Transaction.route) {
-            TransactionScreen()
+            TransactionScreen(viewModel = koinViewModel<TransactionViewModel>())
         }
         composable(Screen.FilterTrans.route) {
             FilterScreen()
