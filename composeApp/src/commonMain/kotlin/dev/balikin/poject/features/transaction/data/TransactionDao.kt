@@ -5,6 +5,7 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import kotlinx.coroutines.flow.Flow
+import kotlinx.datetime.LocalDateTime
 
 @Dao
 interface TransactionDao {
@@ -16,4 +17,29 @@ interface TransactionDao {
 
     @Query("SELECT SUM(amount) FROM transactions WHERE type = :type")
     suspend fun getTotalAmountByType(type: String): Double?
+
+    @Query(
+        "SELECT * FROM transactions WHERE " +
+                "(:type IS NULL OR type = :type) AND " +
+                "(createdAt BETWEEN :startDate AND :endDate) " +
+                "ORDER BY CASE WHEN :sortOrder = 'asc' THEN amount END ASC, " +
+                "CASE WHEN :sortOrder = 'desc' THEN amount END DESC"
+    )
+    fun getFilteredTransactions(
+        type: String?,
+        startDate: LocalDateTime,
+        endDate: LocalDateTime,
+        sortOrder: String
+    ): Flow<List<TransactionEntity>>
+
+    @Query(
+        "SELECT COUNT(*) FROM transactions WHERE " +
+                "(:type IS NULL OR type = :type) AND " +
+                "(createdAt BETWEEN :startDate AND :endDate)"
+    )
+    suspend fun countFilteredTransactions(
+        type: String?,
+        startDate: LocalDateTime,
+        endDate: LocalDateTime
+    ): Int
 }

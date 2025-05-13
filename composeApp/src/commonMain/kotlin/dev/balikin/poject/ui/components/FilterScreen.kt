@@ -34,20 +34,40 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.NavController
+import dev.balikin.poject.features.transaction.data.TransactionType
+import dev.balikin.poject.features.transaction.presentation.FilterParameters
+import dev.balikin.poject.features.transaction.presentation.TransactionViewModel
 import dev.balikin.poject.ui.theme.primary
+import dev.balikin.poject.utils.formatDate
+import dev.balikin.poject.utils.getCurrentDate
+import dev.balikin.poject.utils.getLastWeekDate
 import kotlinx.datetime.Clock
-import kotlinx.datetime.DatePeriod
 import kotlinx.datetime.Instant
-import kotlinx.datetime.LocalDate
+import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
-import kotlinx.datetime.minus
 import kotlinx.datetime.toLocalDateTime
 
 @Composable
-fun FilterScreen() {
+fun FilterScreen(viewModel: TransactionViewModel, navController: NavController) {
+    val previewCount by viewModel.filterPreviewCount.collectAsStateWithLifecycle()
+
     Column(modifier = Modifier.fillMaxWidth()) {
         FilterHeader(onBackClick = { })
-        FilterContent()
+        FilterContent(
+            filterCount = previewCount,
+            onApplyFilters = { params ->
+                viewModel.applyUserFilters(
+                    type = params.type,
+                    sortOrder = params.sortOrder,
+                    startDate = params.startDate,
+                    endDate = params.endDate
+                )
+                navController.popBackStack()
+            },
+            viewModel = viewModel
+        )
     }
 }
 
@@ -80,11 +100,23 @@ fun FilterHeader(onBackClick: () -> Unit) {
 }
 
 @Composable
-fun FilterContent() {
-    var startDate by remember { mutableStateOf<LocalDate?>(null) }
-    var endDate by remember { mutableStateOf<LocalDate?>(null) }
-    val lastWeekStart = getLastWeekStartDate()
-    val currentDate = getCurrentDate()
+fun FilterContent(
+    filterCount: Int,
+    onApplyFilters: (FilterParameters) -> Unit,
+    viewModel: TransactionViewModel
+) {
+    var selectedType by remember { mutableStateOf<TransactionType?>(null) }
+    var selectedSortOrder by remember { mutableStateOf("asc") }
+    var startDate by remember { mutableStateOf(getLastWeekDate()) }
+    var endDate by remember { mutableStateOf(getCurrentDate()) }
+
+    LaunchedEffect(selectedType, startDate, endDate) {
+        viewModel.previewFilterResultCount(
+            type = selectedType,
+            startDate = startDate,
+            endDate = endDate
+        )
+    }
 
     Column(
         modifier = Modifier
@@ -94,12 +126,21 @@ fun FilterContent() {
     ) {
         FilterSection(
             title = "Jenis",
-            filterOptions = listOf("Utang", "Piutang")
+            filterOptions = listOf("Utang", "Piutang"),
+            selectedOption = selectedType?.name,
+            onOptionSelected = { option ->
+                selectedType =
+                    if (selectedType?.name == option) null else TransactionType.valueOf(option)
+            }
         )
         HorizontalDivider(modifier = Modifier.padding(bottom = 8.dp))
         FilterSection(
             title = "Sort",
-            filterOptions = listOf("Terkecil", "Terbesar")
+            filterOptions = listOf("Terkecil", "Terbesar"),
+            selectedOption = if (selectedSortOrder == "asc") "Terkecil" else "Terbesar",
+            onOptionSelected = { option ->
+                selectedSortOrder = if (option == "Terkecil") "asc" else "desc"
+            }
         )
         HorizontalDivider(modifier = Modifier.padding(bottom = 8.dp))
         Text(
@@ -107,22 +148,44 @@ fun FilterContent() {
             style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.SemiBold),
         )
         DateFilterChips(
-            initStartDate = startDate ?: lastWeekStart,
-            initEndDate = endDate ?: currentDate,
-            onStartDateChange = { startDate = it },
-            onEndDateChange = { endDate = it }
+            initStartDate = startDate,
+            initEndDate = endDate,
+            onStartDateChange = {
+                if (it != null) {
+                    startDate = it
+                }
+            },
+            onEndDateChange = {
+                if (it != null) {
+                    endDate = it
+                }
+            }
         )
         Spacer(modifier = Modifier.weight(1f))
         DefaultButton(
-            text = "Show 42 result",
-            onClick = { /* Handle apply button click */ },
+            text = "Show $filterCount result",
+            onClick = {
+                onApplyFilters(
+                    FilterParameters(
+                        selectedType,
+                        selectedSortOrder,
+                        startDate,
+                        endDate
+                    )
+                )
+            },
             modifier = Modifier.fillMaxWidth()
         )
     }
 }
 
 @Composable
-fun FilterSection(title: String, filterOptions: List<String>) {
+fun FilterSection(
+    title: String,
+    filterOptions: List<String>,
+    selectedOption: String?,
+    onOptionSelected: (String) -> Unit
+) {
     Column(modifier = Modifier.fillMaxWidth()) {
         Text(
             text = title,
@@ -136,8 +199,8 @@ fun FilterSection(title: String, filterOptions: List<String>) {
         ) {
             filterOptions.forEachIndexed { index, option ->
                 FilterChip(
-                    selected = index == 0,
-                    onClick = {},
+                    selected = selectedOption == option,
+                    onClick = { onOptionSelected(option) },
                     label = { Text(option) }
                 )
             }
@@ -148,13 +211,13 @@ fun FilterSection(title: String, filterOptions: List<String>) {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DateFilterChips(
-    initStartDate: LocalDate,
-    initEndDate: LocalDate,
-    onStartDateChange: (LocalDate?) -> Unit,
-    onEndDateChange: (LocalDate?) -> Unit
+    initStartDate: LocalDateTime,
+    initEndDate: LocalDateTime,
+    onStartDateChange: (LocalDateTime?) -> Unit,
+    onEndDateChange: (LocalDateTime?) -> Unit
 ) {
-    var startDate by remember { mutableStateOf<LocalDate?>(initStartDate) }
-    var endDate by remember { mutableStateOf<LocalDate?>(initEndDate) }
+    var startDate by remember { mutableStateOf<LocalDateTime?>(initStartDate) }
+    var endDate by remember { mutableStateOf<LocalDateTime?>(initEndDate) }
     var showStartDatePicker by remember { mutableStateOf(false) }
     var showEndDatePicker by remember { mutableStateOf(false) }
 
@@ -171,7 +234,8 @@ fun DateFilterChips(
             onClick = { showStartDatePicker = true },
             label = {
                 Text(
-                    text = startDate?.let { formatDate(it) } ?: "Start Date", modifier = Modifier.padding(vertical = 12.dp)
+                    text = startDate?.let { formatDate(it) } ?: "Start Date",
+                    modifier = Modifier.padding(vertical = 12.dp)
                 )
             },
             leadingIcon = {
@@ -191,7 +255,8 @@ fun DateFilterChips(
             onClick = { showEndDatePicker = true },
             label = {
                 Text(
-                    text = endDate?.let { formatDate(it) } ?: "End Date",  modifier = Modifier.padding(vertical = 12.dp)
+                    text = endDate?.let { formatDate(it) } ?: "End Date",
+                    modifier = Modifier.padding(vertical = 12.dp)
                 )
             },
             leadingIcon = {
@@ -229,14 +294,14 @@ fun DateFilterChips(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CustomDatePickerDialog(
-    onDateSelected: (LocalDate) -> Unit,
+    onDateSelected: (LocalDateTime) -> Unit,
     onDismiss: () -> Unit
 ) {
     val datePickerState = rememberDatePickerState(
         initialSelectedDateMillis = Clock.System.now().toEpochMilliseconds(),
     )
     val selectedDate = datePickerState.selectedDateMillis?.let {
-        Instant.fromEpochMilliseconds(it).toLocalDateTime(TimeZone.currentSystemDefault()).date
+        Instant.fromEpochMilliseconds(it).toLocalDateTime(TimeZone.currentSystemDefault())
     }
     DatePickerDialog(
         onDismissRequest = onDismiss,
@@ -259,20 +324,4 @@ fun CustomDatePickerDialog(
             state = datePickerState,
         )
     }
-}
-
-fun formatDate(date: LocalDate): String {
-    val day = date.dayOfMonth.toString().padStart(2, '0')
-    val month = date.month.name.substring(0, 3).lowercase()
-    val year = date.year
-    return "$day $month $year"
-}
-
-fun getLastWeekStartDate(): LocalDate {
-    val today = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date
-    return today.minus(DatePeriod(days = 7))
-}
-
-fun getCurrentDate(): LocalDate {
-    return Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date
 }

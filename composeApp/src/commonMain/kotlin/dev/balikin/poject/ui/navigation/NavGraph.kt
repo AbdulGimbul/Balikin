@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.CalendarMonth
 import androidx.compose.material3.DatePicker
@@ -36,6 +37,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
@@ -62,12 +64,13 @@ import dev.balikin.poject.features.transaction.presentation.TransactionScreen
 import dev.balikin.poject.features.transaction.presentation.TransactionViewModel
 import dev.balikin.poject.ui.components.DefaultButton
 import dev.balikin.poject.ui.components.FilterScreen
+import dev.balikin.poject.utils.formatDate
 import dev.balikin.poject.utils.formattedDate
+import dev.balikin.poject.utils.getCurrentDate
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
-import kotlinx.datetime.toInstant
 import kotlinx.datetime.toLocalDateTime
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -124,9 +127,11 @@ fun NavHostContent(
     innerPadding: PaddingValues,
     homeViewModel: HomeViewModel
 ) {
+    val transactionViewModel: TransactionViewModel = koinViewModel()
+
     NavHost(
         navController = navController,
-        startDestination = Screen.Profile.route,
+        startDestination = Screen.Home.route,
         modifier = Modifier.padding(innerPadding)
     ) {
         composable(Screen.Login.route) {
@@ -169,10 +174,13 @@ fun NavHostContent(
             )
         }
         composable(Screen.Transaction.route) {
-            TransactionScreen(viewModel = koinViewModel<TransactionViewModel>())
+            TransactionScreen(viewModel = transactionViewModel, navController = navController)
         }
         composable(Screen.FilterTrans.route) {
-            FilterScreen()
+            FilterScreen(
+                viewModel = transactionViewModel,
+                navController = navController
+            )
         }
         composable(Screen.Profile.route) {
             ProfileScreen()
@@ -192,7 +200,7 @@ private fun AddTransactionBottomSheet(
     var expanded by remember { mutableStateOf(false) }
     var selectedType by remember { mutableStateOf("Utang") }
     var amount by remember { mutableStateOf("") }
-    var date by remember { mutableStateOf("") }
+    var date by remember { mutableStateOf<LocalDateTime>(getCurrentDate()) }
     var note by remember { mutableStateOf("") }
     var showDatePicker by remember { mutableStateOf(false) }
 
@@ -259,16 +267,23 @@ private fun AddTransactionBottomSheet(
 
                 OutlinedTextField(
                     value = amount,
-                    onValueChange = { amount = it },
+                    onValueChange = { newValue ->
+                        if (newValue.all { it.isDigit() }) {
+                            amount = newValue
+                        }
+                    },
                     label = { RequiredLabel("Amount") },
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier.weight(1f),
+                    keyboardOptions = KeyboardOptions.Default.copy(
+                        keyboardType = KeyboardType.Number
+                    )
                 )
 
             }
 
             OutlinedTextField(
-                value = formattedDate(date),
-                onValueChange = { date = it },
+                value = formatDate(date),
+                onValueChange = {  },
                 readOnly = true,
                 label = { RequiredLabel("Tanggal") },
                 modifier = Modifier.fillMaxWidth(),
@@ -288,11 +303,14 @@ private fun AddTransactionBottomSheet(
                     onDateSelected = { millis ->
                         val localDate = millis?.let { Instant.fromEpochMilliseconds(it) }
                             ?.toLocalDateTime(TimeZone.currentSystemDefault())?.date
-                        val currentTime = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).time
+                        val currentTime =
+                            Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).time
 
                         val combined = localDate?.let { LocalDateTime(it, currentTime) }
 
-                        date = combined?.toString() ?: ""
+                        if (combined != null) {
+                            date = combined
+                        }
                     },
                     onDismiss = { showDatePicker = false }
                 )
@@ -311,7 +329,7 @@ private fun AddTransactionBottomSheet(
                 onClick = {
                     viewModel.addTransaction(
                         name = name,
-                        date = date,
+                        date = date.toString(),
                         note = note,
                         amount = amount,
                         type = selectedType
@@ -327,7 +345,6 @@ private fun AddTransactionBottomSheet(
 
 @Composable
 fun RequiredLabel(label: String) {
-    // Use an AnnotatedString to color only the asterisk
     Text(
         buildAnnotatedString {
             append(label)

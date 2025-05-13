@@ -1,8 +1,11 @@
 package dev.balikin.poject.utils
 
 import kotlinx.datetime.Clock
+import kotlinx.datetime.DateTimePeriod
+import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
+import kotlinx.datetime.minus
 import kotlinx.datetime.toLocalDateTime
 
 expect fun currencyFormat(amount: Double): String
@@ -59,4 +62,24 @@ fun formatTimeTo12Hour(hour: Int, minute: Int): String {
     val minuteStr = if (minute < 10) "0$minute" else "$minute"
     val hourStr = if (hour12 < 10) "0$hour12" else "$hour12"
     return "$hourStr.$minuteStr $amPm"
+}
+
+fun formatDate(date: LocalDateTime): String {
+    val day = date.dayOfMonth.toString().padStart(2, '0')
+    val month = date.month.name.substring(0, 3).lowercase().replaceFirstChar { it.uppercase() }
+    val year = date.year
+    return "$day $month $year"
+}
+
+fun getLastWeekDate(): LocalDateTime {
+    val now = Clock.System.now()
+    val lastWeekInstant = now.minus(
+        DateTimePeriod(days = 7),
+        TimeZone.currentSystemDefault()
+    )
+    return lastWeekInstant.toLocalDateTime(TimeZone.currentSystemDefault())
+}
+
+fun getCurrentDate(): LocalDateTime {
+    return Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
 }

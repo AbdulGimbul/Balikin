@@ -1,6 +1,7 @@
 package dev.balikin.poject.features.transaction.data
 
 import kotlinx.coroutines.flow.Flow
+import kotlinx.datetime.LocalDateTime
 
 class TransactionRepositoryImpl(
     private val transactionDao: TransactionDao
@@ -15,5 +16,27 @@ class TransactionRepositoryImpl(
 
     override suspend fun getTotalAmountByType(type: TransactionType): Double? {
         return transactionDao.getTotalAmountByType(type.name) ?: 0.0
+    }
+
+    override fun getFilteredTransactions(
+        type: String?,
+        startDate: LocalDateTime,
+        endDate: LocalDateTime,
+        sortOrder: String
+    ): Flow<List<TransactionEntity>> {
+        return transactionDao.getFilteredTransactions(
+            type,
+            startDate,
+            endDate,
+            sortOrder
+        )
+    }
+
+    override suspend fun countFilteredTransactions(
+        type: String?,
+        startDate: LocalDateTime,
+        endDate: LocalDateTime
+    ): Int {
+        return transactionDao.countFilteredTransactions(type, startDate, endDate)
     }
 }

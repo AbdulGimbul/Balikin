@@ -2,6 +2,7 @@ package dev.balikin.poject.features.transaction.presentation
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -19,20 +20,19 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.FilterList
-import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.FilterChip
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -43,34 +43,45 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.NavController
 import balikin.composeapp.generated.resources.Res
 import balikin.composeapp.generated.resources.agus
+import balikin.composeapp.generated.resources.rm_tag
 import balikin.composeapp.generated.resources.trans_piutang
+import dev.balikin.poject.features.transaction.data.TransactionEntity
 import dev.balikin.poject.ui.components.FilterButton
+import dev.balikin.poject.ui.navigation.Screen
 import dev.balikin.poject.ui.theme.grey2
-import dev.balikin.poject.ui.theme.primary
+import dev.balikin.poject.ui.theme.orange
+import dev.balikin.poject.ui.theme.primary_blue
 import dev.balikin.poject.ui.theme.primary_text
 import dev.balikin.poject.ui.theme.secondary_text
-import org.jetbrains.compose.resources.painterResource
-import androidx.compose.runtime.getValue
-import dev.balikin.poject.features.transaction.data.TransactionEntity
 import dev.balikin.poject.utils.currencyFormat
+import dev.balikin.poject.utils.formatDate
 import dev.balikin.poject.utils.formatDateCreated
-import dev.balikin.poject.utils.formattedDate
+import org.jetbrains.compose.resources.painterResource
 
 @Composable
 fun TransactionScreen(
-    viewModel: TransactionViewModel
+    viewModel: TransactionViewModel,
+    navController: NavController
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
     Transaction(
-        uiState = uiState
+        uiState = uiState,
+        onEvent = viewModel::onEvent,
+        moveToFilter = {
+            navController.navigate(Screen.FilterTrans.route)
+        }
     )
 }
 
 @Composable
 fun Transaction(
     uiState: TransactionUiState,
+    onEvent: (TransactionUiEvent) -> Unit,
+    moveToFilter: () -> Unit
 ) {
     Column(
         modifier = Modifier.fillMaxWidth()
@@ -115,12 +126,21 @@ fun Transaction(
                         .weight(1f)
                 )
                 Spacer(modifier = Modifier.width(8.dp))
-                FilterButton(onClick = {})
+                FilterButton(onClick = moveToFilter)
+            }
+            // Display filter chips
+            uiState.appliedFilters?.let { filters ->
+                FilterTags(
+                    filters = filters,
+                    onRemoveDate = { onEvent(TransactionUiEvent.OnRemoveDate) },
+                    onRemoveSort = { onEvent(TransactionUiEvent.OnRemoveSort) },
+                    onRemoveType = { onEvent(TransactionUiEvent.OnRemoveType) }
+                )
             }
             LazyColumn(
                 modifier = Modifier.padding(top = 16.dp)
             ) {
-                items (uiState.transactions) { transaction ->
+                items(uiState.transactions) { transaction ->
                     BillCard(
                         transaction = transaction,
                         onTagihClick = { /* TODO: Handle tagih action */ },
@@ -130,6 +150,67 @@ fun Transaction(
                     )
                 }
             }
+        }
+    }
+}
+
+@Composable
+fun FilterTags(
+    filters: FilterParameters,
+    onRemoveType: () -> Unit,
+    onRemoveSort: () -> Unit,
+    onRemoveDate: () -> Unit
+) {
+    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        filters.type?.let { type ->
+            FilterChip(
+                label = { Text(type.name, style = MaterialTheme.typography.labelSmall) },
+                selected = true,
+                onClick = onRemoveType,
+                leadingIcon = {
+                    Icon(
+                        painter = painterResource(Res.drawable.rm_tag),
+                        contentDescription = null
+                    )
+                }
+            )
+        }
+        filters.sortOrder?.let { sort ->
+            FilterChip(
+                label = {
+                    Text(
+                        if (sort == "asc") "Terkecil" else "Terbesar",
+                        style = MaterialTheme.typography.labelSmall
+                    )
+                },
+                selected = true,
+                onClick = onRemoveSort,
+                leadingIcon = {
+                    Icon(
+                        painter = painterResource(Res.drawable.rm_tag),
+                        contentDescription = null
+                    )
+                },
+            )
+        }
+
+        if (filters.startDate != null && filters.endDate != null) {
+            FilterChip(
+                label = {
+                    Text(
+                        text = "${formatDate(filters.startDate)} - ${formatDate(filters.endDate)}",
+                        style = MaterialTheme.typography.labelSmall
+                    )
+                },
+                selected = true,
+                onClick = onRemoveDate,
+                leadingIcon = {
+                    Icon(
+                        painter = painterResource(Res.drawable.rm_tag),
+                        contentDescription = null
+                    )
+                },
+            )
         }
     }
 }
@@ -180,15 +261,20 @@ fun BillCard(
 
                 Spacer(modifier = Modifier.weight(1f))
 
-                Button(
+                TextButton(
                     onClick = onTagihClick,
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = Color(0xFFFFECE5),
-                        contentColor = Color(0xFFFF7A00)
+                        containerColor = if (transaction.type.name.lowercase() == "piutang") orange.copy(
+                            alpha = 0.15f
+                        ) else primary_blue.copy(alpha = 0.15f),
+                        contentColor = if (transaction.type.name.lowercase() == "piutang") orange else primary_blue
                     ),
                     shape = RoundedCornerShape(50)
                 ) {
-                    Text(text = "Tagih →")
+                    Text(
+                        text = if (transaction.type.name.lowercase() == "piutang") "Tagih →" else "Bayar →",
+                        modifier = Modifier.padding(horizontal = 4.dp)
+                    )
                 }
             }
 
@@ -230,7 +316,7 @@ fun BillCard(
                             )
                         )
                         Text(
-                            text = formattedDate(transaction.dueDate.toString()),
+                            text = formatDate(transaction.dueDate),
                             style = MaterialTheme.typography.titleMedium.copy(
                                 fontWeight = FontWeight.SemiBold
                             )
