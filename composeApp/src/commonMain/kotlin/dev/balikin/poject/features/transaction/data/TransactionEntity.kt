@@ -16,8 +16,10 @@ data class TransactionEntity(
     val note: String,
     val amount: Double,
     val type: TransactionType,
+    val isPaid: Boolean = false,
+    val paidAt: LocalDateTime? = null,
     val createdAt: LocalDateTime = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()),
-    val updatedAt: LocalDateTime = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
+    val updatedAt: LocalDateTime? = null
 )
 
 enum class TransactionType {

@@ -39,4 +39,8 @@ class TransactionRepositoryImpl(
     ): Int {
         return transactionDao.countFilteredTransactions(type, startDate, endDate)
     }
+
+    override suspend fun markTransactionAsPaid(transactionId: Long) {
+        transactionDao.markTransactionAsPaid(transactionId)
+    }
 }

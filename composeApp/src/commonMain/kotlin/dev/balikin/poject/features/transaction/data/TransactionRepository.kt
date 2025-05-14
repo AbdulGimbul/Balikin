@@ -20,4 +20,6 @@ interface TransactionRepository {
         startDate: LocalDateTime,
         endDate: LocalDateTime
     ): Int
+
+    suspend fun markTransactionAsPaid(transactionId: Long)
 }

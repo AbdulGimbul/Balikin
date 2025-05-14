@@ -20,19 +20,41 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.NavController
 import dev.balikin.poject.ui.components.FilterButton
+import dev.balikin.poject.ui.components.FilterTags
 import dev.balikin.poject.ui.components.TransactionItem
+import dev.balikin.poject.ui.navigation.Screen
 import dev.balikin.poject.ui.theme.primary_text
 import dev.balikin.poject.ui.theme.secondary_text
 
 @Composable
-fun HistoryScreen() {
+fun HistoryScreen(viewModel: HistoryViewModel, navController: NavController) {
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+    History(
+        uiState = uiState,
+        onEvent = viewModel::onEvent,
+        moveToFilter = {
+//            navController.navigate(Screen.FilterHistory.route)
+        }
+    )
+}
+
+@Composable
+fun History(
+    uiState: HistoryUiState,
+    onEvent: (HistoryUiEvent) -> Unit,
+    moveToFilter: () -> Unit
+) {
     Column(
         modifier = Modifier.fillMaxWidth()
     ) {
@@ -76,14 +98,22 @@ fun HistoryScreen() {
                         .weight(1f)
                 )
                 Spacer(modifier = Modifier.width(8.dp))
-                FilterButton(onClick = {})
+                FilterButton(onClick = moveToFilter)
+            }
+            uiState.appliedFilters?.let { filters ->
+                FilterTags(
+                    filters = filters,
+                    onRemoveDate = { onEvent(HistoryUiEvent.OnRemoveDate) },
+                    onRemoveSort = { onEvent(HistoryUiEvent.OnRemoveSort) },
+                    onRemoveType = { onEvent(HistoryUiEvent.OnRemoveType) }
+                )
             }
             LazyColumn(
                 modifier = Modifier.padding(top = 16.dp)
             ) {
-//                items(dummyTransactions) { trans ->
-//                    TransactionItem(trans)
-//                }
+                items(uiState.transactions) { trans ->
+                    TransactionItem(trans)
+                }
             }
         }
     }

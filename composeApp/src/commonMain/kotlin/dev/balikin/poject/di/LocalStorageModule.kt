@@ -13,4 +13,5 @@ val provideLocalStorageModule = module {
             .build()
     }
     single { get<BalikinDatabase>().transactionDao }
+    single { get<BalikinDatabase>().historyDao }
 }

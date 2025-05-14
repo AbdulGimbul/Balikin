@@ -49,12 +49,16 @@ import balikin.composeapp.generated.resources.rm_tag
 import balikin.composeapp.generated.resources.trans_piutang
 import balikin.composeapp.generated.resources.trans_utang
 import dev.balikin.poject.features.transaction.data.TransactionEntity
+import dev.balikin.poject.features.transaction.data.TransactionType
 import dev.balikin.poject.ui.components.FilterButton
+import dev.balikin.poject.ui.components.FilterTags
 import dev.balikin.poject.ui.navigation.Screen
+import dev.balikin.poject.ui.theme.green
 import dev.balikin.poject.ui.theme.grey2
 import dev.balikin.poject.ui.theme.orange
 import dev.balikin.poject.ui.theme.primary_blue
 import dev.balikin.poject.ui.theme.primary_text
+import dev.balikin.poject.ui.theme.red
 import dev.balikin.poject.ui.theme.secondary_text
 import dev.balikin.poject.utils.currencyFormat
 import dev.balikin.poject.utils.formatDate
@@ -155,67 +159,6 @@ fun Transaction(
 }
 
 @Composable
-fun FilterTags(
-    filters: FilterParameters,
-    onRemoveType: () -> Unit,
-    onRemoveSort: () -> Unit,
-    onRemoveDate: () -> Unit
-) {
-    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-        filters.type?.let { type ->
-            FilterChip(
-                label = { Text(type.name, style = MaterialTheme.typography.labelSmall) },
-                selected = true,
-                onClick = onRemoveType,
-                leadingIcon = {
-                    Icon(
-                        painter = painterResource(Res.drawable.rm_tag),
-                        contentDescription = null
-                    )
-                }
-            )
-        }
-        filters.sortOrder?.let { sort ->
-            FilterChip(
-                label = {
-                    Text(
-                        if (sort == "asc") "Terkecil" else "Terbesar",
-                        style = MaterialTheme.typography.labelSmall
-                    )
-                },
-                selected = true,
-                onClick = onRemoveSort,
-                leadingIcon = {
-                    Icon(
-                        painter = painterResource(Res.drawable.rm_tag),
-                        contentDescription = null
-                    )
-                },
-            )
-        }
-
-        if (filters.startDate != null && filters.endDate != null) {
-            FilterChip(
-                label = {
-                    Text(
-                        text = "${formatDate(filters.startDate)} - ${formatDate(filters.endDate)}",
-                        style = MaterialTheme.typography.labelSmall
-                    )
-                },
-                selected = true,
-                onClick = onRemoveDate,
-                leadingIcon = {
-                    Icon(
-                        painter = painterResource(Res.drawable.rm_tag),
-                        contentDescription = null
-                    )
-                },
-            )
-        }
-    }
-}
-
-@Composable
 fun BillCard(
     transaction: TransactionEntity,
     onTagihClick: () -> Unit,
@@ -227,65 +170,58 @@ fun BillCard(
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
 
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Box(
-                    modifier = Modifier
-                        .size(48.dp)
-                        .clip(CircleShape)
-                        .background(Color.Gray)
-                ) {
-                    Image(
-                        painter = painterResource(Res.drawable.agus),
-                        contentDescription = null,
-                        contentScale = ContentScale.Fit,
-                        modifier = Modifier.fillMaxSize()
-                    )
-                }
-
-                Spacer(modifier = Modifier.width(8.dp))
-
-                Column {
-                    Text(
-                        text = transaction.name,
-                        style = MaterialTheme.typography.titleMedium.copy(
-                            fontWeight = FontWeight.SemiBold
+            Row(verticalAlignment = Alignment.Top) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Box(
+                        modifier = Modifier
+                            .size(48.dp)
+                            .clip(CircleShape)
+                            .background(Color.Gray)
+                    ) {
+                        Image(
+                            painter = painterResource(Res.drawable.agus),
+                            contentDescription = null,
+                            contentScale = ContentScale.Fit,
+                            modifier = Modifier.fillMaxSize()
                         )
-                    )
-                    Text(
-                        text = formatDateCreated(transaction.createdAt),
-                        style = MaterialTheme.typography.bodyMedium.copy(
-                            color = secondary_text
+                    }
+
+                    Spacer(modifier = Modifier.width(8.dp))
+
+                    Column {
+                        Text(
+                            text = transaction.name,
+                            style = MaterialTheme.typography.titleMedium.copy(
+                                fontWeight = FontWeight.SemiBold
+                            )
                         )
-                    )
+                        Text(
+                            text = formatDateCreated(transaction.createdAt),
+                            style = MaterialTheme.typography.bodyMedium.copy(
+                                color = secondary_text
+                            )
+                        )
+                    }
                 }
 
                 Spacer(modifier = Modifier.weight(1f))
-
-//                TextButton(
-//                    onClick = onTagihClick,
-//                    colors = ButtonDefaults.buttonColors(
-//                        containerColor = if (transaction.type.name.lowercase() == "piutang") orange.copy(
-//                            alpha = 0.15f
-//                        ) else primary_blue.copy(alpha = 0.15f),
-//                        contentColor = if (transaction.type.name.lowercase() == "piutang") orange else primary_blue
-//                    ),
-//                    shape = RoundedCornerShape(50)
-//                ) {
-//                    Text(
-//                        text = if (transaction.type.name.lowercase() == "piutang") "Tagih →" else "Bayar →",
-//                        modifier = Modifier.padding(horizontal = 4.dp)
-//                    )
-//                }
-                val roundedShape = RoundedCornerShape(50)
-                Text(
-                    text = if (transaction.type.name.lowercase() == "piutang") "Tagih →" else "Bayar →",
-                    modifier = Modifier.clip(roundedShape).clickable { }.background(
-                        color = if (transaction.type.name.lowercase() == "piutang") orange.copy(
-                            alpha = 0.15f,
-                        ) else primary_blue.copy(alpha = 0.15f), shape = roundedShape
-                    ).padding(horizontal = 10.dp, vertical = 4.dp),
-                    color = if (transaction.type.name.lowercase() == "piutang") orange else primary_blue
-                )
+                Row {
+                    val roundedShape = RoundedCornerShape(50)
+                    Text(
+                        text = if (transaction.type.name.lowercase() == "piutang") "Tagih →" else "Bayar →",
+                        modifier = Modifier
+                            .clip(roundedShape)
+                            .clickable { }
+                            .background(
+                                color = if (transaction.type.name.lowercase() == "piutang")
+                                    orange.copy(alpha = 0.15f) else primary_blue.copy(alpha = 0.15f),
+                                shape = roundedShape
+                            )
+                            .padding(horizontal = 10.dp, vertical = 4.dp),
+                        color = if (transaction.type.name.lowercase() == "piutang") orange else primary_blue,
+                        style = MaterialTheme.typography.labelLarge
+                    )
+                }
             }
 
             Spacer(modifier = Modifier.height(12.dp))
@@ -303,9 +239,9 @@ fun BillCard(
                 ) {
                     Column {
                         Text(
-                            text = "Piutang",
+                            text = transaction.type.name,
                             style = MaterialTheme.typography.bodyMedium.copy(
-                                color = grey2
+                                color = if (transaction.type == TransactionType.Utang) red else green
                             )
                         )
                         Text(

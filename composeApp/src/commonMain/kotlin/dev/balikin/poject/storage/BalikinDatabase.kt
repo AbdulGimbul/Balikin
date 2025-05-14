@@ -5,6 +5,7 @@ import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.room.RoomDatabaseConstructor
 import androidx.room.TypeConverters
+import dev.balikin.poject.features.history.data.HistoryDao
 import dev.balikin.poject.features.transaction.data.TransactionDao
 import dev.balikin.poject.features.transaction.data.TransactionEntity
 
@@ -16,6 +17,7 @@ import dev.balikin.poject.features.transaction.data.TransactionEntity
 @ConstructedBy(BalikinDatabaseConstructor::class)
 abstract class BalikinDatabase : RoomDatabase() {
     abstract val transactionDao: TransactionDao
+    abstract val historyDao: HistoryDao
 
     companion object {
         const val DB_NAME = "balikin.db"

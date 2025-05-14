@@ -21,7 +21,7 @@ interface TransactionDao {
     @Query(
         "SELECT * FROM transactions WHERE " +
                 "(:type IS NULL OR type = :type) AND " +
-                "(createdAt BETWEEN :startDate AND :endDate) " +
+                "(createdAt BETWEEN :startDate AND :endDate) AND isPaid = 0 " +
                 "ORDER BY CASE WHEN :sortOrder = 'asc' THEN amount END ASC, " +
                 "CASE WHEN :sortOrder = 'desc' THEN amount END DESC"
     )
@@ -34,7 +34,7 @@ interface TransactionDao {
 
     @Query(
         "SELECT COUNT(*) FROM transactions WHERE " +
-                "(:type IS NULL OR type = :type) AND " +
+                "(:type IS NULL OR type = :type) AND isPaid = 0 AND " +
                 "(createdAt BETWEEN :startDate AND :endDate)"
     )
     suspend fun countFilteredTransactions(
@@ -42,4 +42,7 @@ interface TransactionDao {
         startDate: LocalDateTime,
         endDate: LocalDateTime
     ): Int
+
+    @Query("UPDATE transactions SET isPaid = 1 WHERE id = :transactionId")
+    suspend fun markTransactionAsPaid(transactionId: Long)
 }
