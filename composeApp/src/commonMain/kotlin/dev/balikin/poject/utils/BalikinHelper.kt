@@ -5,6 +5,7 @@ import kotlinx.datetime.DateTimePeriod
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
+import kotlinx.datetime.atTime
 import kotlinx.datetime.minus
 import kotlinx.datetime.toLocalDateTime
 
@@ -77,9 +78,9 @@ fun getLastWeekDate(): LocalDateTime {
         DateTimePeriod(days = 7),
         TimeZone.currentSystemDefault()
     )
-    return lastWeekInstant.toLocalDateTime(TimeZone.currentSystemDefault())
+    return lastWeekInstant.toLocalDateTime(TimeZone.currentSystemDefault()).date.atTime(0, 0, 0)
 }
 
 fun getCurrentDate(): LocalDateTime {
-    return Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
+    return Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date.atTime(23, 59, 59)
 }

@@ -2,6 +2,7 @@ package dev.balikin.poject.features.transaction.presentation
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -21,7 +22,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -30,7 +30,6 @@ import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -48,6 +47,7 @@ import balikin.composeapp.generated.resources.Res
 import balikin.composeapp.generated.resources.agus
 import balikin.composeapp.generated.resources.rm_tag
 import balikin.composeapp.generated.resources.trans_piutang
+import balikin.composeapp.generated.resources.trans_utang
 import dev.balikin.poject.features.transaction.data.TransactionEntity
 import dev.balikin.poject.ui.components.FilterButton
 import dev.balikin.poject.ui.navigation.Screen
@@ -261,21 +261,31 @@ fun BillCard(
 
                 Spacer(modifier = Modifier.weight(1f))
 
-                TextButton(
-                    onClick = onTagihClick,
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = if (transaction.type.name.lowercase() == "piutang") orange.copy(
-                            alpha = 0.15f
-                        ) else primary_blue.copy(alpha = 0.15f),
-                        contentColor = if (transaction.type.name.lowercase() == "piutang") orange else primary_blue
-                    ),
-                    shape = RoundedCornerShape(50)
-                ) {
-                    Text(
-                        text = if (transaction.type.name.lowercase() == "piutang") "Tagih →" else "Bayar →",
-                        modifier = Modifier.padding(horizontal = 4.dp)
-                    )
-                }
+//                TextButton(
+//                    onClick = onTagihClick,
+//                    colors = ButtonDefaults.buttonColors(
+//                        containerColor = if (transaction.type.name.lowercase() == "piutang") orange.copy(
+//                            alpha = 0.15f
+//                        ) else primary_blue.copy(alpha = 0.15f),
+//                        contentColor = if (transaction.type.name.lowercase() == "piutang") orange else primary_blue
+//                    ),
+//                    shape = RoundedCornerShape(50)
+//                ) {
+//                    Text(
+//                        text = if (transaction.type.name.lowercase() == "piutang") "Tagih →" else "Bayar →",
+//                        modifier = Modifier.padding(horizontal = 4.dp)
+//                    )
+//                }
+                val roundedShape = RoundedCornerShape(50)
+                Text(
+                    text = if (transaction.type.name.lowercase() == "piutang") "Tagih →" else "Bayar →",
+                    modifier = Modifier.clip(roundedShape).clickable { }.background(
+                        color = if (transaction.type.name.lowercase() == "piutang") orange.copy(
+                            alpha = 0.15f,
+                        ) else primary_blue.copy(alpha = 0.15f), shape = roundedShape
+                    ).padding(horizontal = 10.dp, vertical = 4.dp),
+                    color = if (transaction.type.name.lowercase() == "piutang") orange else primary_blue
+                )
             }
 
             Spacer(modifier = Modifier.height(12.dp))
@@ -325,8 +335,10 @@ fun BillCard(
 
                     Spacer(modifier = Modifier.weight(1f))
 
+                    val piutangPainter = painterResource(Res.drawable.trans_piutang)
+                    val utangPainter = painterResource(Res.drawable.trans_utang)
                     Image(
-                        painter = painterResource(Res.drawable.trans_piutang),
+                        painter = if (transaction.type.name.lowercase() == "piutang") piutangPainter else utangPainter,
                         contentDescription = "Refresh",
                     )
                 }
