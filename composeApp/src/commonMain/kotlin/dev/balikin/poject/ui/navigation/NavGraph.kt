@@ -60,6 +60,7 @@ import dev.balikin.poject.features.front_page.presentation.OnBoardingScreen
 import dev.balikin.poject.features.front_page.presentation.OnBoardingViewModel
 import dev.balikin.poject.features.history.presentation.HistoryScreen
 import dev.balikin.poject.features.history.presentation.HistoryViewModel
+import dev.balikin.poject.features.history.presentation.filter.HistoryFilterScreen
 import dev.balikin.poject.features.home.presentation.HomeScreen
 import dev.balikin.poject.features.home.presentation.HomeViewModel
 import dev.balikin.poject.features.transaction.presentation.TransactionScreen
@@ -67,7 +68,6 @@ import dev.balikin.poject.features.transaction.presentation.TransactionViewModel
 import dev.balikin.poject.features.transaction.presentation.filter.TransFilterScreen
 import dev.balikin.poject.ui.components.DefaultButton
 import dev.balikin.poject.utils.formatDate
-import dev.balikin.poject.utils.formattedDate
 import dev.balikin.poject.utils.getCurrentDate
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
@@ -130,17 +130,15 @@ fun NavHostContent(
     homeViewModel: HomeViewModel
 ) {
     val transactionViewModel: TransactionViewModel = koinViewModel()
+    val historyViewModel: HistoryViewModel = koinViewModel()
 
     NavHost(
         navController = navController,
-        startDestination = Screen.History.route,
+        startDestination = Screen.OnBoarding.route,
         modifier = Modifier.padding(innerPadding)
     ) {
         composable(Screen.Login.route) {
-            LoginScreen(
-                viewModel = koinViewModel<LoginViewModel>(),
-                navController = navController
-            )
+            LoginScreen(viewModel = koinViewModel<LoginViewModel>(), navController = navController)
         }
         composable(Screen.Register.route) {
             RegisterScreen(
@@ -164,10 +162,7 @@ fun NavHostContent(
             )
         }
         composable(Screen.ResetPassword.route) {
-            ResetPasswordScreen(
-                viewModel = ResetPasswordViewModel(),
-                navController = navController
-            )
+            ResetPasswordScreen(viewModel = ResetPasswordViewModel(), navController = navController)
         }
         composable(Screen.SetNewPassword.route) {
             SetNewPasswordScreen(
@@ -179,16 +174,16 @@ fun NavHostContent(
             TransactionScreen(viewModel = transactionViewModel, navController = navController)
         }
         composable(Screen.FilterTrans.route) {
-            TransFilterScreen(
-                viewModel = transactionViewModel,
-                navController = navController
-            )
+            TransFilterScreen(viewModel = transactionViewModel, navController = navController)
         }
         composable(Screen.Profile.route) {
             ProfileScreen()
         }
         composable(Screen.History.route) {
-            HistoryScreen(viewModel = koinViewModel<HistoryViewModel>(), navController = navController)
+            HistoryScreen(viewModel = historyViewModel, navController = navController)
+        }
+        composable(Screen.FilterHistory.route) {
+            HistoryFilterScreen(viewModel = historyViewModel, navController = navController)
         }
     }
 }
@@ -288,7 +283,7 @@ private fun AddTransactionBottomSheet(
 
             OutlinedTextField(
                 value = formatDate(date),
-                onValueChange = {  },
+                onValueChange = { },
                 readOnly = true,
                 label = { RequiredLabel("Tanggal") },
                 modifier = Modifier.fillMaxWidth(),

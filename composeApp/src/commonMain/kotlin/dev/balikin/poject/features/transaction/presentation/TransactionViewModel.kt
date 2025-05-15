@@ -36,6 +36,21 @@ class TransactionViewModel(
             is TransactionUiEvent.OnRemoveDate -> removeDateFilter()
             is TransactionUiEvent.OnRemoveSort -> removeSortFilter()
             is TransactionUiEvent.OnRemoveType -> removeTypeFilter()
+            is TransactionUiEvent.OnPaidClicked -> {
+                _uiState.value = _uiState.value.copy(
+                    showDialog = true,
+                    selectedTransactionId = uiEvent.id
+                )
+            }
+
+            is TransactionUiEvent.OnMarkAsPaid -> {
+                _uiState.value.selectedTransactionId?.let { markAsPaid(it) }
+                _uiState.value = _uiState.value.copy(showDialog = false)
+            }
+
+            TransactionUiEvent.OnDismissDialog -> {
+                _uiState.value = _uiState.value.copy(showDialog = false)
+            }
         }
     }
 
@@ -146,7 +161,6 @@ class TransactionViewModel(
                         }
                     )
                 }
-                println("cek : $transactions")
             }
         }
     }

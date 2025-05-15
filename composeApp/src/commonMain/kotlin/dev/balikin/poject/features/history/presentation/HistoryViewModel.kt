@@ -3,8 +3,12 @@ package dev.balikin.poject.features.history.presentation
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dev.balikin.poject.features.history.data.HistoryRepository
+import dev.balikin.poject.features.history.presentation.filter.HistoryFilterUiEvent
+import dev.balikin.poject.features.history.presentation.filter.HistoryFilterUiState
 import dev.balikin.poject.features.transaction.data.TransactionType
 import dev.balikin.poject.features.transaction.presentation.FilterParameters
+import dev.balikin.poject.features.transaction.presentation.filter.TransFilterUiEvent
+import dev.balikin.poject.features.transaction.presentation.filter.TransFilterUiState
 import dev.balikin.poject.utils.getCurrentDate
 import dev.balikin.poject.utils.getLastWeekDate
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -20,11 +24,11 @@ class HistoryViewModel(
     private val _uiState = MutableStateFlow(HistoryUiState())
     val uiState = _uiState.asStateFlow()
 
+    private val _filterUiState = MutableStateFlow(HistoryFilterUiState())
+    val filterUiState = _filterUiState.asStateFlow()
+
     private val defaultStartDate = getLastWeekDate()
     private val defaultEndDate = getCurrentDate()
-
-    private val _filterPreviewCount = MutableStateFlow(0)
-    val filterPreviewCount = _filterPreviewCount.asStateFlow()
 
     init {
         applyDefaultFilters()
@@ -35,6 +39,51 @@ class HistoryViewModel(
             is HistoryUiEvent.OnRemoveDate -> removeDateFilter()
             is HistoryUiEvent.OnRemoveSort -> removeSortFilter()
             is HistoryUiEvent.OnRemoveType -> removeTypeFilter()
+        }
+    }
+
+    fun onEventFilter(uiEvent: HistoryFilterUiEvent) {
+        when (uiEvent) {
+            is HistoryFilterUiEvent.OnApplyFilters -> {
+                applyUserFilters(
+                    type = _filterUiState.value.selectedType,
+                    sortOrder = _filterUiState.value.selectedSortOrder,
+                    startDate = _filterUiState.value.startDate,
+                    endDate = _filterUiState.value.endDate
+                )
+            }
+
+            is HistoryFilterUiEvent.OnEndDateChanged -> {
+                _filterUiState.update { currentState ->
+                    currentState.copy(endDate = uiEvent.endDate)
+                }
+            }
+
+            is HistoryFilterUiEvent.OnStartDateChanged -> {
+                _filterUiState.update { currentState ->
+                    currentState.copy(startDate = uiEvent.startDate)
+                }
+            }
+
+            is HistoryFilterUiEvent.OnSortOrderChanged -> {
+                _filterUiState.update { currentState ->
+                    currentState.copy(selectedSortOrder = uiEvent.sortOrder)
+                }
+            }
+
+            is HistoryFilterUiEvent.OnTypeChanged -> {
+                _filterUiState.update { currentState ->
+                    currentState.copy(selectedType = uiEvent.type)
+                }
+            }
+
+            is HistoryFilterUiEvent.OnPreviewResultCount -> {
+                previewFilterResultCount(
+                    type = filterUiState.value.selectedType,
+                    startDate = filterUiState.value.startDate,
+                    endDate = filterUiState.value.endDate
+                )
+            }
         }
     }
 
@@ -118,7 +167,7 @@ class HistoryViewModel(
                 startDate,
                 endDate
             )
-            _filterPreviewCount.value = count
+            _filterUiState.value = _filterUiState.value.copy(count)
         }
     }
 

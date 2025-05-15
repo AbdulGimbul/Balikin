@@ -6,7 +6,9 @@ import kotlinx.datetime.LocalDateTime
 
 data class TransactionUiState(
     val transactions: List<TransactionEntity> = emptyList(),
-    val appliedFilters: FilterParameters? = null
+    val appliedFilters: FilterParameters? = null,
+    val showDialog: Boolean = false,
+    val selectedTransactionId: Long? = null
 )
 
 data class FilterParameters(

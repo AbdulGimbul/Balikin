@@ -224,7 +224,7 @@ fun DebtCard(
             Row {
                 Column {
                     Text(
-                        text = "Total Utang",
+                        text = "Total $selectedTab",
                         color = Color.White,
                         style = MaterialTheme.typography.labelLarge
                     )

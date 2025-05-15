@@ -60,11 +60,13 @@ fun TransactionItem(transaction: TransactionEntity) {
                     }
                     append(transaction.note)
                 }
-                Text(
-                    text = noteText,
-                    color = Color.Gray,
-                    fontSize = 14.sp
-                )
+                if (transaction.note.isNotBlank()) {
+                    Text(
+                        text = noteText,
+                        color = Color.Gray,
+                        fontSize = 14.sp
+                    )
+                }
             }
             Spacer(modifier = Modifier.weight(1f))
             Column(horizontalAlignment = Alignment.End) {

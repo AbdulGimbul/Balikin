@@ -22,7 +22,10 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.material3.FilterChip
+import androidx.compose.material.icons.outlined.Error
+import androidx.compose.material.icons.outlined.ErrorOutline
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -30,6 +33,7 @@ import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -41,11 +45,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import balikin.composeapp.generated.resources.Res
 import balikin.composeapp.generated.resources.agus
-import balikin.composeapp.generated.resources.rm_tag
 import balikin.composeapp.generated.resources.trans_piutang
 import balikin.composeapp.generated.resources.trans_utang
 import dev.balikin.poject.features.transaction.data.TransactionEntity
@@ -87,6 +91,16 @@ fun Transaction(
     onEvent: (TransactionUiEvent) -> Unit,
     moveToFilter: () -> Unit
 ) {
+
+    if (uiState.showDialog && uiState.selectedTransactionId != null) {
+        CustomDialog(
+            onDismissRequest = { onEvent(TransactionUiEvent.OnDismissDialog) },
+            onConfirmation = {
+                onEvent(TransactionUiEvent.OnMarkAsPaid)
+            }
+        )
+    }
+
     Column(
         modifier = Modifier.fillMaxWidth()
     ) {
@@ -147,7 +161,7 @@ fun Transaction(
                 items(uiState.transactions) { transaction ->
                     BillCard(
                         transaction = transaction,
-                        onTagihClick = { /* TODO: Handle tagih action */ },
+                        onPaid = { onEvent(TransactionUiEvent.OnPaidClicked(transaction.id)) },
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(vertical = 4.dp)
@@ -161,7 +175,7 @@ fun Transaction(
 @Composable
 fun BillCard(
     transaction: TransactionEntity,
-    onTagihClick: () -> Unit,
+    onPaid: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     OutlinedCard(
@@ -207,18 +221,32 @@ fun BillCard(
                 Spacer(modifier = Modifier.weight(1f))
                 Row {
                     val roundedShape = RoundedCornerShape(50)
+                    // This will be implemented in online mode
+//                    Text(
+//                        text = if (transaction.type.name.lowercase() == "piutang") "Tagih →" else "Bayar →",
+//                        modifier = Modifier
+//                            .clip(roundedShape)
+//                            .clickable { onPaid() }
+//                            .background(
+//                                color = if (transaction.type.name.lowercase() == "piutang")
+//                                    orange.copy(alpha = 0.15f) else primary_blue.copy(alpha = 0.15f),
+//                                shape = roundedShape
+//                            )
+//                            .padding(horizontal = 10.dp, vertical = 4.dp),
+//                        color = if (transaction.type.name.lowercase() == "piutang") orange else primary_blue,
+//                        style = MaterialTheme.typography.labelLarge
+//                    )
                     Text(
-                        text = if (transaction.type.name.lowercase() == "piutang") "Tagih →" else "Bayar →",
+                        text = "Selesai →",
                         modifier = Modifier
                             .clip(roundedShape)
-                            .clickable { }
+                            .clickable { onPaid() }
                             .background(
-                                color = if (transaction.type.name.lowercase() == "piutang")
-                                    orange.copy(alpha = 0.15f) else primary_blue.copy(alpha = 0.15f),
+                                color = green.copy(alpha = 0.15f),
                                 shape = roundedShape
                             )
                             .padding(horizontal = 10.dp, vertical = 4.dp),
-                        color = if (transaction.type.name.lowercase() == "piutang") orange else primary_blue,
+                        color = green,
                         style = MaterialTheme.typography.labelLarge
                     )
                 }
@@ -277,6 +305,68 @@ fun BillCard(
                         painter = if (transaction.type.name.lowercase() == "piutang") piutangPainter else utangPainter,
                         contentDescription = "Refresh",
                     )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun CustomDialog(
+    onDismissRequest: () -> Unit,
+    onConfirmation: () -> Unit,
+) {
+    Dialog(onDismissRequest = onDismissRequest) {
+        Card(
+            modifier = Modifier
+                .fillMaxWidth(),
+            shape = RoundedCornerShape(16.dp),
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth().padding(16.dp),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+                Icon(
+                    imageVector = Icons.Outlined.ErrorOutline,
+                    contentDescription = null,
+                )
+                Text(
+                    text = "Selesai?",
+                    modifier = Modifier.padding(8.dp),
+                    style = MaterialTheme.typography.titleMedium.copy(color = secondary_text)
+                )
+                Text(
+                    text = "Apakah anda yakin utang yang anda pinjamkan sudah terbayar?",
+                    modifier = Modifier.padding(8.dp),
+                    style = MaterialTheme.typography.bodyMedium.copy(color = secondary_text, textAlign = TextAlign.Center)
+                )
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth(),
+                    horizontalArrangement = Arrangement.Center,
+                ) {
+                    TextButton(
+                        onClick = { onConfirmation() },
+                        modifier = Modifier.weight(1f).padding(8.dp),
+                        colors = ButtonDefaults.buttonColors(
+                            contentColor = Color.White,
+                            containerColor = primary_blue
+                        )
+                    ) {
+                        Text("Ya, Selesai")
+                    }
+                    TextButton(
+                        onClick = { onDismissRequest() },
+                        modifier = Modifier.weight(1f).padding(8.dp),
+                        colors = ButtonDefaults.buttonColors(
+                            contentColor = primary_text,
+                            containerColor = Color.Transparent
+                        )
+                    ) {
+                        Text("Batal")
+                    }
                 }
             }
         }

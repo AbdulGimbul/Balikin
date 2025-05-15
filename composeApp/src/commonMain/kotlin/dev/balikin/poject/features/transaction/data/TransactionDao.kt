@@ -43,6 +43,10 @@ interface TransactionDao {
         endDate: LocalDateTime
     ): Int
 
-    @Query("UPDATE transactions SET isPaid = 1 WHERE id = :transactionId")
-    suspend fun markTransactionAsPaid(transactionId: Long)
+    @Query("UPDATE transactions SET isPaid = 1, paidAt = :paidAt, updatedAt = :updatedAt WHERE id = :transactionId")
+    suspend fun markTransactionAsPaid(
+        transactionId: Long,
+        paidAt: LocalDateTime,
+        updatedAt: LocalDateTime
+    )
 }

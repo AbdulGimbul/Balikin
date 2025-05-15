@@ -44,7 +44,7 @@ fun HistoryScreen(viewModel: HistoryViewModel, navController: NavController) {
         uiState = uiState,
         onEvent = viewModel::onEvent,
         moveToFilter = {
-//            navController.navigate(Screen.FilterHistory.route)
+            navController.navigate(Screen.FilterHistory.route)
         }
     )
 }
