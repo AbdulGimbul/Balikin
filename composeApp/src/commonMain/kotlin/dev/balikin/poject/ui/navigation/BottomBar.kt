@@ -66,7 +66,7 @@ val navigationItems = listOf(
     BottomNavItem(
         title = "Profile",
         icon = Icons.Outlined.AccountCircle,
-        screen = Screen.Profile
+        screen = Screen.Login
     )
 )
 
