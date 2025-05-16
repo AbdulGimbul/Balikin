@@ -31,8 +31,10 @@ import dev.balikin.poject.utils.formatDateCreated
 import org.jetbrains.compose.resources.painterResource
 
 @Composable
-fun TransactionItem(transaction: TransactionEntity) {
-    Column {
+fun TransactionItem(transaction: TransactionEntity, modifier: Modifier = Modifier) {
+    Column(
+        modifier = modifier
+    ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth(),

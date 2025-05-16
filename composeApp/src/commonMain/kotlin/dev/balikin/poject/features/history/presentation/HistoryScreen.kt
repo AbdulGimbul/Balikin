@@ -1,9 +1,11 @@
 package dev.balikin.poject.features.history.presentation
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
@@ -100,6 +102,9 @@ fun History(
                 Spacer(modifier = Modifier.width(8.dp))
                 FilterButton(onClick = moveToFilter)
             }
+
+            Spacer(modifier = Modifier.height(24.dp))
+
             uiState.appliedFilters?.let { filters ->
                 FilterTags(
                     filters = filters,
@@ -109,7 +114,7 @@ fun History(
                 )
             }
             LazyColumn(
-                modifier = Modifier.padding(top = 16.dp)
+                verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 items(uiState.transactions) { trans ->
                     TransactionItem(trans)
