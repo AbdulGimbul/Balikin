@@ -13,11 +13,18 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AccountCircle
+import androidx.compose.material.icons.filled.History
+import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Timeline
+import androidx.compose.material.icons.filled.Wallet
 import androidx.compose.material.icons.outlined.AccountCircle
 import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material.icons.outlined.History
 import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.Payments
+import androidx.compose.material.icons.outlined.Timeline
+import androidx.compose.material.icons.outlined.Wallet
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -40,7 +47,8 @@ import dev.balikin.poject.ui.theme.primary_blue
  */
 data class BottomNavItem(
     val title: String,
-    val icon: ImageVector,
+    val iconOutlined: ImageVector,
+    val iconFilled: ImageVector,
     val screen: Screen
 )
 
@@ -50,22 +58,26 @@ data class BottomNavItem(
 val navigationItems = listOf(
     BottomNavItem(
         title = "Home",
-        icon = Icons.Outlined.Home,
+        iconOutlined = Icons.Outlined.Home,
+        iconFilled = Icons.Filled.Home,
         screen = Screen.Home
     ),
     BottomNavItem(
         title = "Transaksi",
-        icon = Icons.Outlined.Payments,
+        iconOutlined = Icons.Outlined.Wallet,
+        iconFilled = Icons.Filled.Wallet,
         screen = Screen.Transaction
     ),
     BottomNavItem(
         title = "History",
-        icon = Icons.Outlined.History,
+        iconOutlined = Icons.Outlined.Timeline,
+        iconFilled = Icons.Filled.Timeline,
         screen = Screen.History
     ),
     BottomNavItem(
         title = "Profile",
-        icon = Icons.Outlined.AccountCircle,
+        iconOutlined = Icons.Outlined.AccountCircle,
+        iconFilled = Icons.Filled.AccountCircle,
         screen = Screen.Login
     )
 )
@@ -153,6 +165,12 @@ fun BottomBarItem(
         grey2
     }
 
+    val icon = if (selected) {
+        item.iconFilled
+    } else {
+        item.iconOutlined
+    }
+
     Box(
         modifier = modifier
             .height(64.dp)
@@ -167,7 +185,7 @@ fun BottomBarItem(
             verticalArrangement = Arrangement.Center
         ) {
             Icon(
-                imageVector = item.icon,
+                imageVector = icon,
                 contentDescription = "${item.title} tab",  // Accessibility support
                 tint = contentColor,
                 modifier = Modifier.size(24.dp)
