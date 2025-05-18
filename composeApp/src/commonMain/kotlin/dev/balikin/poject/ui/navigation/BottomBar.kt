@@ -35,20 +35,32 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
+import balikin.composeapp.generated.resources.Res
+import balikin.composeapp.generated.resources.ic_history_fill
+import balikin.composeapp.generated.resources.ic_history_outline
+import balikin.composeapp.generated.resources.ic_home_fill
+import balikin.composeapp.generated.resources.ic_home_outline
+import balikin.composeapp.generated.resources.ic_user_fill
+import balikin.composeapp.generated.resources.ic_user_outline
+import balikin.composeapp.generated.resources.ic_wallet_fill
+import balikin.composeapp.generated.resources.ic_wallet_outline
 import dev.balikin.poject.ui.theme.grey2
 import dev.balikin.poject.ui.theme.primary_blue
+import org.jetbrains.compose.resources.DrawableResource
+import org.jetbrains.compose.resources.painterResource
 
 /**
  * Data class for bottom navigation items
  */
 data class BottomNavItem(
     val title: String,
-    val iconOutlined: ImageVector,
-    val iconFilled: ImageVector,
+    val iconOutlined: DrawableResource,
+    val iconFilled: DrawableResource,
     val screen: Screen
 )
 
@@ -58,26 +70,26 @@ data class BottomNavItem(
 val navigationItems = listOf(
     BottomNavItem(
         title = "Home",
-        iconOutlined = Icons.Outlined.Home,
-        iconFilled = Icons.Filled.Home,
+        iconOutlined = Res.drawable.ic_home_outline,
+        iconFilled = Res.drawable.ic_home_fill,
         screen = Screen.Home
     ),
     BottomNavItem(
         title = "Transaksi",
-        iconOutlined = Icons.Outlined.Wallet,
-        iconFilled = Icons.Filled.Wallet,
+        iconOutlined = Res.drawable.ic_wallet_outline,
+        iconFilled = Res.drawable.ic_wallet_fill,
         screen = Screen.Transaction
     ),
     BottomNavItem(
         title = "History",
-        iconOutlined = Icons.Outlined.Timeline,
-        iconFilled = Icons.Filled.Timeline,
+        iconOutlined = Res.drawable.ic_history_outline,
+        iconFilled = Res.drawable.ic_history_fill,
         screen = Screen.History
     ),
     BottomNavItem(
         title = "Profile",
-        iconOutlined = Icons.Outlined.AccountCircle,
-        iconFilled = Icons.Filled.AccountCircle,
+        iconOutlined = Res.drawable.ic_user_outline,
+        iconFilled = Res.drawable.ic_user_fill,
         screen = Screen.Login
     )
 )
@@ -185,7 +197,7 @@ fun BottomBarItem(
             verticalArrangement = Arrangement.Center
         ) {
             Icon(
-                imageVector = icon,
+                painter = painterResource(icon),
                 contentDescription = "${item.title} tab",  // Accessibility support
                 tint = contentColor,
                 modifier = Modifier.size(24.dp)

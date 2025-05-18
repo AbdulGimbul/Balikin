@@ -21,6 +21,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -29,6 +30,16 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import balikin.composeapp.generated.resources.Res
 import balikin.composeapp.generated.resources.agus
+import balikin.composeapp.generated.resources.ic_edit
+import balikin.composeapp.generated.resources.ic_profile_contact
+import balikin.composeapp.generated.resources.ic_profile_email
+import balikin.composeapp.generated.resources.ic_profile_faceid
+import balikin.composeapp.generated.resources.ic_profile_lock
+import balikin.composeapp.generated.resources.ic_profile_logout
+import balikin.composeapp.generated.resources.ic_profile_notif
+import balikin.composeapp.generated.resources.ic_profile_user
+import dev.balikin.poject.ui.theme.primary_blue
+import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.painterResource
 
 @Composable
@@ -55,13 +66,13 @@ fun ProfileScreen() {
                     .clip(CircleShape)
             )
             Icon(
-                imageVector = Icons.Default.Edit,
+                painter = painterResource(Res.drawable.ic_edit),
                 contentDescription = "Edit",
-                tint = Color(0xFF8875FF),
+                tint = primary_blue,
                 modifier = Modifier
                     .offset(x = (-8).dp, y = (-8).dp)
                     .size(24.dp)
-                    .background(Color.White, CircleShape)
+                    .background(Color(0XFFE3E6FF), CircleShape)
                     .padding(4.dp)
             )
         }
@@ -85,25 +96,25 @@ fun ProfileScreen() {
                 .fillMaxWidth()
                 .background(Color(0xFFF7F8F9), RoundedCornerShape(16.dp))
         ) {
-            ProfileInfoCard(icon = Icons.Outlined.Person, label = "Agus Ihsan Mochamad")
+            ProfileInfoCard(icon = Res.drawable.ic_profile_user, label = "Agus Ihsan Mochamad")
             HorizontalDivider(
                 modifier = Modifier.padding(horizontal = 16.dp),
                 thickness = 1.dp,
                 color = Color.LightGray
             )
-            ProfileInfoCard(icon = Icons.Outlined.Email, label = "agusikhsan08@gmail.com")
+            ProfileInfoCard(icon = Res.drawable.ic_profile_email, label = "agusikhsan08@gmail.com")
             HorizontalDivider(
                 modifier = Modifier.padding(horizontal = 16.dp),
                 thickness = 1.dp,
                 color = Color.LightGray
             )
-            ProfileInfoCard(icon = Icons.Outlined.AccountBox, label = "@agusihsan_")
+            ProfileInfoCard(icon = Res.drawable.ic_profile_contact, label = "@agusihsan_")
             HorizontalDivider(
                 modifier = Modifier.padding(horizontal = 16.dp),
                 thickness = 1.dp,
                 color = Color.LightGray
             )
-            ProfileInfoCard(icon = Icons.Outlined.Lock, label = "************", isPassword = true)
+            ProfileInfoCard(icon = Res.drawable.ic_profile_lock, label = "************", isPassword = true)
         }
 
         Spacer(modifier = Modifier.height(24.dp))
@@ -131,10 +142,9 @@ fun ProfileScreen() {
                     .padding(vertical = 16.dp, horizontal = 16.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Icon(
-                    imageVector = Icons.Default.Logout,
+                Image(
+                    painter = painterResource(Res.drawable.ic_profile_logout),
                     contentDescription = "Logout",
-                    tint = Color.Red
                 )
                 Spacer(modifier = Modifier.width(16.dp))
                 Text("Logout", color = Color.Red, fontWeight = FontWeight.Medium)
@@ -148,7 +158,7 @@ fun ProfileScreen() {
 }
 
 @Composable
-fun ProfileInfoCard(icon: ImageVector, label: String, isPassword: Boolean = false) {
+fun ProfileInfoCard(icon: DrawableResource, label: String, isPassword: Boolean = false) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -156,7 +166,7 @@ fun ProfileInfoCard(icon: ImageVector, label: String, isPassword: Boolean = fals
             .clickable { /* Handle click */ },
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Icon(icon, contentDescription = null, tint = Color.Gray)
+        Image(painter = painterResource(icon), contentDescription = null)
         Spacer(modifier = Modifier.width(16.dp))
         Text(
             text = label,
@@ -177,10 +187,9 @@ fun PreferenceSwitch(label: String, isChecked: Boolean, onCheckedChange: (Boolea
             .padding(horizontal = 16.dp, vertical = 10.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Icon(
-            imageVector = if (label == "Notifications") Icons.Outlined.Notifications else Icons.Outlined.Face,
-            contentDescription = null,
-            tint = Color.Gray
+        Image(
+            painter = if (label == "Notifications") painterResource(Res.drawable.ic_profile_notif) else painterResource(Res.drawable.ic_profile_faceid),
+            contentDescription = null
         )
         Spacer(modifier = Modifier.width(16.dp))
         Text(text = label, modifier = Modifier.weight(1f))

@@ -231,7 +231,7 @@ fun DebtCard(
                     Text(
                         text = totalDebt,
                         color = Color.White,
-                        style = MaterialTheme.typography.headlineMedium,
+                        style = MaterialTheme.typography.headlineLarge,
                         fontWeight = FontWeight.Bold
                     )
                 }

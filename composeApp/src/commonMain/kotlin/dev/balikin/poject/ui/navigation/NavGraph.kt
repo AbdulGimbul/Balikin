@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.CalendarMonth
@@ -45,6 +46,8 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
+import balikin.composeapp.generated.resources.Res
+import balikin.composeapp.generated.resources.ic_calendar
 import dev.balikin.poject.features.auth.presentation.forgot_password.ForgotPasswordScreen
 import dev.balikin.poject.features.auth.presentation.forgot_password.ForgotPasswordViewModel
 import dev.balikin.poject.features.auth.presentation.login.LoginScreen
@@ -67,6 +70,7 @@ import dev.balikin.poject.features.transaction.presentation.TransactionScreen
 import dev.balikin.poject.features.transaction.presentation.TransactionViewModel
 import dev.balikin.poject.features.transaction.presentation.filter.TransFilterScreen
 import dev.balikin.poject.ui.components.DefaultButton
+import dev.balikin.poject.ui.theme.primary_blue
 import dev.balikin.poject.utils.formatDate
 import dev.balikin.poject.utils.getCurrentDate
 import kotlinx.datetime.Clock
@@ -74,6 +78,7 @@ import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
+import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.viewmodel.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -290,8 +295,10 @@ private fun AddTransactionBottomSheet(
                 trailingIcon = {
                     IconButton(onClick = { showDatePicker = true }) {
                         Icon(
-                            imageVector = Icons.Outlined.CalendarMonth,
-                            contentDescription = "Select date"
+                            painter = painterResource(Res.drawable.ic_calendar),
+                            contentDescription = "Select date",
+                            tint = primary_blue,
+                            modifier = Modifier.size(24.dp)
                         )
                     }
                 },
