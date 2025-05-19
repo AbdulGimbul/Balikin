@@ -9,23 +9,12 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AccountCircle
-import androidx.compose.material.icons.filled.History
-import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.Timeline
-import androidx.compose.material.icons.filled.Wallet
-import androidx.compose.material.icons.outlined.AccountCircle
 import androidx.compose.material.icons.outlined.Add
-import androidx.compose.material.icons.outlined.History
-import androidx.compose.material.icons.outlined.Home
-import androidx.compose.material.icons.outlined.Payments
-import androidx.compose.material.icons.outlined.Timeline
-import androidx.compose.material.icons.outlined.Wallet
 import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.FloatingActionButtonDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -35,8 +24,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.painter.Painter
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
@@ -109,7 +96,7 @@ fun BottomBarWithFab(
     Box(
         modifier = modifier
             .height(80.dp)
-            .navigationBarsPadding()
+            .navigationBarsPadding(),
     ) {
         HorizontalDivider(
             color = MaterialTheme.colorScheme.outlineVariant,
@@ -119,7 +106,7 @@ fun BottomBarWithFab(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(64.dp),
+                .height(64.dp).align(Alignment.Center),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -141,11 +128,13 @@ fun BottomBarWithFab(
         FloatingActionButton(
             onClick = onFabClick,
             modifier = Modifier
-                .align(Alignment.TopCenter)
-                .offset(y = 4.dp),
+                .align(Alignment.Center),
             shape = CircleShape,
             containerColor = primary_blue,
-            contentColor = Color.White
+            contentColor = Color.White,
+            elevation = FloatingActionButtonDefaults.elevation(
+                defaultElevation = 0.dp
+            )
         ) {
             Icon(
                 imageVector = Icons.Outlined.Add,
@@ -158,7 +147,7 @@ fun BottomBarWithFab(
 
 /**
  * Individual item in bottom navigation bar
- * 
+ *
  * @param item The navigation item to display
  * @param selected Whether this item is currently selected
  * @param onClick Action to perform when the item is clicked
@@ -202,9 +191,9 @@ fun BottomBarItem(
                 tint = contentColor,
                 modifier = Modifier.size(24.dp)
             )
-            
+
             Spacer(Modifier.height(4.dp))
-            
+
             Text(
                 text = item.title,
                 style = MaterialTheme.typography.labelSmall,
