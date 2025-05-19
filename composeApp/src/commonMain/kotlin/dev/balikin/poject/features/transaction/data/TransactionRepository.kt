@@ -10,15 +10,15 @@ interface TransactionRepository {
 
     fun getFilteredTransactions(
         type: String?,
-        startDate: LocalDateTime,
-        endDate: LocalDateTime,
-        sortOrder: String
+        startDate: LocalDateTime?,
+        endDate: LocalDateTime?,
+        sortOrder: String?
     ): Flow<List<TransactionEntity>>
 
     suspend fun countFilteredTransactions(
         type: String?,
-        startDate: LocalDateTime,
-        endDate: LocalDateTime
+        startDate: LocalDateTime?,
+        endDate: LocalDateTime?
     ): Int
 
     suspend fun markTransactionAsPaid(transactionId: Long)

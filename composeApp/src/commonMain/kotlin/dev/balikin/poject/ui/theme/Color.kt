@@ -3,6 +3,7 @@ package dev.balikin.poject.ui.theme
 import androidx.compose.ui.graphics.Color
 
 val primary = Color(0XFF252525)
+val secondary = Color(0XFF54595E)
 val primary_blue = Color(0XFF5865F2)
 val secondary_text = Color(0XFF636669)
 val primary_text = Color(0XFF252525)

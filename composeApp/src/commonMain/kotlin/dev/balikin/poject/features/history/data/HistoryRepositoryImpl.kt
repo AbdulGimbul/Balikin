@@ -10,18 +10,22 @@ class HistoryRepositoryImpl(
 
     override fun getHistoryTransactions(
         type: String?,
-        startDate: LocalDateTime,
-        endDate: LocalDateTime,
-        sortOrder: String
+        startDate: LocalDateTime?,
+        endDate: LocalDateTime?,
+        sortOrder: String?
     ): Flow<List<TransactionEntity>> {
         return historyDao.getHistoryTransactions(type, startDate, endDate, sortOrder)
     }
 
     override suspend fun countFilteredHistorys(
         type: String?,
-        startDate: LocalDateTime,
-        endDate: LocalDateTime
+        startDate: LocalDateTime?,
+        endDate: LocalDateTime?
     ): Int {
         return historyDao.countHistoryTransactions(type, startDate, endDate)
+    }
+
+    override suspend fun getAllHistories(): Flow<List<TransactionEntity>> {
+        return historyDao.getAllHistories()
     }
 }

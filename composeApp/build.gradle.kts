@@ -65,6 +65,7 @@ kotlin {
             implementation(libs.datetime)
             implementation(libs.androidx.room.runtime)
             implementation(libs.sqlite.bundled)
+            implementation(libs.cmptoast)
         }
         nativeMain.dependencies {
             implementation(libs.ktor.client.darwin)

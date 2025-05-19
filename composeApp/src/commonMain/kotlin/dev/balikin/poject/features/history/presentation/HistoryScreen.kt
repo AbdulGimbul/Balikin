@@ -104,8 +104,6 @@ fun History(
                 FilterButton(onClick = moveToFilter)
             }
 
-            Spacer(modifier = Modifier.height(24.dp))
-
             uiState.appliedFilters?.let { filters ->
                 FilterTags(
                     filters = filters,
@@ -115,7 +113,8 @@ fun History(
                 )
             }
             LazyColumn(
-                verticalArrangement = Arrangement.spacedBy(16.dp)
+                verticalArrangement = Arrangement.spacedBy(16.dp),
+                modifier = Modifier.padding(top = 16.dp)
             ) {
                 items(uiState.transactions) { trans ->
                     TransactionItem(trans)

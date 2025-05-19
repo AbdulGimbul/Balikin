@@ -23,9 +23,9 @@ class TransactionRepositoryImpl(
 
     override fun getFilteredTransactions(
         type: String?,
-        startDate: LocalDateTime,
-        endDate: LocalDateTime,
-        sortOrder: String
+        startDate: LocalDateTime?,
+        endDate: LocalDateTime?,
+        sortOrder: String?
     ): Flow<List<TransactionEntity>> {
         return transactionDao.getFilteredTransactions(
             type,
@@ -37,8 +37,8 @@ class TransactionRepositoryImpl(
 
     override suspend fun countFilteredTransactions(
         type: String?,
-        startDate: LocalDateTime,
-        endDate: LocalDateTime
+        startDate: LocalDateTime?,
+        endDate: LocalDateTime?
     ): Int {
         return transactionDao.countFilteredTransactions(type, startDate, endDate)
     }

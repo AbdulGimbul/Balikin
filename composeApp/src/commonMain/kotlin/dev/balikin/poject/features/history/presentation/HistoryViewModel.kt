@@ -7,8 +7,6 @@ import dev.balikin.poject.features.history.presentation.filter.HistoryFilterUiEv
 import dev.balikin.poject.features.history.presentation.filter.HistoryFilterUiState
 import dev.balikin.poject.features.transaction.data.TransactionType
 import dev.balikin.poject.features.transaction.presentation.FilterParameters
-import dev.balikin.poject.features.transaction.presentation.filter.TransFilterUiEvent
-import dev.balikin.poject.features.transaction.presentation.filter.TransFilterUiState
 import dev.balikin.poject.utils.getCurrentDate
 import dev.balikin.poject.utils.getLastWeekDate
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -31,10 +29,10 @@ class HistoryViewModel(
     private val defaultEndDate = getCurrentDate()
 
     init {
-        applyDefaultFilters()
+        getAllTransactions()
     }
 
-    fun onEvent(uiEvent: HistoryUiEvent){
+    fun onEvent(uiEvent: HistoryUiEvent) {
         when (uiEvent) {
             is HistoryUiEvent.OnRemoveDate -> removeDateFilter()
             is HistoryUiEvent.OnRemoveSort -> removeSortFilter()
@@ -87,6 +85,15 @@ class HistoryViewModel(
         }
     }
 
+    fun getAllTransactions() {
+        viewModelScope.launch {
+            historyRepository.getAllHistories()
+                .collect { transactions ->
+                    _uiState.value = _uiState.value.copy(transactions = transactions)
+                }
+        }
+    }
+
     private fun applyDefaultFilters() {
         applyFilters(
             type = null,
@@ -119,16 +126,13 @@ class HistoryViewModel(
         endDate: LocalDateTime?,
         isUserApplied: Boolean
     ) {
-        val actualSort = sortOrder ?: "asc"
-        val actualStart = startDate ?: defaultStartDate
-        val actualEnd   = endDate   ?: defaultEndDate
 
         viewModelScope.launch {
             historyRepository.getHistoryTransactions(
                 type?.name,
-                actualStart,
-                actualEnd,
-                actualSort
+                startDate,
+                endDate,
+                sortOrder
             ).collect { transactions ->
                 _uiState.update { currentState ->
                     currentState.copy(
@@ -158,8 +162,8 @@ class HistoryViewModel(
 
     fun previewFilterResultCount(
         type: TransactionType?,
-        startDate: LocalDateTime,
-        endDate: LocalDateTime
+        startDate: LocalDateTime?,
+        endDate: LocalDateTime?
     ) {
         viewModelScope.launch {
             val count = historyRepository.countFilteredHistorys(
@@ -170,6 +174,4 @@ class HistoryViewModel(
             _filterUiState.value = _filterUiState.value.copy(count)
         }
     }
-
-
 }

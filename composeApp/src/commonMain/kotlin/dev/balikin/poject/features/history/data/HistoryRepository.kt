@@ -8,14 +8,16 @@ interface HistoryRepository {
 
     fun getHistoryTransactions(
         type: String?,
-        startDate: LocalDateTime,
-        endDate: LocalDateTime,
-        sortOrder: String
+        startDate: LocalDateTime?,
+        endDate: LocalDateTime?,
+        sortOrder: String?
     ): Flow<List<TransactionEntity>>
 
     suspend fun countFilteredHistorys(
         type: String?,
-        startDate: LocalDateTime,
-        endDate: LocalDateTime
+        startDate: LocalDateTime?,
+        endDate: LocalDateTime?
     ): Int
+
+    suspend fun getAllHistories(): Flow<List<TransactionEntity>>
 }

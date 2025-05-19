@@ -13,6 +13,8 @@ class MyApplication : Application() {
             androidContext(this@MyApplication)
         }
         appContext = applicationContext
+
+        multiplatform.network.cmptoast.AppContext.apply { set(appContext) }
     }
 
     companion object {

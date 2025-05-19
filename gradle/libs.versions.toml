@@ -11,6 +11,7 @@ androidx-espresso-core = "3.6.1"
 androidx-lifecycle = "2.9.0-beta01"
 androidx-material = "1.12.0"
 androidx-test-junit = "1.2.1"
+cmptoast = "1.0.5"
 compose-multiplatform = "1.8.0"
 coreSplashscreen = "1.0.1"
 junit = "4.13.2"
@@ -27,6 +28,7 @@ sqlite = "2.5.1"
 
 [libraries]
 androidx-core-splashscreen = { module = "androidx.core:core-splashscreen", version.ref = "coreSplashscreen" }
+cmptoast = { module = "network.chaintech:cmptoast", version.ref = "cmptoast" }
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
 kotlin-test-junit = { module = "org.jetbrains.kotlin:kotlin-test-junit", version.ref = "kotlin" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }

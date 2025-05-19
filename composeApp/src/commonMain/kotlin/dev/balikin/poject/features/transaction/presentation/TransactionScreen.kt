@@ -60,9 +60,11 @@ import dev.balikin.poject.ui.navigation.Screen
 import dev.balikin.poject.ui.theme.green
 import dev.balikin.poject.ui.theme.grey2
 import dev.balikin.poject.ui.theme.orange
+import dev.balikin.poject.ui.theme.primary
 import dev.balikin.poject.ui.theme.primary_blue
 import dev.balikin.poject.ui.theme.primary_text
 import dev.balikin.poject.ui.theme.red
+import dev.balikin.poject.ui.theme.secondary
 import dev.balikin.poject.ui.theme.secondary_text
 import dev.balikin.poject.utils.currencyFormat
 import dev.balikin.poject.utils.formatDate
@@ -333,11 +335,12 @@ fun CustomDialog(
                 Icon(
                     imageVector = Icons.Outlined.ErrorOutline,
                     contentDescription = null,
+                    tint = primary,
                 )
                 Text(
                     text = "Selesai?",
                     modifier = Modifier.padding(8.dp),
-                    style = MaterialTheme.typography.titleMedium.copy(color = secondary_text)
+                    style = MaterialTheme.typography.titleMedium.copy(color = secondary, fontWeight = FontWeight.SemiBold)
                 )
                 Text(
                     text = "Apakah anda yakin utang yang anda pinjamkan sudah terbayar?",

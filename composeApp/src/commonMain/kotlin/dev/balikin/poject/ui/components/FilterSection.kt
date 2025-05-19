@@ -26,15 +26,20 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import dev.balikin.poject.ui.theme.primary
+import dev.balikin.poject.ui.theme.red
 import dev.balikin.poject.utils.formatDate
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
+import multiplatform.network.cmptoast.ToastDuration
+import multiplatform.network.cmptoast.ToastPadding
+import multiplatform.network.cmptoast.showToast
 
 @Composable
 fun FilterSection(
@@ -68,8 +73,8 @@ fun FilterSection(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DateFilterChips(
-    initStartDate: LocalDateTime,
-    initEndDate: LocalDateTime,
+    initStartDate: LocalDateTime?,
+    initEndDate: LocalDateTime?,
     onStartDateChange: (LocalDateTime?) -> Unit,
     onEndDateChange: (LocalDateTime?) -> Unit
 ) {
@@ -77,6 +82,7 @@ fun DateFilterChips(
     var endDate by remember { mutableStateOf<LocalDateTime?>(initEndDate) }
     var showStartDatePicker by remember { mutableStateOf(false) }
     var showEndDatePicker by remember { mutableStateOf(false) }
+    var showValidationError by remember { mutableStateOf(false) }
 
     LaunchedEffect(initStartDate, initEndDate) {
         startDate = initStartDate
@@ -126,13 +132,27 @@ fun DateFilterChips(
             },
             modifier = Modifier.weight(1f)
         )
+
+        if (showValidationError) {
+            showToast(
+                message = "Tanggal akhir tidak boleh kurang dari tanggal awal",
+                backgroundColor = red,
+                duration = ToastDuration.Long
+            )
+        }
     }
 
     if (showStartDatePicker) {
         CustomDatePickerDialog(
             onDateSelected = {
-                onStartDateChange(it)
                 showStartDatePicker = false
+
+                if (endDate != null && endDate!! < it) {
+                    showValidationError = true
+                } else {
+                    onStartDateChange(it)
+                    showValidationError = false
+                }
             },
             onDismiss = { showStartDatePicker = false }
         )
@@ -140,8 +160,14 @@ fun DateFilterChips(
     if (showEndDatePicker) {
         CustomDatePickerDialog(
             onDateSelected = {
-                onEndDateChange(it)
                 showEndDatePicker = false
+
+                if (startDate != null && it < startDate!!) {
+                    showValidationError = true
+                } else {
+                    onEndDateChange(it)
+                    showValidationError = false
+                }
             },
             onDismiss = { showEndDatePicker = false }
         )

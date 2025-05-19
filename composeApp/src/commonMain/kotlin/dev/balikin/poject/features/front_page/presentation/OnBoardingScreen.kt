@@ -30,6 +30,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -51,6 +52,8 @@ import dev.balikin.poject.ui.theme.primary_blue
 import dev.balikin.poject.ui.theme.primary_text
 import dev.balikin.poject.ui.theme.secondary_text
 import dev.balikin.poject.utils.getBrowserHelper
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.painterResource
 
@@ -89,16 +92,12 @@ fun Onboarding(
     val pagerState = rememberPagerState(pageCount = { uiState.pages.size })
     val coroutineScope = rememberCoroutineScope()
 
-    LaunchedEffect(uiState.currentPage) {
-        if (pagerState.currentPage != uiState.currentPage) {
-            pagerState.animateScrollToPage(uiState.currentPage)
-        }
-    }
-
-    LaunchedEffect(pagerState.currentPage) {
-        if (pagerState.currentPage != uiState.currentPage) {
-            onEvent(OnBoardingUiEvent.PageChanged(pagerState.currentPage))
-        }
+    LaunchedEffect(pagerState) {
+        snapshotFlow { pagerState.currentPage }
+            .distinctUntilChanged()
+            .collect { page ->
+                onEvent(OnBoardingUiEvent.PageChanged(page))
+            }
     }
 
     Box(modifier = Modifier.fillMaxSize()) {

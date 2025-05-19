@@ -28,7 +28,7 @@ class TransactionViewModel(
     private val defaultEndDate = getCurrentDate()
 
     init {
-        applyDefaultFilters()
+        getAllTransactions()
     }
 
     fun onEvent(uiEvent: TransactionUiEvent) {
@@ -140,16 +140,12 @@ class TransactionViewModel(
         endDate: LocalDateTime?,
         isUserApplied: Boolean
     ) {
-        val actualSort = sortOrder ?: "asc"
-        val actualStart = startDate ?: defaultStartDate
-        val actualEnd = endDate ?: defaultEndDate
-
         viewModelScope.launch {
             transactionRepository.getFilteredTransactions(
                 type?.name,
-                actualStart,
-                actualEnd,
-                actualSort
+                startDate,
+                endDate,
+                sortOrder
             ).collect { transactions ->
                 _uiState.update { currentState ->
                     currentState.copy(
@@ -179,8 +175,8 @@ class TransactionViewModel(
 
     fun previewFilterResultCount(
         type: TransactionType?,
-        startDate: LocalDateTime,
-        endDate: LocalDateTime
+        startDate: LocalDateTime?,
+        endDate: LocalDateTime?
     ) {
         viewModelScope.launch {
             val count = transactionRepository.countFilteredTransactions(
@@ -203,7 +199,7 @@ class TransactionViewModel(
                     startDate = it.startDate,
                     endDate = it.endDate
                 )
-            } ?: applyDefaultFilters()
+            } ?: getAllTransactions()
         }
     }
 }

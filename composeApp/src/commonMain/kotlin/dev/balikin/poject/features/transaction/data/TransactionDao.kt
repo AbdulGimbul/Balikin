@@ -12,35 +12,42 @@ interface TransactionDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun addTransaction(transactionEntity: TransactionEntity)
 
-    @Query("SELECT * FROM transactions")
+    @Query("SELECT * FROM transactions WHERE isPaid = 0 ORDER BY createdAt DESC")
     fun getAllTransactions(): Flow<List<TransactionEntity>>
 
-    @Query("SELECT SUM(amount) FROM transactions WHERE type = :type")
+    @Query("SELECT SUM(amount) FROM transactions WHERE type = :type AND isPaid = 0")
     suspend fun getTotalAmountByType(type: String): Double?
 
     @Query(
         "SELECT * FROM transactions WHERE " +
-                "(:type IS NULL OR type = :type) AND " +
-                "(createdAt BETWEEN :startDate AND :endDate) AND isPaid = 0 " +
-                "ORDER BY CASE WHEN :sortOrder = 'asc' THEN amount END ASC, " +
-                "CASE WHEN :sortOrder = 'desc' THEN amount END DESC"
+                "(:type IS NULL OR type = :type) AND isPaid = 0 AND " +
+                "(:startDate IS NULL OR createdAt >= :startDate) AND " +
+                "(:endDate IS NULL OR createdAt <= :endDate) " +
+                "ORDER BY " +
+                "CASE WHEN :sortOrder = 'asc' THEN amount END ASC, " +
+                "CASE WHEN :sortOrder = 'desc' THEN amount END DESC, " +
+                "createdAt DESC"
     )
     fun getFilteredTransactions(
         type: String?,
-        startDate: LocalDateTime,
-        endDate: LocalDateTime,
-        sortOrder: String
+        startDate: LocalDateTime?,
+        endDate: LocalDateTime?,
+        sortOrder: String?
     ): Flow<List<TransactionEntity>>
 
     @Query(
-        "SELECT COUNT(*) FROM transactions WHERE " +
-                "(:type IS NULL OR type = :type) AND isPaid = 0 AND " +
-                "(createdAt BETWEEN :startDate AND :endDate)"
+        """
+    SELECT COUNT(*) FROM transactions
+    WHERE (:type IS NULL OR type = :type)
+      AND isPaid = 0
+      AND (:startDate IS NULL OR createdAt >= :startDate)
+      AND (:endDate IS NULL OR createdAt <= :endDate)
+    """
     )
     suspend fun countFilteredTransactions(
         type: String?,
-        startDate: LocalDateTime,
-        endDate: LocalDateTime
+        startDate: LocalDateTime?,
+        endDate: LocalDateTime?
     ): Int
 
     @Query("UPDATE transactions SET isPaid = 1, paidAt = :paidAt, updatedAt = :updatedAt WHERE id = :transactionId")
