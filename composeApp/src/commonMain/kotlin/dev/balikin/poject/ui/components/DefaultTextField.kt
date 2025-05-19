@@ -9,6 +9,8 @@ import androidx.compose.material.icons.outlined.VisibilityOff
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
@@ -24,6 +26,7 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import dev.balikin.poject.ui.theme.bg_light
+import dev.balikin.poject.ui.theme.primary_blue
 import dev.balikin.poject.ui.theme.secondary_text
 
 @Composable
@@ -41,7 +44,7 @@ fun DefaultTextField(
 ) {
     var passwordVisibility by remember { mutableStateOf(isPassword) }
 
-    TextField(
+    OutlinedTextField(
         value = value,
         onValueChange = onValueChange,
         textStyle = MaterialTheme.typography.bodyMedium,
@@ -52,7 +55,9 @@ fun DefaultTextField(
         } else null,
         modifier = modifier.fillMaxWidth(),
         shape = RoundedCornerShape(10.dp),
-        colors = TextFieldDefaults.colors(
+        colors = OutlinedTextFieldDefaults.colors(
+            focusedTextColor = secondary_text,
+            unfocusedTextColor = secondary_text,
             focusedContainerColor = bg_light,
             unfocusedContainerColor = bg_light,
             cursorColor = secondary_text,
@@ -64,9 +69,25 @@ fun DefaultTextField(
             unfocusedLeadingIconColor = secondary_text,
             focusedTrailingIconColor = secondary_text,
             unfocusedTrailingIconColor = secondary_text,
-            focusedIndicatorColor = Color.Transparent,
-            unfocusedIndicatorColor = Color.Transparent,
-            disabledIndicatorColor = Color.Transparent,
+            focusedBorderColor = primary_blue,
+            unfocusedBorderColor = Color.Transparent,
+
+//            focusedContainerColor = bg_light,
+//            unfocusedContainerColor = bg_light,
+//            cursorColor = secondary_text,
+//            focusedLabelColor = secondary_text,
+//            unfocusedLabelColor = secondary_text,
+//            focusedPlaceholderColor = secondary_text,
+//            unfocusedPlaceholderColor = secondary_text,
+//            focusedLeadingIconColor = secondary_text,
+//            unfocusedLeadingIconColor = secondary_text,
+//            focusedTrailingIconColor = secondary_text,
+//            unfocusedTrailingIconColor = secondary_text,
+//            focusedIndicatorColor = Color.Transparent,
+//            unfocusedIndicatorColor = Color.Transparent,
+//            disabledIndicatorColor = Color.Transparent,
+//            focusedBorderColor = primary_blue, // Color of the border when focused
+//            unfocusedBorderColor = Color.Gray,
         ),
         leadingIcon = if (leadingIcon != null) {
             {

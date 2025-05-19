@@ -129,7 +129,7 @@ fun Transaction(
                     leadingIcon = {
                         Icon(
                             imageVector = Icons.Default.Search,
-                            contentDescription = "Search"
+                            contentDescription = "Search",
                         )
                     },
                     placeholder = { Text(text = "Search", color = secondary_text) },
@@ -142,6 +142,7 @@ fun Transaction(
                     ),
                     modifier = Modifier
                         .weight(1f)
+                        .height(52.dp)
                 )
                 Spacer(modifier = Modifier.width(8.dp))
                 FilterButton(onClick = moveToFilter)
@@ -304,6 +305,7 @@ fun BillCard(
                     Image(
                         painter = if (transaction.type.name.lowercase() == "piutang") piutangPainter else utangPainter,
                         contentDescription = "Refresh",
+                        modifier = Modifier.size(28.dp)
                     )
                 }
             }

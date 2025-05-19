@@ -21,11 +21,8 @@ fun ManropeFontFamily() = FontFamily(
     Font(Res.font.Manrope_ExtraBold, FontWeight.ExtraBold),
     Font(Res.font.Manrope_ExtraLight, FontWeight.ExtraLight),
     Font(Res.font.Manrope_Light, FontWeight.Light),
-    Font(Res.font.Manrope_Regular, FontWeight.Normal),
     Font(Res.font.Manrope_Medium, FontWeight.Medium),
     Font(Res.font.Manrope_SemiBold, FontWeight.SemiBold),
-    Font(Res.font.Manrope_Bold, FontWeight.Bold),
-    Font(Res.font.Manrope_ExtraBold, FontWeight.ExtraBold)
 )
 
 @Composable

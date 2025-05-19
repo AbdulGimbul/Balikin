@@ -98,6 +98,7 @@ fun History(
                     ),
                     modifier = Modifier
                         .weight(1f)
+                        .height(52.dp)
                 )
                 Spacer(modifier = Modifier.width(8.dp))
                 FilterButton(onClick = moveToFilter)

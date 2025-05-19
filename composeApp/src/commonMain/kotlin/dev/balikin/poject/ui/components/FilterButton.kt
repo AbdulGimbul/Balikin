@@ -21,7 +21,7 @@ fun FilterButton(
     OutlinedButton(
         onClick = onClick,
         shape = RoundedCornerShape(10.dp),
-        modifier = Modifier.height(56.dp)
+        modifier = Modifier.height(52.dp)
     ) {
         Icon(
             imageVector = Icons.Filled.FilterList,

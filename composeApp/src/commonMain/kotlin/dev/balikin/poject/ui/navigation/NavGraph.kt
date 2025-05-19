@@ -24,6 +24,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MenuAnchorType
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -71,6 +72,7 @@ import dev.balikin.poject.features.transaction.presentation.TransactionViewModel
 import dev.balikin.poject.features.transaction.presentation.filter.TransFilterScreen
 import dev.balikin.poject.ui.components.DefaultButton
 import dev.balikin.poject.ui.theme.primary_blue
+import dev.balikin.poject.ui.theme.stroke
 import dev.balikin.poject.utils.formatDate
 import dev.balikin.poject.utils.getCurrentDate
 import kotlinx.datetime.Clock
@@ -139,7 +141,7 @@ fun NavHostContent(
 
     NavHost(
         navController = navController,
-        startDestination = Screen.Home.route,
+        startDestination = Screen.OnBoarding .route,
         modifier = Modifier.padding(innerPadding)
     ) {
         composable(Screen.Login.route) {
@@ -229,7 +231,11 @@ private fun AddTransactionBottomSheet(
                 value = name,
                 onValueChange = { name = it },
                 label = { RequiredLabel("Nama") },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
+                colors = OutlinedTextFieldDefaults.colors(
+                    unfocusedBorderColor = stroke,
+                    focusedBorderColor = primary_blue
+                )
             )
 
             Row(
@@ -251,7 +257,10 @@ private fun AddTransactionBottomSheet(
                         trailingIcon = {
                             ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
                         },
-                        colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors()
+                        colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors(
+                            unfocusedBorderColor = stroke,
+                            focusedBorderColor = primary_blue
+                        )
                     )
 
                     ExposedDropdownMenu(
@@ -281,6 +290,10 @@ private fun AddTransactionBottomSheet(
                     modifier = Modifier.weight(1f),
                     keyboardOptions = KeyboardOptions.Default.copy(
                         keyboardType = KeyboardType.Number
+                    ),
+                    colors = OutlinedTextFieldDefaults.colors(
+                        unfocusedBorderColor = stroke,
+                        focusedBorderColor = primary_blue
                     )
                 )
 
@@ -302,7 +315,11 @@ private fun AddTransactionBottomSheet(
                         )
                     }
                 },
-                placeholder = { Text("dd/mm/yyyy") }
+                placeholder = { Text("dd/mm/yyyy") },
+                colors = OutlinedTextFieldDefaults.colors(
+                    unfocusedBorderColor = stroke,
+                    focusedBorderColor = primary_blue
+                )
             )
 
             if (showDatePicker) {
@@ -329,7 +346,11 @@ private fun AddTransactionBottomSheet(
                 label = { Text("Keterangan") },
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = false,
-                maxLines = 3
+                maxLines = 3,
+                colors = OutlinedTextFieldDefaults.colors(
+                    unfocusedBorderColor = stroke,
+                    focusedBorderColor = primary_blue
+                )
             )
 
             DefaultButton(
