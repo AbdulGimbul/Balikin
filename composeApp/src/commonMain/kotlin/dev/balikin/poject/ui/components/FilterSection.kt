@@ -144,6 +144,7 @@ fun DateFilterChips(
 
     if (showStartDatePicker) {
         CustomDatePickerDialog(
+            isEndDate = false,
             onDateSelected = {
                 showStartDatePicker = false
 
@@ -159,6 +160,7 @@ fun DateFilterChips(
     }
     if (showEndDatePicker) {
         CustomDatePickerDialog(
+            isEndDate = true,
             onDateSelected = {
                 showEndDatePicker = false
 
@@ -177,6 +179,7 @@ fun DateFilterChips(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CustomDatePickerDialog(
+    isEndDate: Boolean = false,
     onDateSelected: (LocalDateTime) -> Unit,
     onDismiss: () -> Unit
 ) {
@@ -184,14 +187,21 @@ fun CustomDatePickerDialog(
         initialSelectedDateMillis = Clock.System.now().toEpochMilliseconds(),
     )
     val selectedDate = datePickerState.selectedDateMillis?.let {
-        Instant.fromEpochMilliseconds(it).toLocalDateTime(TimeZone.currentSystemDefault())
+        Instant.fromEpochMilliseconds(it).toLocalDateTime(TimeZone.currentSystemDefault()).date
     }
     DatePickerDialog(
         onDismissRequest = onDismiss,
         confirmButton = {
             TextButton(onClick = {
-                selectedDate?.let {
-                    onDateSelected(it)
+                selectedDate?.let { date ->
+                    val resultDateTime = if (isEndDate) {
+                        // End of the day: 23:59
+                        LocalDateTime(date.year, date.monthNumber, date.dayOfMonth, 23, 59)
+                    } else {
+                        // Start of the day: 00:00
+                        LocalDateTime(date.year, date.monthNumber, date.dayOfMonth, 0, 0)
+                    }
+                    onDateSelected(resultDateTime)
                 }
             }) {
                 Text("OK")

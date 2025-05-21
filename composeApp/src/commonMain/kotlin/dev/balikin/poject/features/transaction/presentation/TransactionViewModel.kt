@@ -163,14 +163,17 @@ class TransactionViewModel(
 
     fun removeTypeFilter() = uiState.value.appliedFilters?.let {
         applyUserFilters(null, it.sortOrder, it.startDate, it.endDate)
+        _filterUiState.value = _filterUiState.value.copy(selectedType = null)
     }
 
     fun removeSortFilter() = uiState.value.appliedFilters?.let {
         applyUserFilters(it.type, null, it.startDate, it.endDate)
+        _filterUiState.value = _filterUiState.value.copy(selectedSortOrder = null)
     }
 
     fun removeDateFilter() = uiState.value.appliedFilters?.let {
         applyUserFilters(it.type, it.sortOrder, null, null)
+        _filterUiState.value = _filterUiState.value.copy(startDate = null, endDate = null)
     }
 
     fun previewFilterResultCount(
