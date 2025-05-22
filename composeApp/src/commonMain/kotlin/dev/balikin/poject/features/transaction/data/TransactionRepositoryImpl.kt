@@ -51,4 +51,8 @@ class TransactionRepositoryImpl(
             updatedAt = currentTime
         )
     }
+
+    override fun searchTransactionsByName(query: String): Flow<List<TransactionEntity>> {
+        return transactionDao.searchTransactionsByName(query)
+    }
 }

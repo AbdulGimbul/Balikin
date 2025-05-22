@@ -85,3 +85,12 @@ fun getLastWeekDate(): LocalDateTime {
 fun getCurrentDate(): LocalDateTime {
     return Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date.atTime(23, 59, 59)
 }
+
+fun formatThousandSeparator(number: String): String {
+    if (number.isBlank()) return ""
+    val digitsOnly = number.filter { it.isDigit() }
+    return digitsOnly.reversed()
+        .chunked(3)
+        .joinToString(".")
+        .reversed()
+}

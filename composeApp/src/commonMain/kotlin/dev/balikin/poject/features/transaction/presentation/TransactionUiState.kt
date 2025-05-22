@@ -8,6 +8,7 @@ data class TransactionUiState(
     val transactions: List<TransactionEntity> = emptyList(),
     val appliedFilters: FilterParameters? = null,
     val showDialog: Boolean = false,
+    val nameSearch: String = "",
     val selectedTransactionId: Long? = null
 )
 

@@ -28,4 +28,8 @@ class HistoryRepositoryImpl(
     override suspend fun getAllHistories(): Flow<List<TransactionEntity>> {
         return historyDao.getAllHistories()
     }
+
+    override fun searchTransactionsByName(query: String): Flow<List<TransactionEntity>> {
+        return historyDao.searchTransactionsByName(query)
+    }
 }

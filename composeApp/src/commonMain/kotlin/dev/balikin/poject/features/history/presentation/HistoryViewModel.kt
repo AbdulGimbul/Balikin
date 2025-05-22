@@ -37,6 +37,9 @@ class HistoryViewModel(
             is HistoryUiEvent.OnRemoveDate -> removeDateFilter()
             is HistoryUiEvent.OnRemoveSort -> removeSortFilter()
             is HistoryUiEvent.OnRemoveType -> removeTypeFilter()
+            is HistoryUiEvent.OnQueryChanged -> {
+                searchTransactionsByName(uiEvent.query)
+            }
         }
     }
 
@@ -90,6 +93,15 @@ class HistoryViewModel(
             historyRepository.getAllHistories()
                 .collect { transactions ->
                     _uiState.value = _uiState.value.copy(transactions = transactions)
+                }
+        }
+    }
+
+    fun searchTransactionsByName(query: String) {
+        viewModelScope.launch {
+            historyRepository.searchTransactionsByName(query)
+                .collect { transactions ->
+                    _uiState.value = _uiState.value.copy(transactions = transactions, nameSearch = query)
                 }
         }
     }

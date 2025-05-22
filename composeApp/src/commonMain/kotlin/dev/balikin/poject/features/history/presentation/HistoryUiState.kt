@@ -5,5 +5,6 @@ import dev.balikin.poject.features.transaction.presentation.FilterParameters
 
 data class HistoryUiState(
     val transactions: List<TransactionEntity> = emptyList(),
-    val appliedFilters: FilterParameters? = null
+    val appliedFilters: FilterParameters? = null,
+    val nameSearch: String = ""
 )

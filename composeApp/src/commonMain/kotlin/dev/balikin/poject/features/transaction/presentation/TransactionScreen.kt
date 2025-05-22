@@ -66,6 +66,7 @@ import dev.balikin.poject.ui.theme.primary_text
 import dev.balikin.poject.ui.theme.red
 import dev.balikin.poject.ui.theme.secondary
 import dev.balikin.poject.ui.theme.secondary_text
+import dev.balikin.poject.ui.theme.stroke
 import dev.balikin.poject.utils.currencyFormat
 import dev.balikin.poject.utils.formatDate
 import dev.balikin.poject.utils.formatDateCreated
@@ -125,8 +126,10 @@ fun Transaction(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 OutlinedTextField(
-                    value = "",
-                    onValueChange = {},
+                    value = uiState.nameSearch,
+                    onValueChange = {
+                        onEvent(TransactionUiEvent.OnQueryChanged(it))
+                    },
                     textStyle = MaterialTheme.typography.bodyMedium,
                     leadingIcon = {
                         Icon(
@@ -141,6 +144,7 @@ fun Transaction(
                     colors = OutlinedTextFieldDefaults.colors(
                         cursorColor = primary_text,
                         unfocusedLabelColor = secondary_text,
+                        focusedBorderColor = primary_blue
                     ),
                     modifier = Modifier
                         .weight(1f)

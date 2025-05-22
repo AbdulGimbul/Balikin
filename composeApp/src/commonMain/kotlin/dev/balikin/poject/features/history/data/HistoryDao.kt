@@ -44,4 +44,11 @@ interface HistoryDao {
         endDate: LocalDateTime?,
         sortOrder: String?
     ): Flow<List<TransactionEntity>>
+
+    @Query(
+        "SELECT * FROM transactions WHERE " +
+                "name LIKE '%' || :query || '%' AND isPaid = 1 " +
+                "ORDER BY createdAt DESC"
+    )
+    fun searchTransactionsByName(query: String): Flow<List<TransactionEntity>>
 }

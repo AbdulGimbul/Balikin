@@ -22,4 +22,6 @@ interface TransactionRepository {
     ): Int
 
     suspend fun markTransactionAsPaid(transactionId: Long)
+
+    fun searchTransactionsByName(query: String): Flow<List<TransactionEntity>>
 }

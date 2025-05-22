@@ -35,8 +35,10 @@ import dev.balikin.poject.ui.components.FilterButton
 import dev.balikin.poject.ui.components.FilterTags
 import dev.balikin.poject.ui.components.TransactionItem
 import dev.balikin.poject.ui.navigation.Screen
+import dev.balikin.poject.ui.theme.primary_blue
 import dev.balikin.poject.ui.theme.primary_text
 import dev.balikin.poject.ui.theme.secondary_text
+import dev.balikin.poject.ui.theme.stroke
 
 @Composable
 fun HistoryScreen(viewModel: HistoryViewModel, navController: NavController) {
@@ -79,8 +81,10 @@ fun History(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 OutlinedTextField(
-                    value = "",
-                    onValueChange = {},
+                    value = uiState.nameSearch,
+                    onValueChange = {
+                        onEvent(HistoryUiEvent.OnQueryChanged(it))
+                    },
                     textStyle = MaterialTheme.typography.bodyMedium,
                     leadingIcon = {
                         Icon(
@@ -95,6 +99,7 @@ fun History(
                     colors = OutlinedTextFieldDefaults.colors(
                         cursorColor = primary_text,
                         unfocusedLabelColor = secondary_text,
+                        focusedBorderColor = primary_blue
                     ),
                     modifier = Modifier
                         .weight(1f)

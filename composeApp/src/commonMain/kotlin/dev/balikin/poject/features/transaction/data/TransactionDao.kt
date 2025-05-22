@@ -56,4 +56,11 @@ interface TransactionDao {
         paidAt: LocalDateTime,
         updatedAt: LocalDateTime
     )
+
+    @Query(
+        "SELECT * FROM transactions WHERE " +
+                "name LIKE '%' || :query || '%' AND isPaid = 0 " +
+                "ORDER BY createdAt DESC"
+    )
+    fun searchTransactionsByName(query: String): Flow<List<TransactionEntity>>
 }

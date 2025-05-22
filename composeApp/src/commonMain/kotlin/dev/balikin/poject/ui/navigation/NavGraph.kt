@@ -72,14 +72,18 @@ import dev.balikin.poject.features.transaction.presentation.TransactionViewModel
 import dev.balikin.poject.features.transaction.presentation.filter.TransFilterScreen
 import dev.balikin.poject.ui.components.DefaultButton
 import dev.balikin.poject.ui.theme.primary_blue
+import dev.balikin.poject.ui.theme.red
 import dev.balikin.poject.ui.theme.stroke
 import dev.balikin.poject.utils.formatDate
+import dev.balikin.poject.utils.formatThousandSeparator
 import dev.balikin.poject.utils.getCurrentDate
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
+import multiplatform.network.cmptoast.ToastDuration
+import multiplatform.network.cmptoast.showToast
 import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -280,10 +284,11 @@ private fun AddTransactionBottomSheet(
                 }
 
                 OutlinedTextField(
-                    value = amount,
+                    value = formatThousandSeparator(amount),
                     onValueChange = { newValue ->
-                        if (newValue.all { it.isDigit() }) {
-                            amount = newValue
+                        val cleaned = newValue.replace(".", "")
+                        if (cleaned.all { it.isDigit() }) {
+                            amount = cleaned
                         }
                     },
                     label = { RequiredLabel("Amount") },
@@ -296,7 +301,6 @@ private fun AddTransactionBottomSheet(
                         focusedBorderColor = primary_blue
                     )
                 )
-
             }
 
             OutlinedTextField(
@@ -355,14 +359,21 @@ private fun AddTransactionBottomSheet(
 
             DefaultButton(
                 onClick = {
-                    viewModel.addTransaction(
-                        name = name,
-                        date = date.toString(),
-                        note = note,
-                        amount = amount,
-                        type = selectedType
-                    )
-                    onSaveClicked()
+                    if (amount.isNotBlank() && amount.toDoubleOrNull() != 0.0 && name.isNotBlank()) {
+                        viewModel.addTransaction(
+                            name = name,
+                            date = date.toString(),
+                            note = note,
+                            amount = amount,
+                            type = selectedType
+                        )
+                        onSaveClicked()
+                    } else {
+                        showToast(
+                            message = "Data yang anda isi belum lengkap!",
+                            backgroundColor = red
+                        )
+                    }
                 },
                 modifier = Modifier.fillMaxWidth(),
                 text = "Simpan"

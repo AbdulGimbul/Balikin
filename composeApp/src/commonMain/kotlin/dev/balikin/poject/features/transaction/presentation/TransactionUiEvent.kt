@@ -7,4 +7,5 @@ sealed class TransactionUiEvent {
     data object OnMarkAsPaid: TransactionUiEvent()
     data class OnPaidClicked(val id: Long): TransactionUiEvent()
     data object OnDismissDialog: TransactionUiEvent()
+    data class OnQueryChanged(val query: String): TransactionUiEvent()
 }

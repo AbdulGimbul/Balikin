@@ -20,4 +20,6 @@ interface HistoryRepository {
     ): Int
 
     suspend fun getAllHistories(): Flow<List<TransactionEntity>>
+
+    fun searchTransactionsByName(query: String): Flow<List<TransactionEntity>>
 }

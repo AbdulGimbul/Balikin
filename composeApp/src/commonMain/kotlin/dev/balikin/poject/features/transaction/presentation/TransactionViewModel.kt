@@ -51,6 +51,10 @@ class TransactionViewModel(
             TransactionUiEvent.OnDismissDialog -> {
                 _uiState.value = _uiState.value.copy(showDialog = false)
             }
+
+            is TransactionUiEvent.OnQueryChanged -> {
+                searchTransactionsByName(uiEvent.query)
+            }
         }
     }
 
@@ -104,6 +108,15 @@ class TransactionViewModel(
             transactionRepository.getAllTransactions()
                 .collect { transactions ->
                     _uiState.value = _uiState.value.copy(transactions = transactions)
+                }
+        }
+    }
+
+    fun searchTransactionsByName(query: String) {
+        viewModelScope.launch {
+            transactionRepository.searchTransactionsByName(query)
+                .collect { transactions ->
+                    _uiState.value = _uiState.value.copy(transactions = transactions, nameSearch = query)
                 }
         }
     }
