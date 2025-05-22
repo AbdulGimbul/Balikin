@@ -9,8 +9,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.CalendarMonth
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.DropdownMenuItem
@@ -82,7 +80,6 @@ import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
-import multiplatform.network.cmptoast.ToastDuration
 import multiplatform.network.cmptoast.showToast
 import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.viewmodel.koinViewModel
@@ -145,7 +142,7 @@ fun NavHostContent(
 
     NavHost(
         navController = navController,
-        startDestination = Screen.OnBoarding .route,
+        startDestination = Screen.OnBoarding.route,
         modifier = Modifier.padding(innerPadding)
     ) {
         composable(Screen.Login.route) {

@@ -38,7 +38,6 @@ import dev.balikin.poject.ui.navigation.Screen
 import dev.balikin.poject.ui.theme.primary_blue
 import dev.balikin.poject.ui.theme.primary_text
 import dev.balikin.poject.ui.theme.secondary_text
-import dev.balikin.poject.ui.theme.stroke
 
 @Composable
 fun HistoryScreen(viewModel: HistoryViewModel, navController: NavController) {

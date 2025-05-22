@@ -8,6 +8,6 @@ sealed class HistoryFilterUiEvent {
     data class OnSortOrderChanged(val sortOrder: String?) : HistoryFilterUiEvent()
     data class OnStartDateChanged(val startDate: LocalDateTime?) : HistoryFilterUiEvent()
     data class OnEndDateChanged(val endDate: LocalDateTime?) : HistoryFilterUiEvent()
-    object OnPreviewResultCount: HistoryFilterUiEvent()
-    object OnApplyFilters: HistoryFilterUiEvent()
+    object OnPreviewResultCount : HistoryFilterUiEvent()
+    object OnApplyFilters : HistoryFilterUiEvent()
 }

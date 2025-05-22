@@ -86,9 +86,9 @@ class HomeViewModel(
             transactionRepository.addTransaction(transaction)
 
             val currentUiType = when (_uiState.value.selectedTab.lowercase()) {
-                "utang"  -> TransactionType.Utang
+                "utang" -> TransactionType.Utang
                 "piutang" -> TransactionType.Piutang
-                else     -> TransactionType.Piutang
+                else -> TransactionType.Piutang
             }
 
             getTotalAmountByType(currentUiType)

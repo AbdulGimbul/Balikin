@@ -101,7 +101,8 @@ class HistoryViewModel(
         viewModelScope.launch {
             historyRepository.searchTransactionsByName(query)
                 .collect { transactions ->
-                    _uiState.value = _uiState.value.copy(transactions = transactions, nameSearch = query)
+                    _uiState.value =
+                        _uiState.value.copy(transactions = transactions, nameSearch = query)
                 }
         }
     }

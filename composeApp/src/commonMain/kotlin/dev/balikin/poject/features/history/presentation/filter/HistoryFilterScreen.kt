@@ -27,7 +27,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import dev.balikin.poject.features.history.presentation.HistoryViewModel
 import dev.balikin.poject.features.transaction.data.TransactionType
-import dev.balikin.poject.features.transaction.presentation.filter.TransFilterUiEvent
 import dev.balikin.poject.ui.components.DateFilterChips
 import dev.balikin.poject.ui.components.DefaultButton
 import dev.balikin.poject.ui.components.FilterSection

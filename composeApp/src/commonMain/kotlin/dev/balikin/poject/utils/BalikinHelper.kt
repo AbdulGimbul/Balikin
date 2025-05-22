@@ -1,9 +1,7 @@
 package dev.balikin.poject.utils
 
-import dev.balikin.poject.features.transaction.presentation.FilterParameters
 import kotlinx.datetime.Clock
 import kotlinx.datetime.DateTimePeriod
-import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.atTime
@@ -83,7 +81,11 @@ fun getLastWeekDate(): LocalDateTime {
 }
 
 fun getCurrentDate(): LocalDateTime {
-    return Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date.atTime(23, 59, 59)
+    return Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date.atTime(
+        23,
+        59,
+        59
+    )
 }
 
 fun formatThousandSeparator(number: String): String {

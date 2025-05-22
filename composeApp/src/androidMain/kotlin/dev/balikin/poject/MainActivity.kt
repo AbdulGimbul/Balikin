@@ -6,7 +6,6 @@ import android.animation.ObjectAnimator
 import android.os.Bundle
 import android.util.TypedValue
 import android.view.View
-import android.view.animation.AccelerateDecelerateInterpolator
 import android.view.animation.DecelerateInterpolator
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -40,6 +39,7 @@ class MainActivity : ComponentActivity() {
                     override fun onAnimationEnd(animation: Animator) {
                         splashView.remove()
                     }
+
                     override fun onAnimationStart(animation: Animator) {}
                     override fun onAnimationCancel(animation: Animator) {}
                     override fun onAnimationRepeat(animation: Animator) {}

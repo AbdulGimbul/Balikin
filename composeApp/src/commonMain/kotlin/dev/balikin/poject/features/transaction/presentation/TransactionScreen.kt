@@ -22,7 +22,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.material.icons.outlined.Error
 import androidx.compose.material.icons.outlined.ErrorOutline
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -59,14 +58,12 @@ import dev.balikin.poject.ui.components.FilterTags
 import dev.balikin.poject.ui.navigation.Screen
 import dev.balikin.poject.ui.theme.green
 import dev.balikin.poject.ui.theme.grey2
-import dev.balikin.poject.ui.theme.orange
 import dev.balikin.poject.ui.theme.primary
 import dev.balikin.poject.ui.theme.primary_blue
 import dev.balikin.poject.ui.theme.primary_text
 import dev.balikin.poject.ui.theme.red
 import dev.balikin.poject.ui.theme.secondary
 import dev.balikin.poject.ui.theme.secondary_text
-import dev.balikin.poject.ui.theme.stroke
 import dev.balikin.poject.utils.currencyFormat
 import dev.balikin.poject.utils.formatDate
 import dev.balikin.poject.utils.formatDateCreated
@@ -344,12 +341,18 @@ fun CustomDialog(
                 Text(
                     text = "Selesai?",
                     modifier = Modifier.padding(8.dp),
-                    style = MaterialTheme.typography.titleMedium.copy(color = secondary, fontWeight = FontWeight.SemiBold)
+                    style = MaterialTheme.typography.titleMedium.copy(
+                        color = secondary,
+                        fontWeight = FontWeight.SemiBold
+                    )
                 )
                 Text(
                     text = "Apakah anda yakin utang yang anda pinjamkan sudah terbayar?",
                     modifier = Modifier.padding(8.dp),
-                    style = MaterialTheme.typography.bodyMedium.copy(color = secondary_text, textAlign = TextAlign.Center)
+                    style = MaterialTheme.typography.bodyMedium.copy(
+                        color = secondary_text,
+                        textAlign = TextAlign.Center
+                    )
                 )
                 Row(
                     modifier = Modifier

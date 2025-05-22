@@ -1,8 +1,6 @@
 package dev.balikin.poject.features.auth.presentation.reset_password
 
-import androidx.compose.runtime.mutableStateListOf
 import androidx.lifecycle.ViewModel
-import dev.balikin.poject.ui.navigation.Screen
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -12,7 +10,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-class ResetPasswordViewModel(): ViewModel() {
+class ResetPasswordViewModel() : ViewModel() {
     private val _uiState = MutableStateFlow(ResetPasswordUiState())
     val uiState: StateFlow<ResetPasswordUiState> = _uiState.asStateFlow()
 
@@ -29,6 +27,7 @@ class ResetPasswordViewModel(): ViewModel() {
                 newOtpValues[event.index] = event.value
                 _uiState.update { it.copy(otpValues = newOtpValues) }
             }
+
             is ResetPasswordUiEvent.VerifyOtp -> {
                 // Implement OTP verification logic
                 val otpValues = _uiState.value.otpValues
@@ -38,6 +37,7 @@ class ResetPasswordViewModel(): ViewModel() {
                     verifyOtp(otp)
                 }
             }
+
             is ResetPasswordUiEvent.ResendCode -> {
                 // Implement code resend logic
                 _uiState.update { it.copy(timeLeft = 81) }

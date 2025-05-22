@@ -18,7 +18,8 @@ data class TransactionEntity(
     val type: TransactionType,
     val isPaid: Boolean = false,
     val paidAt: LocalDateTime? = null,
-    val createdAt: LocalDateTime = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()),
+    val createdAt: LocalDateTime = Clock.System.now()
+        .toLocalDateTime(TimeZone.currentSystemDefault()),
     val updatedAt: LocalDateTime? = null
 )
 

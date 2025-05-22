@@ -26,7 +26,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import dev.balikin.poject.ui.theme.primary
@@ -38,7 +37,6 @@ import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import multiplatform.network.cmptoast.ToastDuration
-import multiplatform.network.cmptoast.ToastPadding
 import multiplatform.network.cmptoast.showToast
 
 @Composable

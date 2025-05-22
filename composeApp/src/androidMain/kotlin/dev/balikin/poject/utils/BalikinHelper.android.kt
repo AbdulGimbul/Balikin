@@ -2,8 +2,8 @@ package dev.balikin.poject.utils
 
 import android.content.Context
 import android.content.Intent
-import dev.balikin.poject.MyApplication
 import androidx.core.net.toUri
+import dev.balikin.poject.MyApplication
 import java.text.NumberFormat
 import java.util.Locale
 
