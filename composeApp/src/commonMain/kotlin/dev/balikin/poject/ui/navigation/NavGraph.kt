@@ -29,11 +29,14 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.backhandler.BackHandler
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -75,6 +78,7 @@ import dev.balikin.poject.ui.theme.stroke
 import dev.balikin.poject.utils.formatDate
 import dev.balikin.poject.utils.formatThousandSeparator
 import dev.balikin.poject.utils.getCurrentDate
+import kotlinx.coroutines.delay
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDateTime
@@ -84,9 +88,11 @@ import multiplatform.network.cmptoast.showToast
 import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.viewmodel.koinViewModel
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
 @Composable
-fun SetupNavHost(navController: NavHostController) {
+fun SetupNavHost(navController: NavHostController, onExitApp: () -> Unit) {
+    var backPressedOnce by remember { mutableStateOf(false) }
+
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
     val sheetState = rememberModalBottomSheetState(
@@ -94,6 +100,22 @@ fun SetupNavHost(navController: NavHostController) {
     )
     var showBottomSheet by remember { mutableStateOf(false) }
     val homeViewModel: HomeViewModel = koinViewModel()
+
+    if (currentRoute == Screen.Home.route) {
+        BackHandler {
+            if (backPressedOnce) {
+                onExitApp()
+            } else {
+                backPressedOnce = true
+                showToast("Press back again to exit")
+            }
+        }
+
+        LaunchedEffect(Unit) {
+            delay(2000)
+            backPressedOnce = false
+        }
+    }
 
     Scaffold(
         bottomBar = {

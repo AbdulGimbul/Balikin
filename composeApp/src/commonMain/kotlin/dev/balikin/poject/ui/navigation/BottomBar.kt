@@ -119,7 +119,17 @@ fun BottomBarWithFab(
                     modifier = Modifier.weight(1f),
                     item = item,
                     selected = currentRoute == item.screen.route,
-                    onClick = { navController.navigate(item.screen.route) }
+                    onClick = {
+                        navController.navigate(item.screen.route) {
+                            navController.graph.startDestinationRoute?.let {
+                                popUpTo(Screen.Home.route) {
+                                    saveState = true
+                                }
+                                restoreState = true
+                                launchSingleTop = true
+                            }
+                        }
+                    }
                 )
             }
         }

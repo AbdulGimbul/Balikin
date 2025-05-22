@@ -9,12 +9,12 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 
 @Composable
 @Preview
-fun App() {
+fun App(onExitApp: () -> Unit) {
     MaterialTheme(
         typography = ManropeTypography()
     ) {
         val navController = rememberNavController()
 
-        SetupNavHost(navController = navController)
+        SetupNavHost(navController = navController, onExitApp = onExitApp)
     }
 }

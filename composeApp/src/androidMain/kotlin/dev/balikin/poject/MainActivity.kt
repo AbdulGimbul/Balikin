@@ -49,7 +49,9 @@ class MainActivity : ComponentActivity() {
         }
 
         setContent {
-            App()
+            App(
+                onExitApp = { finish() }
+            )
         }
     }
 }
@@ -57,5 +59,5 @@ class MainActivity : ComponentActivity() {
 @Preview
 @Composable
 fun AppAndroidPreview() {
-    App()
+    App(onExitApp = {})
 }
