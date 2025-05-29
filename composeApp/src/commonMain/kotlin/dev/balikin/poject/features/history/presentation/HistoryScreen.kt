@@ -62,7 +62,7 @@ fun History(
         modifier = Modifier.fillMaxWidth()
     ) {
         Text(
-            text = "Transaksi Utang Piutang",
+            text = "History",
             style = MaterialTheme.typography.titleLarge.copy(
                 fontWeight = FontWeight.SemiBold
             ),

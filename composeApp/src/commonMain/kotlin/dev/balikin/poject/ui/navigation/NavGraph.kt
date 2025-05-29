@@ -39,8 +39,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.backhandler.BackHandler
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
@@ -75,6 +77,7 @@ import dev.balikin.poject.ui.components.DefaultButton
 import dev.balikin.poject.ui.theme.primary_blue
 import dev.balikin.poject.ui.theme.red
 import dev.balikin.poject.ui.theme.stroke
+import dev.balikin.poject.utils.ThousandSeparatorVisualTransformation
 import dev.balikin.poject.utils.formatDate
 import dev.balikin.poject.utils.formatThousandSeparator
 import dev.balikin.poject.utils.getCurrentDate
@@ -229,7 +232,7 @@ private fun AddTransactionBottomSheet(
     val transactionTypes = listOf("Utang", "Piutang")
     var expanded by remember { mutableStateOf(false) }
     var selectedType by remember { mutableStateOf("Utang") }
-    var amount by remember { mutableStateOf("") }
+    var amount by remember { mutableStateOf(TextFieldValue("")) }
     var date by remember { mutableStateOf<LocalDateTime>(getCurrentDate()) }
     var note by remember { mutableStateOf("") }
     var showDatePicker by remember { mutableStateOf(false) }
@@ -303,18 +306,17 @@ private fun AddTransactionBottomSheet(
                 }
 
                 OutlinedTextField(
-                    value = formatThousandSeparator(amount),
+                    value = amount.text,
                     onValueChange = { newValue ->
-                        val cleaned = newValue.replace(".", "")
-                        if (cleaned.all { it.isDigit() }) {
-                            amount = cleaned
-                        }
+                        val cleaned = newValue.filter { it.isDigit() }
+                        amount = TextFieldValue(text = cleaned, selection = TextRange(cleaned.length))
                     },
                     label = { RequiredLabel("Amount") },
                     modifier = Modifier.weight(1f),
                     keyboardOptions = KeyboardOptions.Default.copy(
-                        keyboardType = KeyboardType.Number
+                        keyboardType = KeyboardType.NumberPassword
                     ),
+                    visualTransformation = ThousandSeparatorVisualTransformation(),
                     colors = OutlinedTextFieldDefaults.colors(
                         unfocusedBorderColor = stroke,
                         focusedBorderColor = primary_blue
@@ -378,12 +380,13 @@ private fun AddTransactionBottomSheet(
 
             DefaultButton(
                 onClick = {
-                    if (amount.isNotBlank() && amount.toDoubleOrNull() != 0.0 && name.isNotBlank()) {
+                    val rawAmount = amount.text
+                    if (rawAmount.isNotBlank() && rawAmount.toDoubleOrNull() != 0.0 && name.isNotBlank()) {
                         viewModel.addTransaction(
                             name = name,
                             date = date.toString(),
                             note = note,
-                            amount = amount,
+                            amount = rawAmount,
                             type = selectedType
                         )
                         onSaveClicked()

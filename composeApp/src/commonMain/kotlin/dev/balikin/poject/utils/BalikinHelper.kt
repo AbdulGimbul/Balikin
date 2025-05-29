@@ -1,5 +1,9 @@
 package dev.balikin.poject.utils
 
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.input.OffsetMapping
+import androidx.compose.ui.text.input.TransformedText
+import androidx.compose.ui.text.input.VisualTransformation
 import kotlinx.datetime.Clock
 import kotlinx.datetime.DateTimePeriod
 import kotlinx.datetime.LocalDateTime
@@ -95,4 +99,51 @@ fun formatThousandSeparator(number: String): String {
         .chunked(3)
         .joinToString(".")
         .reversed()
+}
+
+class ThousandSeparatorVisualTransformation : VisualTransformation {
+    override fun filter(text: AnnotatedString): TransformedText {
+        val originalText = text.text
+        if (originalText.isEmpty()) {
+            return TransformedText(AnnotatedString(""), OffsetMapping.Identity)
+        }
+
+        // Ensure only digits are processed for formatting,
+        // though the TextField's onValueChange should already handle this.
+        val digitsOnly = originalText.filter { it.isDigit() }
+        if (digitsOnly.isEmpty()) {
+            return TransformedText(AnnotatedString(""), OffsetMapping.Identity)
+        }
+
+        val formattedText = digitsOnly.reversed()
+            .chunked(3)
+            .joinToString(".")
+            .reversed()
+
+        val offsetMapping = object : OffsetMapping {
+            override fun originalToTransformed(offset: Int): Int {
+                if (digitsOnly.isEmpty()) return offset
+                // Calculate how many separators are inserted before the original offset
+                val separatorsBefore = (offset - 1) / 3
+                return offset + separatorsBefore
+            }
+
+            override fun transformedToOriginal(offset: Int): Int {
+                if (formattedText.isEmpty()) return offset
+                // Calculate how many separators are before the transformed offset
+                var originalOffset = offset
+                var separatorsCount = 0
+                var i = 0
+                while (i < offset && i < formattedText.length) {
+                    if (formattedText[i] == '.') {
+                        separatorsCount++
+                    }
+                    i++
+                }
+                originalOffset -= separatorsCount
+                return kotlin.math.max(0, originalOffset) // Ensure it's not negative
+            }
+        }
+        return TransformedText(AnnotatedString(formattedText), offsetMapping)
+    }
 }

@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
@@ -93,64 +94,67 @@ fun BottomBarWithFab(
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
 
-    Box(
+    Column(
         modifier = modifier
-            .height(80.dp)
-            .navigationBarsPadding(),
+            .fillMaxWidth()
+            .navigationBarsPadding()
     ) {
         HorizontalDivider(
             color = MaterialTheme.colorScheme.outlineVariant,
             thickness = 0.5.dp
         )
 
-        Row(
+        Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(64.dp).align(Alignment.Center),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
+                .padding(vertical = 10.dp),
+            contentAlignment = Alignment.Center
         ) {
-            navigationItems.forEachIndexed { index, item ->
-                if (index == 2) {  // Position before the FAB spacer
-                    Spacer(Modifier.weight(1f))
-                }
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                navigationItems.forEachIndexed { index, item ->
+                    if (index == 2) {
+                        Spacer(Modifier.weight(1f))
+                    }
 
-                BottomBarItem(
-                    modifier = Modifier.weight(1f),
-                    item = item,
-                    selected = currentRoute == item.screen.route,
-                    onClick = {
-                        navController.navigate(item.screen.route) {
-                            navController.graph.startDestinationRoute?.let {
-                                popUpTo(Screen.Home.route) {
-                                    saveState = true
+                    BottomBarItem(
+                        modifier = Modifier.weight(1f),
+                        item = item,
+                        selected = currentRoute == item.screen.route,
+                        onClick = {
+                            navController.navigate(item.screen.route) {
+                                navController.graph.startDestinationRoute?.let {
+                                    popUpTo(Screen.Home.route) {
+                                        saveState = true
+                                    }
+                                    restoreState = true
+                                    launchSingleTop = true
                                 }
-                                restoreState = true
-                                launchSingleTop = true
                             }
                         }
-                    }
+                    )
+                }
+            }
+
+            FloatingActionButton(
+                onClick = onFabClick,
+                shape = CircleShape,
+                containerColor = primary_blue,
+                contentColor = Color.White,
+                elevation = FloatingActionButtonDefaults.elevation(
+                    defaultElevation = 0.dp
+                )
+            ) {
+                Icon(
+                    imageVector = Icons.Outlined.Add,
+                    contentDescription = "Add Transaction",
+                    modifier = Modifier.size(24.dp)
                 )
             }
-        }
-
-        // Centered FAB
-        FloatingActionButton(
-            onClick = onFabClick,
-            modifier = Modifier
-                .align(Alignment.Center),
-            shape = CircleShape,
-            containerColor = primary_blue,
-            contentColor = Color.White,
-            elevation = FloatingActionButtonDefaults.elevation(
-                defaultElevation = 0.dp
-            )
-        ) {
-            Icon(
-                imageVector = Icons.Outlined.Add,
-                contentDescription = "Add Transaction",
-                modifier = Modifier.size(24.dp)
-            )
         }
     }
 }

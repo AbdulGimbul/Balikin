@@ -38,6 +38,7 @@ class HistoryViewModel(
             is HistoryUiEvent.OnRemoveSort -> removeSortFilter()
             is HistoryUiEvent.OnRemoveType -> removeTypeFilter()
             is HistoryUiEvent.OnQueryChanged -> {
+                _uiState.value = _uiState.value.copy(nameSearch = uiEvent.query)
                 searchTransactionsByName(uiEvent.query)
             }
         }
@@ -102,7 +103,7 @@ class HistoryViewModel(
             historyRepository.searchTransactionsByName(query)
                 .collect { transactions ->
                     _uiState.value =
-                        _uiState.value.copy(transactions = transactions, nameSearch = query)
+                        _uiState.value.copy(transactions = transactions)
                 }
         }
     }

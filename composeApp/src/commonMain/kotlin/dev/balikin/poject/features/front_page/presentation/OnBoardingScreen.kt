@@ -8,6 +8,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -19,7 +20,9 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -34,10 +37,12 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import balikin.composeapp.generated.resources.Res
@@ -61,11 +66,7 @@ fun OnBoardingScreen(viewModel: OnBoardingViewModel, navController: NavControlle
         uiState = uiState.value,
         onEvent = viewModel::onEvent,
         moveToLogin = {
-            navController.navigate(Screen.Login.route) {
-                popUpTo(Screen.OnBoarding.route) {
-                    inclusive = true
-                }
-            }
+            navController.navigate(Screen.Login.route)
         },
         moveToHome = {
             navController.navigate(Screen.Home.route) {
@@ -112,88 +113,106 @@ fun Onboarding(
             Image(
                 painter = painterResource(Res.drawable.bg_onboarding),
                 contentDescription = null,
-                contentScale = ContentScale.FillWidth,
+                contentScale = ContentScale.FillWidth, // Changed to FillWidth for better adaptability
                 modifier = Modifier.fillMaxWidth()
             )
         }
 
-        Column {
-            Column(
-                modifier = Modifier.weight(1f),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                HorizontalPager(
-                    state = pagerState,
-                    modifier = Modifier.weight(1f)
-                ) { page ->
+        Column(modifier = Modifier.fillMaxSize()) { // Ensure Column fills size
+            HorizontalPager(
+                state = pagerState,
+                modifier = Modifier.weight(1f) // Pager takes up available space
+            ) { page ->
+                // Make each page content scrollable
+                BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
+                    val screenHeight = maxHeight
+                    val screenWidth = maxWidth
+                    val density = LocalDensity.current
+
+                    // Adjust font sizes based on screen height
+                    val titleFontSize = remember(screenHeight) {
+                        // Coerce the Float value, then convert to .sp
+                        (screenHeight.value * 0.035f).coerceIn(24f, 32f).sp
+                    }
+                    val descriptionFontSize = remember(screenHeight) {
+                        // Coerce the Float value, then convert to .sp
+                        (screenHeight.value * 0.025f).coerceIn(14f, 18f).sp
+                    }
+                    val imageSize = remember(screenWidth, screenHeight) {
+                        (kotlin.math.min(screenWidth.value, screenHeight.value * 0.5f) * 0.6f).dp.coerceIn(150.dp, 300.dp)
+                    }
+                    val logoSize = remember(screenWidth) {
+                        (screenWidth.value * 0.25f).dp.coerceIn(80.dp, 120.dp)
+                    }
+
                     Column(
                         modifier = Modifier
-                            .fillMaxWidth(),
+                            .fillMaxSize() // Fill the BoxWithConstraints
+                            .verticalScroll(rememberScrollState()) // Make content scrollable
+                            .padding(horizontal = 24.dp, vertical = 16.dp), // Add some padding
                         horizontalAlignment = Alignment.CenterHorizontally,
                         verticalArrangement = Arrangement.Center
                     ) {
-                        if (page == 2) {
+                        if (page == 2) { // Last page (Get Started)
                             Image(
                                 painter = painterResource(Res.drawable.balikin_logo),
                                 contentDescription = null,
-                                modifier = Modifier.size(100.dp).padding(bottom = 10.dp)
+                                modifier = Modifier.size(logoSize).padding(bottom = 10.dp)
                             )
                             Image(
                                 painter = painterResource(uiState.pages[page].imageRes),
                                 contentDescription = null,
-                                modifier = Modifier.size(250.dp)
+                                modifier = Modifier.size(imageSize) // Adaptive size
                             )
-
                             Spacer(modifier = Modifier.height(32.dp))
-
                             Text(
                                 text = uiState.pages[page].title,
-                                style = MaterialTheme.typography.headlineMedium,
+                                style = MaterialTheme.typography.headlineMedium.copy(fontSize = titleFontSize),
                                 textAlign = TextAlign.Center,
                                 color = primary_text
                             )
-
                             Spacer(modifier = Modifier.height(16.dp))
-
                             Text(
                                 text = uiState.pages[page].description,
-                                style = MaterialTheme.typography.bodyLarge,
+                                style = MaterialTheme.typography.bodyLarge.copy(fontSize = descriptionFontSize),
                                 color = secondary_text,
-                                textAlign = TextAlign.Center,
-                                modifier = Modifier.padding(horizontal = 24.dp)
+                                textAlign = TextAlign.Center
                             )
-                        } else {
+                        } else { // Other pages
+                            // Spacer to push content down a bit, or adjust arrangement
+                            Spacer(modifier = Modifier.height(screenHeight * 0.1f))
                             Text(
                                 text = uiState.pages[page].title,
-                                style = MaterialTheme.typography.headlineMedium,
+                                style = MaterialTheme.typography.headlineMedium.copy(fontSize = titleFontSize),
                                 textAlign = TextAlign.Center,
                                 color = Color.White
                             )
-
                             Spacer(modifier = Modifier.height(32.dp))
-
                             Image(
                                 painter = painterResource(uiState.pages[page].imageRes),
                                 contentDescription = null,
-                                modifier = Modifier.size(250.dp)
+                                modifier = Modifier.size(imageSize) // Adaptive size
                             )
-
                             Spacer(modifier = Modifier.height(16.dp))
-
                             Text(
                                 text = uiState.pages[page].description,
-                                style = MaterialTheme.typography.bodyLarge,
+                                style = MaterialTheme.typography.bodyLarge.copy(fontSize = descriptionFontSize),
                                 color = Color.White,
-                                textAlign = TextAlign.Center,
-                                modifier = Modifier.padding(horizontal = 24.dp)
+                                textAlign = TextAlign.Center
                             )
+                            Spacer(modifier = Modifier.weight(1f)) // Pushes content above indicators if it's short
                         }
                     }
                 }
+            }
 
+            // Controls section (Dots, Button, Skip/Login)
+            Column(
+                modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp), // Padding for controls
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
                 Row(
-                    modifier = Modifier
-                        .weight(0.15f),
+                    modifier = Modifier.padding(vertical = 16.dp), // Add padding around dots
                     horizontalArrangement = Arrangement.Center,
                 ) {
                     repeat(pagerState.pageCount) { iteration ->
@@ -208,7 +227,6 @@ fun Onboarding(
                                 .size(10.dp)
                                 .background(color)
                         )
-
                         if (iteration < pagerState.pageCount - 1) {
                             Spacer(modifier = Modifier.width(6.dp))
                         }
@@ -223,7 +241,7 @@ fun Onboarding(
                                 pagerState.animateScrollToPage(pagerState.currentPage + 1)
                             }
                         } else {
-                            moveToHome()
+                            moveToHome() // Or moveToLogin() if Get Started should go to Login
                         }
                     },
                     colors = ButtonDefaults.buttonColors(
@@ -232,14 +250,14 @@ fun Onboarding(
                     ),
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 24.dp, 16.dp),
+                        .padding(horizontal = 24.dp, vertical = 8.dp), // Adjusted padding
                 )
 
                 if (uiState.isLastPage) {
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(bottom = 32.dp),
+                            .padding(bottom = 16.dp, top = 8.dp), // Adjusted padding
                         horizontalArrangement = Arrangement.Center
                     ) {
                         Text(
@@ -247,7 +265,6 @@ fun Onboarding(
                             style = MaterialTheme.typography.bodyLarge,
                             color = secondary_text
                         )
-
                         Text(
                             text = "Sign in",
                             style = MaterialTheme.typography.bodyLarge,
@@ -268,7 +285,7 @@ fun Onboarding(
                         ),
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(bottom = 32.dp)
+                            .padding(bottom = 16.dp, top = 8.dp) // Adjusted padding
                             .clickable(
                                 interactionSource = remember { MutableInteractionSource() },
                                 indication = null
@@ -281,26 +298,23 @@ fun Onboarding(
                         color = Color.White
                     )
                 }
-            }
-            Column(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
+
+                // Attribution text
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(bottom = 32.dp),
+                        .padding(bottom = 16.dp), // Padding for attribution
                     horizontalArrangement = Arrangement.Center
                 ) {
                     Text(
                         text = "Icons by ",
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = Color.White.copy(alpha = 0.3f)
+                        style = MaterialTheme.typography.bodySmall, // Made smaller
+                        color = if (uiState.isLastPage) Color.Gray else Color.White.copy(alpha = 0.5f) // Adjusted color
                     )
                     Text(
                         text = "icons8",
-                        style = MaterialTheme.typography.bodyMedium.copy(
-                            color = Color.White.copy(alpha = 0.5f),
+                        style = MaterialTheme.typography.bodySmall.copy( // Made smaller
+                            color = if (uiState.isLastPage) primary_blue else Color.White.copy(alpha = 0.7f), // Adjusted color
                             textDecoration = TextDecoration.Underline
                         ),
                         modifier = Modifier.clickable(
