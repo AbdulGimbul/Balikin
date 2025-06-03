@@ -78,7 +78,7 @@ val navigationItems = listOf(
         title = "Profile",
         iconOutlined = Res.drawable.ic_user_outline,
         iconFilled = Res.drawable.ic_user_fill,
-        screen = Screen.Login
+        screen = Screen.Profile
     )
 )
 

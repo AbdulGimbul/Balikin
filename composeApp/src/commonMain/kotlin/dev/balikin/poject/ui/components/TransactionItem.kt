@@ -8,7 +8,10 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -31,7 +34,7 @@ import dev.balikin.poject.utils.formatDateCreated
 import org.jetbrains.compose.resources.painterResource
 
 @Composable
-fun TransactionItem(transaction: TransactionEntity, modifier: Modifier = Modifier) {
+fun TransactionItem(transaction: TransactionEntity, modifier: Modifier = Modifier, isOnline: Boolean = false) {
     Column(
         modifier = modifier
     ) {
@@ -40,10 +43,20 @@ fun TransactionItem(transaction: TransactionEntity, modifier: Modifier = Modifie
                 .fillMaxWidth(),
             verticalAlignment = Alignment.Top,
         ) {
-            Image(
-                painter = painterResource(Res.drawable.agus), contentDescription = null,
-                modifier = Modifier.size(40.dp),
-            )
+            if (isOnline) {
+                Image(
+                    painter = painterResource(Res.drawable.agus),
+                    contentDescription = "User Avatar",
+                    modifier = Modifier.size(40.dp),
+                )
+            } else {
+                Icon(
+                    imageVector = Icons.Default.AccountCircle,
+                    contentDescription = "Offline Indicator",
+                    modifier = Modifier.size(40.dp),
+                    tint = Color.Gray
+                )
+            }
             Spacer(modifier = Modifier.width(12.dp))
             Column {
                 Text(
