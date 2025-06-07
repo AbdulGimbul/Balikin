@@ -217,7 +217,6 @@ fun NavHostContent(
             TransFilterScreen(viewModel = transactionViewModel, navController = navController)
         }
         composable(Screen.Profile.route) {
-//            ProfileScreen() this is for online version
             Column(
                 modifier = Modifier.fillMaxSize().padding(16.dp),
                 verticalArrangement = Arrangement.Center,

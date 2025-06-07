@@ -37,7 +37,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
@@ -113,33 +112,31 @@ fun Onboarding(
             Image(
                 painter = painterResource(Res.drawable.bg_onboarding),
                 contentDescription = null,
-                contentScale = ContentScale.FillWidth, // Changed to FillWidth for better adaptability
+                contentScale = ContentScale.FillWidth,
                 modifier = Modifier.fillMaxWidth()
             )
         }
 
-        Column(modifier = Modifier.fillMaxSize()) { // Ensure Column fills size
+        Column(modifier = Modifier.fillMaxSize()) {
             HorizontalPager(
                 state = pagerState,
-                modifier = Modifier.weight(1f) // Pager takes up available space
+                modifier = Modifier.weight(1f)
             ) { page ->
-                // Make each page content scrollable
                 BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
                     val screenHeight = maxHeight
                     val screenWidth = maxWidth
-                    val density = LocalDensity.current
 
-                    // Adjust font sizes based on screen height
                     val titleFontSize = remember(screenHeight) {
-                        // Coerce the Float value, then convert to .sp
                         (screenHeight.value * 0.035f).coerceIn(24f, 32f).sp
                     }
                     val descriptionFontSize = remember(screenHeight) {
-                        // Coerce the Float value, then convert to .sp
                         (screenHeight.value * 0.025f).coerceIn(14f, 18f).sp
                     }
                     val imageSize = remember(screenWidth, screenHeight) {
-                        (kotlin.math.min(screenWidth.value, screenHeight.value * 0.5f) * 0.6f).dp.coerceIn(150.dp, 300.dp)
+                        (kotlin.math.min(
+                            screenWidth.value,
+                            screenHeight.value * 0.5f
+                        ) * 0.6f).dp.coerceIn(150.dp, 300.dp)
                     }
                     val logoSize = remember(screenWidth) {
                         (screenWidth.value * 0.25f).dp.coerceIn(80.dp, 120.dp)
@@ -147,13 +144,13 @@ fun Onboarding(
 
                     Column(
                         modifier = Modifier
-                            .fillMaxSize() // Fill the BoxWithConstraints
-                            .verticalScroll(rememberScrollState()) // Make content scrollable
-                            .padding(horizontal = 24.dp, vertical = 16.dp), // Add some padding
+                            .fillMaxSize()
+                            .verticalScroll(rememberScrollState())
+                            .padding(horizontal = 24.dp, vertical = 16.dp),
                         horizontalAlignment = Alignment.CenterHorizontally,
                         verticalArrangement = Arrangement.Center
                     ) {
-                        if (page == 2) { // Last page (Get Started)
+                        if (page == 2) {
                             Image(
                                 painter = painterResource(Res.drawable.balikin_logo),
                                 contentDescription = null,
@@ -162,7 +159,7 @@ fun Onboarding(
                             Image(
                                 painter = painterResource(uiState.pages[page].imageRes),
                                 contentDescription = null,
-                                modifier = Modifier.size(imageSize) // Adaptive size
+                                modifier = Modifier.size(imageSize)
                             )
                             Spacer(modifier = Modifier.height(32.dp))
                             Text(
@@ -178,8 +175,7 @@ fun Onboarding(
                                 color = secondary_text,
                                 textAlign = TextAlign.Center
                             )
-                        } else { // Other pages
-                            // Spacer to push content down a bit, or adjust arrangement
+                        } else {
                             Spacer(modifier = Modifier.height(screenHeight * 0.1f))
                             Text(
                                 text = uiState.pages[page].title,
@@ -191,7 +187,7 @@ fun Onboarding(
                             Image(
                                 painter = painterResource(uiState.pages[page].imageRes),
                                 contentDescription = null,
-                                modifier = Modifier.size(imageSize) // Adaptive size
+                                modifier = Modifier.size(imageSize)
                             )
                             Spacer(modifier = Modifier.height(16.dp))
                             Text(
@@ -200,19 +196,18 @@ fun Onboarding(
                                 color = Color.White,
                                 textAlign = TextAlign.Center
                             )
-                            Spacer(modifier = Modifier.weight(1f)) // Pushes content above indicators if it's short
+                            Spacer(modifier = Modifier.weight(1f))
                         }
                     }
                 }
             }
 
-            // Controls section (Dots, Button, Skip/Login)
             Column(
-                modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp), // Padding for controls
+                modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Row(
-                    modifier = Modifier.padding(vertical = 16.dp), // Add padding around dots
+                    modifier = Modifier.padding(vertical = 16.dp),
                     horizontalArrangement = Arrangement.Center,
                 ) {
                     repeat(pagerState.pageCount) { iteration ->
@@ -241,7 +236,7 @@ fun Onboarding(
                                 pagerState.animateScrollToPage(pagerState.currentPage + 1)
                             }
                         } else {
-                            moveToHome() // Or moveToLogin() if Get Started should go to Login
+                            moveToHome()
                         }
                     },
                     colors = ButtonDefaults.buttonColors(
@@ -250,34 +245,10 @@ fun Onboarding(
                     ),
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 24.dp, vertical = 8.dp), // Adjusted padding
+                        .padding(horizontal = 24.dp, vertical = 8.dp),
                 )
 
-                if (uiState.isLastPage) {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(bottom = 16.dp, top = 8.dp), // Adjusted padding
-                        horizontalArrangement = Arrangement.Center
-                    ) {
-                        Text(
-                            text = "Already have an account? ",
-                            style = MaterialTheme.typography.bodyLarge,
-                            color = secondary_text
-                        )
-                        Text(
-                            text = "Sign in",
-                            style = MaterialTheme.typography.bodyLarge,
-                            color = primary_blue,
-                            modifier = Modifier.clickable(
-                                interactionSource = remember { MutableInteractionSource() },
-                                indication = null
-                            ) {
-                                moveToLogin()
-                            }
-                        )
-                    }
-                } else {
+                if (!uiState.isLastPage) {
                     Text(
                         text = "Skip",
                         style = MaterialTheme.typography.titleMedium.copy(
@@ -299,22 +270,21 @@ fun Onboarding(
                     )
                 }
 
-                // Attribution text
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(bottom = 16.dp), // Padding for attribution
+                        .padding(bottom = 16.dp),
                     horizontalArrangement = Arrangement.Center
                 ) {
                     Text(
                         text = "Icons by ",
-                        style = MaterialTheme.typography.bodySmall, // Made smaller
-                        color = if (uiState.isLastPage) Color.Gray else Color.White.copy(alpha = 0.5f) // Adjusted color
+                        style = MaterialTheme.typography.bodySmall,
+                        color = if (uiState.isLastPage) Color.Gray else Color.White.copy(alpha = 0.5f)
                     )
                     Text(
                         text = "icons8",
-                        style = MaterialTheme.typography.bodySmall.copy( // Made smaller
-                            color = if (uiState.isLastPage) primary_blue else Color.White.copy(alpha = 0.7f), // Adjusted color
+                        style = MaterialTheme.typography.bodySmall.copy(
+                            color = if (uiState.isLastPage) primary_blue else Color.White.copy(alpha = 0.7f),
                             textDecoration = TextDecoration.Underline
                         ),
                         modifier = Modifier.clickable(
