@@ -9,5 +9,4 @@ import org.koin.dsl.module
 actual val platformModule: Module
     get() = module {
         single { DatabaseFactory(androidApplication()) }
-        factory { PermissionsController(applicationContext = androidApplication()) }
     }

@@ -59,12 +59,12 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import balikin.composeapp.generated.resources.Res
 import balikin.composeapp.generated.resources.ic_calendar
 import balikin.composeapp.generated.resources.offline_profile
+import com.tweener.alarmee.AlarmeeService
 import com.tweener.alarmee.rememberAlarmeeService
 import dev.balikin.poject.features.auth.presentation.forgot_password.ForgotPasswordScreen
 import dev.balikin.poject.features.auth.presentation.forgot_password.ForgotPasswordViewModel
 import dev.balikin.poject.features.auth.presentation.login.LoginScreen
 import dev.balikin.poject.features.auth.presentation.login.LoginViewModel
-import dev.balikin.poject.features.auth.presentation.profile.ProfileScreen
 import dev.balikin.poject.features.auth.presentation.register.RegisterScreen
 import dev.balikin.poject.features.auth.presentation.register.RegisterViewModel
 import dev.balikin.poject.features.auth.presentation.reset_password.ResetPasswordScreen
@@ -90,12 +90,11 @@ import dev.balikin.poject.ui.theme.stroke
 import dev.balikin.poject.utils.ThousandSeparatorVisualTransformation
 import dev.balikin.poject.utils.createAlarmeePlatformConfiguration
 import dev.balikin.poject.utils.formatDate
-import dev.balikin.poject.utils.getCurrentDate
+import dev.balikin.poject.utils.getDefaultDueDate
 import dev.icerock.moko.permissions.PermissionsController
 import dev.icerock.moko.permissions.compose.BindEffect
 import dev.icerock.moko.permissions.compose.rememberPermissionsControllerFactory
 import kotlinx.coroutines.delay
-import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
@@ -121,6 +120,10 @@ fun SetupNavHost(navController: NavHostController, onExitApp: () -> Unit) {
     val permissionsController: PermissionsController =
         remember { permissionsControllerFactory.createPermissionsController() }
     BindEffect(permissionsController)
+
+    val alarmService: AlarmeeService = rememberAlarmeeService(
+        platformConfiguration = createAlarmeePlatformConfiguration()
+    )
 
     if (currentRoute == Screen.Home.route) {
         BackHandler {
@@ -165,6 +168,7 @@ fun SetupNavHost(navController: NavHostController, onExitApp: () -> Unit) {
                     AddTransactionBottomSheet(
                         viewModel = homeViewModel,
                         permissionsController = permissionsController,
+                        alarmeeService = alarmService,
                         onSaveClicked = {
                             showBottomSheet = false
                         }
@@ -279,6 +283,7 @@ fun NavHostContent(
 private fun AddTransactionBottomSheet(
     viewModel: HomeViewModel,
     permissionsController: PermissionsController,
+    alarmeeService: AlarmeeService,
     onSaveClicked: () -> Unit = {}
 ) {
     var name by remember { mutableStateOf("") }
@@ -286,10 +291,9 @@ private fun AddTransactionBottomSheet(
     var expanded by remember { mutableStateOf(false) }
     var selectedType by remember { mutableStateOf("Utang") }
     var amount by remember { mutableStateOf(TextFieldValue("")) }
-    var date by remember { mutableStateOf<LocalDateTime>(getCurrentDate()) }
+    var date by remember { mutableStateOf<LocalDateTime>(getDefaultDueDate()) }
     var note by remember { mutableStateOf("") }
     var showDatePicker by remember { mutableStateOf(false) }
-    val alarmeeService = rememberAlarmeeService(createAlarmeePlatformConfiguration())
 
     Column(
         modifier = Modifier
@@ -407,13 +411,13 @@ private fun AddTransactionBottomSheet(
                     onDateSelected = { millis ->
                         val localDate = millis?.let { Instant.fromEpochMilliseconds(it) }
                             ?.toLocalDateTime(TimeZone.currentSystemDefault())?.date
-                        val currentTime =
-                            Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).time
 
-                        val combined = localDate?.let { LocalDateTime(it, currentTime) }
+                        val reminderDateTime = localDate?.let {
+                            LocalDateTime(it.year, it.month, it.dayOfMonth, 9, 0, 0)
+                        }
 
-                        if (combined != null) {
-                            date = combined
+                        if (reminderDateTime != null) {
+                            date = reminderDateTime
                         }
                     },
                     onDismiss = { showDatePicker = false }
