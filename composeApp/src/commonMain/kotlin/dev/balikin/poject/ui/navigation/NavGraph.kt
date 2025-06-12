@@ -1,15 +1,11 @@
 package dev.balikin.poject.ui.navigation
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.text.KeyboardOptions
@@ -38,7 +34,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.backhandler.BackHandler
@@ -46,7 +41,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.buildAnnotatedString
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
@@ -58,11 +52,12 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import balikin.composeapp.generated.resources.Res
 import balikin.composeapp.generated.resources.ic_calendar
-import balikin.composeapp.generated.resources.offline_profile
+import com.tweener.alarmee.rememberAlarmeeService
 import dev.balikin.poject.features.auth.presentation.forgot_password.ForgotPasswordScreen
 import dev.balikin.poject.features.auth.presentation.forgot_password.ForgotPasswordViewModel
 import dev.balikin.poject.features.auth.presentation.login.LoginScreen
 import dev.balikin.poject.features.auth.presentation.login.LoginViewModel
+import dev.balikin.poject.features.auth.presentation.profile.ProfileScreen
 import dev.balikin.poject.features.auth.presentation.register.RegisterScreen
 import dev.balikin.poject.features.auth.presentation.register.RegisterViewModel
 import dev.balikin.poject.features.auth.presentation.reset_password.ResetPasswordScreen
@@ -81,13 +76,15 @@ import dev.balikin.poject.features.transaction.presentation.TransactionViewModel
 import dev.balikin.poject.features.transaction.presentation.filter.TransFilterScreen
 import dev.balikin.poject.ui.components.DefaultButton
 import dev.balikin.poject.ui.theme.primary_blue
-import dev.balikin.poject.ui.theme.primary_text
 import dev.balikin.poject.ui.theme.red
-import dev.balikin.poject.ui.theme.secondary_text
 import dev.balikin.poject.ui.theme.stroke
 import dev.balikin.poject.utils.ThousandSeparatorVisualTransformation
+import dev.balikin.poject.utils.createAlarmeePlatformConfiguration
 import dev.balikin.poject.utils.formatDate
 import dev.balikin.poject.utils.getCurrentDate
+import dev.icerock.moko.permissions.PermissionsController
+import dev.icerock.moko.permissions.compose.BindEffect
+import dev.icerock.moko.permissions.compose.rememberPermissionsControllerFactory
 import kotlinx.coroutines.delay
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
@@ -110,6 +107,11 @@ fun SetupNavHost(navController: NavHostController, onExitApp: () -> Unit) {
     )
     var showBottomSheet by remember { mutableStateOf(false) }
     val homeViewModel: HomeViewModel = koinViewModel()
+
+    val permissionsControllerFactory = rememberPermissionsControllerFactory()
+    val permissionsController: PermissionsController =
+        remember { permissionsControllerFactory.createPermissionsController() }
+    BindEffect(permissionsController)
 
     if (currentRoute == Screen.Home.route) {
         BackHandler {
@@ -153,6 +155,7 @@ fun SetupNavHost(navController: NavHostController, onExitApp: () -> Unit) {
                 ) {
                     AddTransactionBottomSheet(
                         viewModel = homeViewModel,
+                        permissionsController = permissionsController,
                         onSaveClicked = {
                             showBottomSheet = false
                         }
@@ -266,6 +269,7 @@ fun NavHostContent(
 @Composable
 private fun AddTransactionBottomSheet(
     viewModel: HomeViewModel,
+    permissionsController: PermissionsController,
     onSaveClicked: () -> Unit = {}
 ) {
     var name by remember { mutableStateOf("") }
@@ -276,6 +280,7 @@ private fun AddTransactionBottomSheet(
     var date by remember { mutableStateOf<LocalDateTime>(getCurrentDate()) }
     var note by remember { mutableStateOf("") }
     var showDatePicker by remember { mutableStateOf(false) }
+    val alarmeeService = rememberAlarmeeService(createAlarmeePlatformConfiguration())
 
     Column(
         modifier = Modifier
@@ -428,7 +433,9 @@ private fun AddTransactionBottomSheet(
                             date = date.toString(),
                             note = note,
                             amount = rawAmount,
-                            type = selectedType
+                            type = selectedType,
+                            permissionsController = permissionsController,
+                            alarmeeService = alarmeeService
                         )
                         onSaveClicked()
                     } else {
