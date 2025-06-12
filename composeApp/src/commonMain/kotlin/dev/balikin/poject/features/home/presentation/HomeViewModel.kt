@@ -106,8 +106,8 @@ class HomeViewModel(
                 alarmeeService.local.schedule(
                     alarmee = Alarmee(
                         uuid = newTransactionId.toString(),
-                        notificationTitle = "Reminder: Utang Jatuh Tempo",
-                        notificationBody = "Utang Anda kepada $name akan jatuh tempo hari ini.",
+                        notificationTitle = "Reminder: $transactionType Jatuh Tempo",
+                        notificationBody = "$transactionType Anda kepada $name akan jatuh tempo hari ini.",
                         scheduledDateTime = dueDate,
                         androidNotificationConfiguration = AndroidNotificationConfiguration(
                             channelId = "due_date_reminders"

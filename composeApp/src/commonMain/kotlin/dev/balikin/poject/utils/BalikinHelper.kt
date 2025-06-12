@@ -95,6 +95,14 @@ fun getCurrentDate(): LocalDateTime {
     )
 }
 
+fun getDefaultDueDate(): LocalDateTime {
+    return Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date.atTime(
+        9,
+        0,
+        0
+    )
+}
+
 fun formatThousandSeparator(number: String): String {
     if (number.isBlank()) return ""
     val digitsOnly = number.filter { it.isDigit() }
