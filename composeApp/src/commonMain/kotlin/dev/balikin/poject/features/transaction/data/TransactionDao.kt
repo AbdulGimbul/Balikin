@@ -10,7 +10,7 @@ import kotlinx.datetime.LocalDateTime
 @Dao
 interface TransactionDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun addTransaction(transactionEntity: TransactionEntity)
+    suspend fun addTransaction(transactionEntity: TransactionEntity): Long
 
     @Query("SELECT * FROM transactions WHERE isPaid = 0 ORDER BY createdAt DESC")
     fun getAllTransactions(): Flow<List<TransactionEntity>>

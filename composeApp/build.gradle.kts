@@ -54,6 +54,7 @@ kotlin {
             implementation(compose.components.uiToolingPreview)
             implementation(libs.androidx.lifecycle.viewmodel)
             implementation(libs.androidx.lifecycle.runtime.compose)
+            implementation(libs.lifecycle.viewmodel.compose)
             implementation(libs.navigation.compose)
             implementation(compose.materialIconsExtended)
             implementation(libs.material.navigation)
@@ -67,6 +68,9 @@ kotlin {
             implementation(libs.sqlite.bundled)
             implementation(libs.cmptoast)
             implementation(libs.ui.backhandler)
+            implementation(libs.permissions.notifications)
+            api(libs.permissions.compose)
+            implementation(libs.alarmee)
         }
         nativeMain.dependencies {
             implementation(libs.ktor.client.darwin)

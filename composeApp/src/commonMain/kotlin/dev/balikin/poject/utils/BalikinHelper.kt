@@ -4,6 +4,7 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.input.OffsetMapping
 import androidx.compose.ui.text.input.TransformedText
 import androidx.compose.ui.text.input.VisualTransformation
+import com.tweener.alarmee.configuration.AlarmeePlatformConfiguration
 import kotlinx.datetime.Clock
 import kotlinx.datetime.DateTimePeriod
 import kotlinx.datetime.LocalDateTime
@@ -19,6 +20,8 @@ interface BrowserHelper {
 }
 
 expect fun getBrowserHelper(): BrowserHelper
+
+expect fun createAlarmeePlatformConfiguration(): AlarmeePlatformConfiguration
 
 fun formattedDate(dateString: String): String {
     val localDateTime = try {

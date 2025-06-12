@@ -49,6 +49,7 @@ import balikin.composeapp.generated.resources.Res
 import balikin.composeapp.generated.resources.agus
 import balikin.composeapp.generated.resources.trans_piutang
 import balikin.composeapp.generated.resources.trans_utang
+import com.tweener.alarmee.rememberAlarmeeService
 import dev.balikin.poject.features.transaction.data.TransactionEntity
 import dev.balikin.poject.features.transaction.data.TransactionType
 import dev.balikin.poject.ui.components.FilterButton
@@ -62,6 +63,7 @@ import dev.balikin.poject.ui.theme.primary_text
 import dev.balikin.poject.ui.theme.red
 import dev.balikin.poject.ui.theme.secondary
 import dev.balikin.poject.ui.theme.secondary_text
+import dev.balikin.poject.utils.createAlarmeePlatformConfiguration
 import dev.balikin.poject.utils.currencyFormat
 import dev.balikin.poject.utils.formatDate
 import dev.balikin.poject.utils.formatDateCreated
@@ -89,12 +91,13 @@ fun Transaction(
     onEvent: (TransactionUiEvent) -> Unit,
     moveToFilter: () -> Unit
 ) {
+    val alarmeeService = rememberAlarmeeService(createAlarmeePlatformConfiguration())
 
     if (uiState.showDialog && uiState.selectedTransactionId != null) {
         CustomDialog(
             onDismissRequest = { onEvent(TransactionUiEvent.OnDismissDialog) },
             onConfirmation = {
-                onEvent(TransactionUiEvent.OnMarkAsPaid)
+                onEvent(TransactionUiEvent.OnMarkAsPaid(alarmeeService))
             }
         )
     }

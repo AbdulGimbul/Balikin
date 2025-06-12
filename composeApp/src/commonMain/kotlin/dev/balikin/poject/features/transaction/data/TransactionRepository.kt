@@ -5,7 +5,7 @@ import kotlinx.datetime.LocalDateTime
 
 interface TransactionRepository {
     suspend fun getAllTransactions(): Flow<List<TransactionEntity>>
-    suspend fun addTransaction(transactionEntity: TransactionEntity)
+    suspend fun addTransaction(transactionEntity: TransactionEntity): Long
     suspend fun getTotalAmountByType(type: TransactionType): Double?
 
     fun getFilteredTransactions(

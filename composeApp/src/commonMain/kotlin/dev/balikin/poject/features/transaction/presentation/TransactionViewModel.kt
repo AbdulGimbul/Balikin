@@ -2,6 +2,7 @@ package dev.balikin.poject.features.transaction.presentation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.tweener.alarmee.AlarmeeService
 import dev.balikin.poject.features.transaction.data.TransactionRepository
 import dev.balikin.poject.features.transaction.data.TransactionType
 import dev.balikin.poject.features.transaction.presentation.filter.TransFilterUiEvent
@@ -44,7 +45,7 @@ class TransactionViewModel(
             }
 
             is TransactionUiEvent.OnMarkAsPaid -> {
-                _uiState.value.selectedTransactionId?.let { markAsPaid(it) }
+                _uiState.value.selectedTransactionId?.let { markAsPaid(it, uiEvent.alarmeeService) }
                 _uiState.value = _uiState.value.copy(showDialog = false)
             }
 
@@ -123,16 +124,6 @@ class TransactionViewModel(
         }
     }
 
-    private fun applyDefaultFilters() {
-        applyFilters(
-            type = null,
-            sortOrder = "asc",
-            startDate = defaultStartDate,
-            endDate = defaultEndDate,
-            isUserApplied = false
-        )
-    }
-
     fun applyUserFilters(
         type: TransactionType?,
         sortOrder: String?,
@@ -206,9 +197,13 @@ class TransactionViewModel(
         }
     }
 
-    fun markAsPaid(transactionId: Long) {
+    fun markAsPaid(transactionId: Long, alarmeeService: AlarmeeService) {
         viewModelScope.launch {
             transactionRepository.markTransactionAsPaid(transactionId)
+
+            alarmeeService.local.cancel(uuid = transactionId.toString())
+
+            _uiState.update { it.copy(showDialog = false, selectedTransactionId = null) }
 
             uiState.value.appliedFilters?.let {
                 applyUserFilters(

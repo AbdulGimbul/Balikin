@@ -13,8 +13,8 @@ class TransactionRepositoryImpl(
         return transactionDao.getAllTransactions()
     }
 
-    override suspend fun addTransaction(transactionEntity: TransactionEntity) {
-        transactionDao.addTransaction(transactionEntity)
+    override suspend fun addTransaction(transactionEntity: TransactionEntity): Long {
+        return transactionDao.addTransaction(transactionEntity)
     }
 
     override suspend fun getTotalAmountByType(type: TransactionType): Double? {

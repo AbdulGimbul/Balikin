@@ -52,6 +52,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import balikin.composeapp.generated.resources.Res
 import balikin.composeapp.generated.resources.ic_calendar
+import com.tweener.alarmee.rememberAlarmeeService
 import dev.balikin.poject.features.auth.presentation.forgot_password.ForgotPasswordScreen
 import dev.balikin.poject.features.auth.presentation.forgot_password.ForgotPasswordViewModel
 import dev.balikin.poject.features.auth.presentation.login.LoginScreen
@@ -78,8 +79,12 @@ import dev.balikin.poject.ui.theme.primary_blue
 import dev.balikin.poject.ui.theme.red
 import dev.balikin.poject.ui.theme.stroke
 import dev.balikin.poject.utils.ThousandSeparatorVisualTransformation
+import dev.balikin.poject.utils.createAlarmeePlatformConfiguration
 import dev.balikin.poject.utils.formatDate
 import dev.balikin.poject.utils.getCurrentDate
+import dev.icerock.moko.permissions.PermissionsController
+import dev.icerock.moko.permissions.compose.BindEffect
+import dev.icerock.moko.permissions.compose.rememberPermissionsControllerFactory
 import kotlinx.coroutines.delay
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
@@ -102,6 +107,11 @@ fun SetupNavHost(navController: NavHostController, onExitApp: () -> Unit) {
     )
     var showBottomSheet by remember { mutableStateOf(false) }
     val homeViewModel: HomeViewModel = koinViewModel()
+
+    val permissionsControllerFactory = rememberPermissionsControllerFactory()
+    val permissionsController: PermissionsController =
+        remember { permissionsControllerFactory.createPermissionsController() }
+    BindEffect(permissionsController)
 
     if (currentRoute == Screen.Home.route) {
         BackHandler {
@@ -145,6 +155,7 @@ fun SetupNavHost(navController: NavHostController, onExitApp: () -> Unit) {
                 ) {
                     AddTransactionBottomSheet(
                         viewModel = homeViewModel,
+                        permissionsController = permissionsController,
                         onSaveClicked = {
                             showBottomSheet = false
                         }
@@ -225,6 +236,7 @@ fun NavHostContent(
 @Composable
 private fun AddTransactionBottomSheet(
     viewModel: HomeViewModel,
+    permissionsController: PermissionsController,
     onSaveClicked: () -> Unit = {}
 ) {
     var name by remember { mutableStateOf("") }
@@ -235,6 +247,7 @@ private fun AddTransactionBottomSheet(
     var date by remember { mutableStateOf<LocalDateTime>(getCurrentDate()) }
     var note by remember { mutableStateOf("") }
     var showDatePicker by remember { mutableStateOf(false) }
+    val alarmeeService = rememberAlarmeeService(createAlarmeePlatformConfiguration())
 
     Column(
         modifier = Modifier
@@ -387,7 +400,9 @@ private fun AddTransactionBottomSheet(
                             date = date.toString(),
                             note = note,
                             amount = rawAmount,
-                            type = selectedType
+                            type = selectedType,
+                            permissionsController = permissionsController,
+                            alarmeeService = alarmeeService
                         )
                         onSaveClicked()
                     } else {

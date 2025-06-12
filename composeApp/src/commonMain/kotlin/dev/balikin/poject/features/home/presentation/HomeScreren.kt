@@ -52,6 +52,7 @@ import dev.balikin.poject.ui.theme.primary_blue
 import dev.balikin.poject.ui.theme.primary_text
 import dev.balikin.poject.ui.theme.secondary_text
 import dev.balikin.poject.utils.currencyFormat
+import multiplatform.network.cmptoast.showToast
 import org.jetbrains.compose.resources.painterResource
 
 @Composable
@@ -77,6 +78,12 @@ fun Home(
             else -> TransactionType.Utang
         }
         onEvent(HomeUiEvent.LoadTotalAmountByType(type))
+    }
+
+    LaunchedEffect(uiState.permissionError) {
+        uiState.permissionError?.let { message ->
+            showToast(message)
+        }
     }
 
     Column(
