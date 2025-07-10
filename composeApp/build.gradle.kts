@@ -59,6 +59,8 @@ kotlin {
             implementation(compose.materialIconsExtended)
             implementation(libs.material.navigation)
             api(libs.koin.core)
+            api(libs.androidx.datastore)
+            api(libs.androidx.datastore.preferences)
             implementation(libs.koin.compose)
             implementation(libs.koin.compose.viewmodel)
             implementation(libs.koin.compose.viewmodel.navigation)

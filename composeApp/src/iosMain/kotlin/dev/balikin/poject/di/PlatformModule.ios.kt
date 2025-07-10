@@ -2,6 +2,7 @@ package dev.balikin.poject.di
 
 import dev.balikin.poject.storage.DatabaseFactory
 import dev.icerock.moko.permissions.ios.PermissionsController
+import io.ktor.client.engine.darwin.Darwin
 import org.koin.core.module.Module
 import org.koin.dsl.module
 
@@ -9,4 +10,6 @@ actual val platformModule: Module
     get() = module {
         single { DatabaseFactory() }
         factory { PermissionsController() }
+        single { createDataStore() }
+        single { Darwin.create() }
     }
