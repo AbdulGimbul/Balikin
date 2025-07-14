@@ -1,5 +1,7 @@
 package dev.balikin.poject.di
 
+import dev.balikin.poject.features.auth.data.AuthRepository
+import dev.balikin.poject.features.auth.data.AuthRepositoryImpl
 import dev.balikin.poject.features.auth.presentation.login.LoginViewModel
 import dev.balikin.poject.features.auth.presentation.register.RegisterViewModel
 import dev.balikin.poject.features.front_page.data.OnBoardingRepository
@@ -24,8 +26,11 @@ val provideOnBoardingRepositoryModule = module {
 }
 
 val provideAuthRepositoryModule = module {
+    single<AuthRepositoryImpl> {
+        AuthRepositoryImpl(requestHandler = get())
+    }.bind<AuthRepository>()
     viewModel { RegisterViewModel() }
-    viewModel { LoginViewModel() }
+    viewModel { LoginViewModel(get()) }
 }
 
 val provideTransactionRepositoryModule = module {

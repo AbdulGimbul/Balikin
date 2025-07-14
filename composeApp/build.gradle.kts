@@ -73,6 +73,7 @@ kotlin {
             implementation(libs.permissions.notifications)
             api(libs.permissions.compose)
             implementation(libs.alarmee)
+            implementation(libs.compose.webview)
         }
         nativeMain.dependencies {
             implementation(libs.ktor.client.darwin)
