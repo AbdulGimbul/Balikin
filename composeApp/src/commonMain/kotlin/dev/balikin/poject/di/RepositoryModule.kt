@@ -30,7 +30,7 @@ val provideAuthRepositoryModule = module {
         AuthRepositoryImpl(requestHandler = get())
     }.bind<AuthRepository>()
     viewModel { RegisterViewModel() }
-    viewModel { LoginViewModel(get()) }
+    viewModel { LoginViewModel(get(), get()) }
 }
 
 val provideTransactionRepositoryModule = module {

@@ -5,5 +5,7 @@ data class LoginUiState(
     val password: String = "",
     val isRemember: Boolean = false,
     val isLoading: Boolean = false,
-    val errorMessage: String? = null
+    val errorMessage: String? = null,
+    val showWebView: Boolean = false,
+    val loginSuccess: Boolean = false
 )
