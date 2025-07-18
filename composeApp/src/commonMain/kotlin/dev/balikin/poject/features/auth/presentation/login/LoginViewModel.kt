@@ -26,8 +26,7 @@ class LoginViewModel(
     private val _uiState = MutableStateFlow(LoginUiState())
     val uiState = _uiState.asStateFlow()
 
-    val loginUrl = "https://balikin.vercel.app/api/v1/auth/google" // Your backend's Google auth URL
-    val redirectUrlScheme = "yourappscheme"
+    val loginUrl = "https://balikin.vercel.app/api/v1/auth/google"
 
     fun onEvent(uiEvent: LoginUiEvent) {
         when (uiEvent) {
@@ -53,24 +52,18 @@ class LoginViewModel(
         }
     }
 
-    /**
-     * Handles the JSON content retrieved from the WebView.
-     */
     fun handleLoginResponse(jsonContent: String) {
-        println("Cek 2 ya: $jsonContent")
 
         viewModelScope.launch {
             try {
-                // Step 1: Clean the raw string from the JavaScript callback
                 val cleanedHtml = jsonContent
-                    .removeSurrounding("\"")      // Remove the leading/trailing quotes
-                    .replace("\\u003C", "<") // Un-escape '<'
-                    .replace("\\u003E", ">") // Un-escape '>'
-                    .replace("\\\"", "\"")   // Un-escape '\"'
+                    .removeSurrounding("\"")
+                    .replace("\\u003C", "<")
+                    .replace("\\u003E", ">")
+                    .replace("\\\"", "\"")
 
                 println("Cleaned HTML: $cleanedHtml")
 
-                // Step 2: Extract the JSON content from between the <pre> tags
                 val jsonContent = cleanedHtml.substringAfter("<pre>").substringBefore("</pre>")
 
                 if (jsonContent.isBlank()) {
@@ -79,24 +72,17 @@ class LoginViewModel(
 
                 println("Extracted JSON: $jsonContent")
 
-                // Step 3: Parse the clean JSON string
                 val loginResponse = Json { ignoreUnknownKeys = true }.decodeFromString<LoginApiModel>(jsonContent)
                 val userData = loginResponse.data
 
-                // Save user data using SessionHandler
                 sessionHandler.setUserData(
-                    username = userData.email,
+                    email = userData.email,
                     nama = userData.name,
-                    role = userData.roleId.toString(),
-                    namaToko = "", // Or from response if available
-                    alamat = "",   // Or from response if available
-                    telp = "",     // Or from response if available
                     token = loginResponse.token
                 )
 
-                // Update the state to indicate success, triggering navigation
                 _uiState.update { it.copy(loginSuccess = true, showWebView = false) }
-                println("Cek 3 ya: ${loginResponse.token}")
+                println("Cek 3 ya: $loginResponse")
             } catch (e: Exception) {
                 println("Cek 4 ya Failed to parse login response: ${e.message}")
                 _uiState.update { it.copy(showWebView = false, errorMessage = "Login failed.") }

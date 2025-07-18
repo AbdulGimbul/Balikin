@@ -101,7 +101,7 @@ fun Home(
             )
             Column {
                 Text(
-                    text = "Hello, Fatamore",
+                    text = "Hello, ${uiState.user?.name}",
                     style = MaterialTheme.typography.titleMedium.copy(
                         color = primary_text
                     )

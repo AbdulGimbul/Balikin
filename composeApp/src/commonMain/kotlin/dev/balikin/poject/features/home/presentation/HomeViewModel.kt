@@ -6,6 +6,7 @@ import com.tweener.alarmee.AlarmeeService
 import com.tweener.alarmee.model.Alarmee
 import com.tweener.alarmee.model.AndroidNotificationConfiguration
 import com.tweener.alarmee.model.IosNotificationConfiguration
+import dev.balikin.poject.features.auth.data.AuthRepository
 import dev.balikin.poject.features.transaction.data.TransactionEntity
 import dev.balikin.poject.features.transaction.data.TransactionRepository
 import dev.balikin.poject.features.transaction.data.TransactionType
@@ -24,6 +25,7 @@ import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 
 class HomeViewModel(
+    private val authRepository: AuthRepository,
     private val transactionRepository: TransactionRepository
 ) : ViewModel() {
 
@@ -31,6 +33,9 @@ class HomeViewModel(
     val uiState = _uiState.asStateFlow()
 
     init {
+        if (_uiState.value.user == null) {
+            getUserData()
+        }
         getLatestTransactions()
     }
 
@@ -129,6 +134,22 @@ class HomeViewModel(
             }
 
             getTotalAmountByType(currentUiType)
+        }
+    }
+
+    private fun getUserData() {
+        viewModelScope.launch {
+            _uiState.value = _uiState.value.copy(isLoading = true)
+            try {
+                authRepository.userInfo().let {
+                    _uiState.value = _uiState.value.copy(user = it, isLoading = false)
+                }
+            } catch (e: Exception) {
+                _uiState.value = _uiState.value.copy(isLoading = false)
+                e.printStackTrace()
+            }
+            println("Cek 1 yaa : ${authRepository.userInfo()}")
+            println("Cek 2 yaa : ${_uiState.value.user}")
         }
     }
 }

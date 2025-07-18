@@ -12,14 +12,9 @@ import kotlinx.coroutines.flow.map
 class SessionHandler(private val dataStore: DataStore<Preferences>) {
 
     companion object {
-        val _username = stringPreferencesKey("Username")
+        val _email = stringPreferencesKey("Email")
         val _name = stringPreferencesKey("Nama")
-        val _role = stringPreferencesKey("Role")
-        val _storeName = stringPreferencesKey("Nama Toko")
-        val _address = stringPreferencesKey("Alamat")
-        val _telp = stringPreferencesKey("Telp")
         val _userToken = stringPreferencesKey("Token")
-        val _lastUpdate = stringPreferencesKey("Last Update")
     }
 
     private fun <T> getPreference(key: Preferences.Key<T>, defaultValue: T): Flow<T> {
@@ -30,31 +25,18 @@ class SessionHandler(private val dataStore: DataStore<Preferences>) {
         }
     }
 
-    fun getUsername(): Flow<String> = getPreference(_username, "")
-    fun getRole(): Flow<String> = getPreference(_role, "")
+    fun getEmail(): Flow<String> = getPreference(_email, "")
     fun getName(): Flow<String> = getPreference(_name, "")
     fun getToken(): Flow<String> = getPreference(_userToken, "")
-    fun getStoreName(): Flow<String> = getPreference(_storeName, "")
-    fun getAddress(): Flow<String> = getPreference(_address, "")
-    fun getTelp(): Flow<String> = getPreference(_telp, "")
-    fun getLastUpdate(): Flow<String> = getPreference(_lastUpdate, "")
 
     suspend fun setUserData(
-        username: String,
+        email: String,
         nama: String,
-        role: String,
-        namaToko: String,
-        alamat: String,
-        telp: String,
         token: String
     ) {
         dataStore.edit { pref ->
-            pref[_username] = username
+            pref[_email] = email
             pref[_name] = nama
-            pref[_role] = role
-            pref[_storeName] = namaToko
-            pref[_address] = alamat
-            pref[_telp] = telp
             pref[_userToken] = token
         }
     }
@@ -62,12 +44,6 @@ class SessionHandler(private val dataStore: DataStore<Preferences>) {
     suspend fun clearData() {
         dataStore.edit { preferences ->
             preferences.clear()
-        }
-    }
-
-    suspend fun setLastUpdate(lastUpdate: String) {
-        dataStore.edit { pref ->
-            pref[_lastUpdate] = lastUpdate
         }
     }
 }

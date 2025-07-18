@@ -27,7 +27,7 @@ val provideOnBoardingRepositoryModule = module {
 
 val provideAuthRepositoryModule = module {
     single<AuthRepositoryImpl> {
-        AuthRepositoryImpl(requestHandler = get())
+        AuthRepositoryImpl(sessionHandler = get(),requestHandler = get())
     }.bind<AuthRepository>()
     viewModel { RegisterViewModel() }
     viewModel { LoginViewModel(get(), get()) }
@@ -41,7 +41,7 @@ val provideTransactionRepositoryModule = module {
 }
 
 val provideHomeRepositoryModule = module {
-    viewModel { HomeViewModel(transactionRepository = get()) }
+    viewModel { HomeViewModel(authRepository = get(), transactionRepository = get()) }
 }
 
 val provideHistoryRepositoryModule = module {
