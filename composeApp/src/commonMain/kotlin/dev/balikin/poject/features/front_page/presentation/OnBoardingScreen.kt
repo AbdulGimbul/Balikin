@@ -37,7 +37,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
@@ -66,9 +65,15 @@ fun OnBoardingScreen(viewModel: OnBoardingViewModel, navController: NavControlle
         uiState = uiState.value,
         onEvent = viewModel::onEvent,
         moveToLogin = {
-            navController.navigate(Screen.Login.route)
+            viewModel.onCompleteOnboarding()
+            navController.navigate(Screen.Login.route) {
+                popUpTo(Screen.OnBoarding.route) {
+                    inclusive = true
+                }
+            }
         },
         moveToHome = {
+            viewModel.onCompleteOnboarding()
             navController.navigate(Screen.Home.route) {
                 popUpTo(Screen.OnBoarding.route) {
                     inclusive = true
@@ -134,7 +139,10 @@ fun Onboarding(
                         (screenHeight.value * 0.025f).coerceIn(14f, 18f).sp
                     }
                     val imageSize = remember(screenWidth, screenHeight) {
-                        (kotlin.math.min(screenWidth.value, screenHeight.value * 0.5f) * 0.6f).dp.coerceIn(150.dp, 300.dp)
+                        (kotlin.math.min(
+                            screenWidth.value,
+                            screenHeight.value * 0.5f
+                        ) * 0.6f).dp.coerceIn(150.dp, 300.dp)
                     }
                     val logoSize = remember(screenWidth) {
                         (screenWidth.value * 0.25f).dp.coerceIn(80.dp, 120.dp)

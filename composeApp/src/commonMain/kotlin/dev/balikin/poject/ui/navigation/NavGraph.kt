@@ -34,6 +34,7 @@ import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -81,6 +82,7 @@ import dev.balikin.poject.features.home.presentation.HomeViewModel
 import dev.balikin.poject.features.transaction.presentation.TransactionScreen
 import dev.balikin.poject.features.transaction.presentation.TransactionViewModel
 import dev.balikin.poject.features.transaction.presentation.filter.TransFilterScreen
+import dev.balikin.poject.storage.SessionHandler
 import dev.balikin.poject.ui.components.DefaultButton
 import dev.balikin.poject.ui.theme.primary_blue
 import dev.balikin.poject.ui.theme.primary_text
@@ -101,6 +103,7 @@ import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import multiplatform.network.cmptoast.showToast
 import org.jetbrains.compose.resources.painterResource
+import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
@@ -188,9 +191,18 @@ fun NavHostContent(
     val transactionViewModel: TransactionViewModel = koinViewModel()
     val historyViewModel: HistoryViewModel = koinViewModel()
 
+    val sessionHandler: SessionHandler = koinInject()
+    val isFirstTime by sessionHandler.isFirstTime().collectAsState(initial = true)
+
+    val startDestination = if (isFirstTime) {
+        Screen.OnBoarding.route
+    } else {
+        Screen.Login.route
+    }
+
     NavHost(
         navController = navController,
-        startDestination = Screen.OnBoarding.route,
+        startDestination = startDestination,
         modifier = Modifier.padding(innerPadding)
     ) {
         composable(Screen.Login.route) {

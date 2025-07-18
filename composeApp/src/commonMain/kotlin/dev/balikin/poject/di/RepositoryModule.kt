@@ -22,7 +22,7 @@ val provideOnBoardingRepositoryModule = module {
     single<OnBoardingRepositoryImpl> {
         OnBoardingRepositoryImpl()
     }.bind<OnBoardingRepository>()
-    viewModel { OnBoardingViewModel(repository = get()) }
+    viewModel { OnBoardingViewModel(repository = get(), sessionHandler = get()) }
 }
 
 val provideAuthRepositoryModule = module {
