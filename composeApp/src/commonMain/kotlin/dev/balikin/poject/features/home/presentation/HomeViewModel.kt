@@ -33,8 +33,10 @@ class HomeViewModel(
     val uiState = _uiState.asStateFlow()
 
     init {
-        if (_uiState.value.user == null) {
-            getUserData()
+        viewModelScope.launch {
+            authRepository.userInfo().collect { user ->
+                _uiState.update { it.copy(user = user, isLoading = false) }
+            }
         }
         getLatestTransactions()
     }
@@ -134,22 +136,6 @@ class HomeViewModel(
             }
 
             getTotalAmountByType(currentUiType)
-        }
-    }
-
-    private fun getUserData() {
-        viewModelScope.launch {
-            _uiState.value = _uiState.value.copy(isLoading = true)
-            try {
-                authRepository.userInfo().let {
-                    _uiState.value = _uiState.value.copy(user = it, isLoading = false)
-                }
-            } catch (e: Exception) {
-                _uiState.value = _uiState.value.copy(isLoading = false)
-                e.printStackTrace()
-            }
-            println("Cek 1 yaa : ${authRepository.userInfo()}")
-            println("Cek 2 yaa : ${_uiState.value.user}")
         }
     }
 }

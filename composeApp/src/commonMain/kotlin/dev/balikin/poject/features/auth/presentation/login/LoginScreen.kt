@@ -16,11 +16,11 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Checkbox
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
@@ -33,6 +33,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -53,38 +54,40 @@ import dev.balikin.poject.ui.components.WithGoogleButton
 import dev.balikin.poject.ui.navigation.Screen
 import dev.balikin.poject.ui.theme.primary_blue
 import dev.balikin.poject.ui.theme.secondary_text
-import kotlinx.coroutines.delay
 import org.jetbrains.compose.resources.painterResource
 
 @Composable
 fun LoginScreen(viewModel: LoginViewModel, navController: NavController) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-    if (uiState.loginSuccess) {
-        // This will navigate to Home after a successful login
-        LaunchedEffect(Unit) {
-            navController.navigate(Screen.Home.route) {
-                popUpTo(Screen.Login.route) { inclusive = true }
+    when (val state = uiState) {
+        is LoginUiState.NotAuthenticated -> {
+            if (state.showWebView) {
+                LoginWebView(viewModel)
+            } else {
+                Login(
+                    uiState = state,
+                    onEvent = viewModel::onEvent,
+                    moveToRegister = {
+                        navController.navigate(Screen.Register.route)
+                    }
+                )
             }
         }
-    }
 
-    if (uiState.showWebView) {
-        LoginWebView(viewModel)
-    } else {
-        Login(
-            uiState = uiState,
-            onEvent = viewModel::onEvent,
-            moveToRegister = {
-                navController.navigate(Screen.Register.route)
+        is LoginUiState.Authenticated -> {
+            LaunchedEffect(Unit) {
+                navController.navigate(Screen.Home.route) {
+                    popUpTo(Screen.Login.route) { inclusive = true }
+                }
             }
-        )
+        }
     }
 }
 
 @Composable
 fun Login(
-    uiState: LoginUiState,
+    uiState: LoginUiState.NotAuthenticated,
     onEvent: (LoginUiEvent) -> Unit,
     moveToRegister: () -> Unit
 ) {
@@ -193,7 +196,7 @@ fun RememberMe(
 private fun LoginWebView(viewModel: LoginViewModel) {
     val webViewState = rememberWebViewState(url = viewModel.loginUrl)
     val navigator = rememberWebViewNavigator()
-    var isHandlingLogin by remember { mutableStateOf(false) }
+    var isProcessingLoginResponse by remember { mutableStateOf(false) }
 
     DisposableEffect(Unit) {
         webViewState.webSettings.customUserAgentString =
@@ -202,33 +205,57 @@ private fun LoginWebView(viewModel: LoginViewModel) {
     }
 
     LaunchedEffect(webViewState.loadingState) {
-        if (webViewState.loadingState is LoadingState.Finished && !isHandlingLogin) {
-            delay(300)
+        if (webViewState.loadingState is LoadingState.Finished && !isProcessingLoginResponse) {
+            isProcessingLoginResponse = true
+
             navigator.evaluateJavaScript("document.documentElement.outerHTML") { rawHtml ->
                 if (!rawHtml.isNullOrBlank() && rawHtml.contains("status") && rawHtml.contains("token")) {
-                    isHandlingLogin = true
                     viewModel.handleLoginResponse(rawHtml)
+                } else {
+                    isProcessingLoginResponse = false
                 }
             }
         }
     }
 
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text("Login with Google") },
-                navigationIcon = {
-                    IconButton(onClick = { viewModel.hideWebView() }) {
-                        Icon(Icons.Default.Close, contentDescription = "Close")
-                    }
+    Column(modifier = Modifier.fillMaxSize()) {
+        TopAppBar(
+            title = { Text("Login with Google") },
+            navigationIcon = {
+                IconButton(onClick = {
+                    viewModel.hideWebView()
+                }) {
+                    Icon(Icons.Default.Close, contentDescription = "Close")
                 }
-            )
-        }
-    ) {
-        WebView(
-            state = webViewState,
-            modifier = Modifier.padding(it).fillMaxSize(),
-            navigator = navigator,
+            }
         )
+        Box(
+            modifier = Modifier
+                .weight(1f)
+                .fillMaxSize()
+        ) {
+            WebView(
+                state = webViewState,
+                modifier = Modifier
+                    .fillMaxSize()
+                    .graphicsLayer(alpha = if (isProcessingLoginResponse) 0f else 1f),
+                navigator = navigator,
+            )
+
+            if (webViewState.isLoading || isProcessingLoginResponse) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(MaterialTheme.colorScheme.surface),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator()
+                    Text(
+                        "Processing login...",
+                        modifier = Modifier.align(Alignment.Center).padding(top = 80.dp)
+                    )
+                }
+            }
+        }
     }
 }

@@ -7,23 +7,20 @@ import dev.balikin.poject.features.auth.domain.LoginApiModel
 import dev.balikin.poject.network.onError
 import dev.balikin.poject.network.onSuccess
 import dev.balikin.poject.storage.SessionHandler
-import io.ktor.http.decodeURLPart
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.Json
-import kotlin.math.log
 
 class LoginViewModel(
     private val authRepository: AuthRepository,
     private val sessionHandler: SessionHandler
 ) : ViewModel() {
 
-    private val _uiState = MutableStateFlow(LoginUiState())
+    private val _uiState = MutableStateFlow<LoginUiState>(LoginUiState.NotAuthenticated())
     val uiState = _uiState.asStateFlow()
 
     val loginUrl = "https://balikin.vercel.app/api/v1/auth/google"
@@ -31,15 +28,15 @@ class LoginViewModel(
     fun onEvent(uiEvent: LoginUiEvent) {
         when (uiEvent) {
             is LoginUiEvent.UsernameChanged -> {
-                _uiState.value = _uiState.value.copy(username = uiEvent.username)
+                updateState { it.copy(username = uiEvent.username) }
             }
 
             is LoginUiEvent.PasswordChanged -> {
-                _uiState.value = _uiState.value.copy(password = uiEvent.password)
+                updateState { it.copy(password = uiEvent.password) }
             }
 
             is LoginUiEvent.OnRemember -> {
-                _uiState.value = _uiState.value.copy(isRemember = uiEvent.isRemember)
+                updateState { it.copy(isRemember = uiEvent.isRemember) }
             }
 
             is LoginUiEvent.Login -> {
@@ -47,9 +44,14 @@ class LoginViewModel(
             }
 
             is LoginUiEvent.OnGoogleLogin -> {
-                _uiState.value = _uiState.value.copy(showWebView = true)
+                updateState { it.copy(showWebView = true) }
             }
         }
+    }
+
+    private fun updateState(update: (LoginUiState.NotAuthenticated) -> LoginUiState.NotAuthenticated) {
+        _uiState.value =
+            (_uiState.value as? LoginUiState.NotAuthenticated)?.let(update) ?: _uiState.value
     }
 
     fun handleLoginResponse(jsonContent: String) {
@@ -72,7 +74,8 @@ class LoginViewModel(
 
                 println("Extracted JSON: $jsonContent")
 
-                val loginResponse = Json { ignoreUnknownKeys = true }.decodeFromString<LoginApiModel>(jsonContent)
+                val loginResponse =
+                    Json { ignoreUnknownKeys = true }.decodeFromString<LoginApiModel>(jsonContent)
                 val userData = loginResponse.data
 
                 sessionHandler.setUserData(
@@ -81,24 +84,22 @@ class LoginViewModel(
                     token = loginResponse.token
                 )
 
-                _uiState.update { it.copy(loginSuccess = true, showWebView = false) }
-                println("Cek 3 ya: $loginResponse")
+                _uiState.value = LoginUiState.Authenticated
             } catch (e: Exception) {
-                println("Cek 4 ya Failed to parse login response: ${e.message}")
-                _uiState.update { it.copy(showWebView = false, errorMessage = "Login failed.") }
+                updateState { it.copy(showWebView = false, errorMessage = "Login failed.") }
             }
         }
     }
 
     fun hideWebView() {
-        _uiState.update { it.copy(showWebView = false) }
+        updateState { it.copy(showWebView = false) }
     }
 
-    private fun login(){
+    private fun login() {
         viewModelScope.launch(Dispatchers.IO) {
 
             val result = authRepository.loginWithGoogle()
-            withContext(Dispatchers.Main){
+            withContext(Dispatchers.Main) {
                 result.onSuccess {
                     println("Yes login sukses dengan data: $it")
                 }.onError {

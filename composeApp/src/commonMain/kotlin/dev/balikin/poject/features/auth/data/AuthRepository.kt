@@ -7,5 +7,5 @@ import dev.balikin.poject.network.NetworkResult
 
 interface AuthRepository {
     suspend fun loginWithGoogle(): NetworkResult<LoginApiModel, NetworkException>
-    suspend fun userInfo(): UserData
+    fun userInfo(): kotlinx.coroutines.flow.Flow<UserData?>
 }
