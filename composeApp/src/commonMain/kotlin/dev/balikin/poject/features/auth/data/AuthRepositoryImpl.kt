@@ -1,5 +1,6 @@
 package dev.balikin.poject.features.auth.data
 
+import dev.balikin.poject.features.auth.domain.GetUsersApiModel
 import dev.balikin.poject.features.auth.domain.LoginApiModel
 import dev.balikin.poject.features.auth.domain.UserData
 import dev.balikin.poject.network.NetworkException
@@ -29,5 +30,26 @@ class AuthRepositoryImpl(
                 null
             }
         }
+    }
+
+    override suspend fun isTokenValid(
+        keyword: String,
+        limit: String,
+        offset: String
+    ): NetworkResult<GetUsersApiModel, NetworkException> {
+        val result = requestHandler.get<GetUsersApiModel>(
+            urlPathSegments = listOf("/api/v1/list-users"),
+            queryParams = mapOf(
+                "keyword" to keyword,
+                "limit" to limit,
+                "offset" to offset
+            )
+        )
+
+        if (result is NetworkResult.Error) {
+            sessionHandler.clearData()
+        }
+
+        return result
     }
 }

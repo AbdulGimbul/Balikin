@@ -9,7 +9,7 @@ val provideHttpClientModule = module {
     single {
         BalikinHttpClientBuilder(get())
             .protocol(URLProtocol.HTTPS)
-            .host("https://balikin.vercel.app")
+            .host("balikin.vercel.app")
             .build(get())
     }
 

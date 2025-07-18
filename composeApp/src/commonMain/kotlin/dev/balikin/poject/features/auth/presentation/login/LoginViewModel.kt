@@ -25,6 +25,10 @@ class LoginViewModel(
 
     val loginUrl = "https://balikin.vercel.app/api/v1/auth/google"
 
+    init {
+        checkTokenValidity()
+    }
+
     fun onEvent(uiEvent: LoginUiEvent) {
         when (uiEvent) {
             is LoginUiEvent.UsernameChanged -> {
@@ -93,6 +97,24 @@ class LoginViewModel(
 
     fun hideWebView() {
         updateState { it.copy(showWebView = false) }
+    }
+
+    private fun checkTokenValidity() {
+        viewModelScope.launch {
+            updateState { it.copy(isLoading = true, errorMessage = null) }
+            val result = authRepository.isTokenValid("", "10", "0")
+            withContext(Dispatchers.Main) {
+                result.onSuccess {
+                    _uiState.value = LoginUiState.Authenticated
+                }.onError { error ->
+                    updateState {
+                        it.copy(errorMessage = error.message)
+                    }
+                }
+
+                updateState { it.copy(isLoading = false) }
+            }
+        }
     }
 
     private fun login() {

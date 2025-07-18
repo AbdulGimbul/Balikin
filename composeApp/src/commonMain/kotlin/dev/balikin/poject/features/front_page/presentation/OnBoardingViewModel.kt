@@ -20,20 +20,8 @@ class OnBoardingViewModel(
 
     fun onEvent(event: OnBoardingUiEvent) {
         when (event) {
-            OnBoardingUiEvent.SignInClicked -> handleSignIn()
             is OnBoardingUiEvent.PageChanged -> updatePage(event.newPage)
         }
-    }
-
-    private fun handleNext() {
-        val nextPage = _uiState.value.currentPage + 1
-        if (nextPage < pages.size) {
-            updatePage(nextPage)
-        }
-    }
-
-    private fun handleSkip() {
-        updatePage(pages.lastIndex)
     }
 
     private fun updatePage(newPage: Int) {
@@ -43,9 +31,5 @@ class OnBoardingViewModel(
                 isLastPage = newPage == pages.lastIndex
             )
         }
-    }
-
-    private fun handleSignIn() {
-        // Handle sign in logic
     }
 }

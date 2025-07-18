@@ -196,6 +196,7 @@ fun RememberMe(
 private fun LoginWebView(viewModel: LoginViewModel) {
     val webViewState = rememberWebViewState(url = viewModel.loginUrl)
     val navigator = rememberWebViewNavigator()
+    val finalRedirectUrlPrefix = "https://balikin.vercel.app/api/v1/auth/google/callback"
     var isProcessingLoginResponse by remember { mutableStateOf(false) }
 
     DisposableEffect(Unit) {
@@ -204,15 +205,16 @@ private fun LoginWebView(viewModel: LoginViewModel) {
         onDispose { }
     }
 
-    LaunchedEffect(webViewState.loadingState) {
-        if (webViewState.loadingState is LoadingState.Finished && !isProcessingLoginResponse) {
+    val lastLoadedUrl = webViewState.lastLoadedUrl
+    LaunchedEffect(lastLoadedUrl) {
+        if (lastLoadedUrl?.startsWith(finalRedirectUrlPrefix) == true && !isProcessingLoginResponse) {
             isProcessingLoginResponse = true
 
             navigator.evaluateJavaScript("document.documentElement.outerHTML") { rawHtml ->
                 if (!rawHtml.isNullOrBlank() && rawHtml.contains("status") && rawHtml.contains("token")) {
                     viewModel.handleLoginResponse(rawHtml)
                 } else {
-                    isProcessingLoginResponse = false
+                    viewModel.hideWebView()
                 }
             }
         }
