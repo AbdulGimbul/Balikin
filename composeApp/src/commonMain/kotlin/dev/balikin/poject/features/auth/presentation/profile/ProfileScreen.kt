@@ -18,11 +18,13 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
+import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -35,6 +37,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.NavController
 import balikin.composeapp.generated.resources.Res
 import balikin.composeapp.generated.resources.agus
 import balikin.composeapp.generated.resources.ic_edit
@@ -45,12 +49,36 @@ import balikin.composeapp.generated.resources.ic_profile_lock
 import balikin.composeapp.generated.resources.ic_profile_logout
 import balikin.composeapp.generated.resources.ic_profile_notif
 import balikin.composeapp.generated.resources.ic_profile_user
+import dev.balikin.poject.ui.navigation.Screen
 import dev.balikin.poject.ui.theme.primary_blue
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.painterResource
 
 @Composable
-fun ProfileScreen() {
+fun ProfileScreen(viewModel: ProfileViewModel, navController: NavController) {
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+    if (uiState.isLogout) {
+        LaunchedEffect(uiState.isLogout) {
+            navController.navigate(Screen.Login.route) {
+                popUpTo(navController.graph.startDestinationId) {
+                    inclusive = true
+                }
+            }
+        }
+    }
+
+    Profile(
+        uiState = uiState,
+        onEvent = viewModel::onEvent
+    )
+}
+
+@Composable
+fun Profile(
+    uiState: ProfileUiState,
+    onEvent: (ProfileUiEvent) -> Unit
+) {
     var notificationsEnabled by remember { mutableStateOf(true) }
     var faceIDEnabled by remember { mutableStateOf(false) }
 
@@ -63,7 +91,6 @@ fun ProfileScreen() {
     ) {
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Profile Picture
         Box(contentAlignment = Alignment.BottomEnd) {
             Image(
                 painter = painterResource(Res.drawable.agus),
@@ -87,14 +114,13 @@ fun ProfileScreen() {
         Spacer(modifier = Modifier.height(8.dp))
 
         Text(
-            text = "Agus Ihsan Mochamad",
+            text = uiState.userData?.name.toString(),
             fontSize = 20.sp,
             fontWeight = FontWeight.SemiBold
         )
 
         Spacer(modifier = Modifier.height(24.dp))
 
-        // Information Section
         Text("Information", color = Color.Gray, fontSize = 12.sp)
         Spacer(modifier = Modifier.height(8.dp))
 
@@ -103,13 +129,13 @@ fun ProfileScreen() {
                 .fillMaxWidth()
                 .background(Color(0xFFF7F8F9), RoundedCornerShape(16.dp))
         ) {
-            ProfileInfoCard(icon = Res.drawable.ic_profile_user, label = "Agus Ihsan Mochamad")
+            ProfileInfoCard(icon = Res.drawable.ic_profile_user, label = uiState.userData?.name.toString())
             HorizontalDivider(
                 modifier = Modifier.padding(horizontal = 16.dp),
                 thickness = 1.dp,
                 color = Color.LightGray
             )
-            ProfileInfoCard(icon = Res.drawable.ic_profile_email, label = "agusikhsan08@gmail.com")
+            ProfileInfoCard(icon = Res.drawable.ic_profile_email, label = uiState.userData?.email.toString())
             HorizontalDivider(
                 modifier = Modifier.padding(horizontal = 16.dp),
                 thickness = 1.dp,
@@ -120,11 +146,6 @@ fun ProfileScreen() {
                 modifier = Modifier.padding(horizontal = 16.dp),
                 thickness = 1.dp,
                 color = Color.LightGray
-            )
-            ProfileInfoCard(
-                icon = Res.drawable.ic_profile_lock,
-                label = "************",
-                isPassword = true
             )
         }
 
@@ -138,18 +159,13 @@ fun ProfileScreen() {
                 .fillMaxWidth()
                 .background(Color(0xFFF7F8F9), RoundedCornerShape(16.dp))
         ) {
-            PreferenceSwitch(label = "Notifications", isChecked = notificationsEnabled) {
-                notificationsEnabled = it
-            }
+
             HorizontalDivider(thickness = 1.dp, color = Color.LightGray)
-            PreferenceSwitch(label = "Face ID", isChecked = faceIDEnabled) {
-                faceIDEnabled = it
-            }
-            HorizontalDivider(thickness = 1.dp, color = Color.LightGray)
+            Spacer(modifier = Modifier.height(8.dp))
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .clickable { /* Handle logout */ }
+                    .clickable { onEvent(ProfileUiEvent.Logout) }
                     .padding(vertical = 16.dp, horizontal = 16.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {

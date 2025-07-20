@@ -66,6 +66,8 @@ import dev.balikin.poject.features.auth.presentation.forgot_password.ForgotPassw
 import dev.balikin.poject.features.auth.presentation.forgot_password.ForgotPasswordViewModel
 import dev.balikin.poject.features.auth.presentation.login.LoginScreen
 import dev.balikin.poject.features.auth.presentation.login.LoginViewModel
+import dev.balikin.poject.features.auth.presentation.profile.ProfileScreen
+import dev.balikin.poject.features.auth.presentation.profile.ProfileViewModel
 import dev.balikin.poject.features.auth.presentation.register.RegisterScreen
 import dev.balikin.poject.features.auth.presentation.register.RegisterViewModel
 import dev.balikin.poject.features.auth.presentation.reset_password.ResetPasswordScreen
@@ -245,40 +247,7 @@ fun NavHostContent(
             TransFilterScreen(viewModel = transactionViewModel, navController = navController)
         }
         composable(Screen.Profile.route) {
-            Column(
-                modifier = Modifier.fillMaxSize().padding(16.dp),
-                verticalArrangement = Arrangement.Center,
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Image(
-                    painter = painterResource(Res.drawable.offline_profile),
-                    contentDescription = null,
-                    modifier = Modifier.size(200.dp)
-                )
-                Spacer(modifier = Modifier.height(24.dp))
-                val info = buildAnnotatedString {
-                    withStyle(
-                        style = SpanStyle(
-                            fontWeight = FontWeight.Bold,
-                            color = primary_text
-                        )
-                    ) {
-                        append("Terimakasih telah menunggu!")
-                    }
-                    withStyle(
-                        style = SpanStyle(
-                            fontWeight = FontWeight.SemiBold,
-                            color = secondary_text
-                        )
-                    ) {
-                        append(" Fitur ini masih dalam tahap pengembangan. kami akan segera melakukan update secepat mungkin.")
-                    }
-                }
-                Text(
-                    text = info,
-                    textAlign = TextAlign.Center
-                )
-            }
+            ProfileScreen(viewModel = koinViewModel<ProfileViewModel>(), navController = navController)
         }
         composable(Screen.History.route) {
             HistoryScreen(viewModel = historyViewModel, navController = navController)

@@ -52,7 +52,9 @@ class SessionHandler(private val dataStore: DataStore<Preferences>) {
 
     suspend fun clearData() {
         dataStore.edit { preferences ->
+            val currentIsFirstTime = preferences[_isFirstTime] ?: true
             preferences.clear()
+            preferences[_isFirstTime] = currentIsFirstTime
         }
     }
 }
