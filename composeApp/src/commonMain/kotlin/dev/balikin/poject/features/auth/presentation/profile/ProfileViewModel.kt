@@ -10,6 +10,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class ProfileViewModel(
     private val authRepository: AuthRepository
@@ -31,8 +32,9 @@ class ProfileViewModel(
     }
 
     private fun getUserData() {
+        _uiState.value = _uiState.value.copy(isLoading = true, errorMessage = null)
+
         viewModelScope.launch(Dispatchers.IO) {
-            _uiState.value = _uiState.value.copy(isLoading = true)
             try {
                 authRepository.userInfo().collect { user ->
                     _uiState.update { it.copy(userData = user, isLoading = false) }
@@ -45,12 +47,14 @@ class ProfileViewModel(
     }
 
     private fun logout() {
-        viewModelScope.launch {
+        _uiState.value = _uiState.value.copy(isLoading = true, errorMessage = null)
 
-            authRepository.logout().let {
-                _uiState.value = _uiState.value.copy(
-                    isLogout = true,
-                )
+        viewModelScope.launch(Dispatchers.IO) {
+
+            val result = authRepository.logout()
+            withContext(Dispatchers.Main) {
+                result.onSuccess { _uiState.update { it.copy(isLogout = true) } }
+                    .onFailure { e -> _uiState.update { it.copy(errorMessage = e.message) } }
             }
         }
     }

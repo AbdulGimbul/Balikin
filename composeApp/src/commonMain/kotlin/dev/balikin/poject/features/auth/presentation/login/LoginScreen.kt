@@ -42,12 +42,12 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import balikin.composeapp.generated.resources.Res
 import balikin.composeapp.generated.resources.balikin_logo
-import com.multiplatform.webview.web.LoadingState
 import com.multiplatform.webview.web.WebView
 import com.multiplatform.webview.web.rememberWebViewNavigator
 import com.multiplatform.webview.web.rememberWebViewState
 import dev.balikin.poject.ui.components.DefaultButton
 import dev.balikin.poject.ui.components.DefaultTextField
+import dev.balikin.poject.ui.components.EnhancedLoading
 import dev.balikin.poject.ui.components.LoginRegisterRow
 import dev.balikin.poject.ui.components.OrDivider
 import dev.balikin.poject.ui.components.WithGoogleButton
@@ -91,6 +91,11 @@ fun Login(
     onEvent: (LoginUiEvent) -> Unit,
     moveToRegister: () -> Unit
 ) {
+    if (uiState.isLoading) {
+        EnhancedLoading()
+        return
+    }
+
     Column(
         modifier = Modifier.fillMaxSize()
             .background(Color.White)

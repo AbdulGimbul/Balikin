@@ -53,7 +53,9 @@ class AuthRepositoryImpl(
         return result
     }
 
-    override suspend fun logout() {
-        sessionHandler.clearData()
+    override suspend fun logout(): Result<Unit> {
+        return runCatching {
+            sessionHandler.clearData()
+        }
     }
 }

@@ -15,5 +15,5 @@ interface AuthRepository {
         limit: String,
         offset: String
     ): NetworkResult<GetUsersApiModel, NetworkException>
-    suspend fun logout()
+    suspend fun logout(): Result<Unit>
 }

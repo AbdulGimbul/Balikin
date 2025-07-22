@@ -147,6 +147,7 @@ fun SetupNavHost(navController: NavHostController, onExitApp: () -> Unit) {
     }
 
     Scaffold(
+        containerColor = Color.White,
         bottomBar = {
             if (currentRoute in listOf(
                     Screen.Home.route,

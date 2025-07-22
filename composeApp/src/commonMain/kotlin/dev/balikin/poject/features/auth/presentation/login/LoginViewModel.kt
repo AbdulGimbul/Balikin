@@ -103,17 +103,15 @@ class LoginViewModel(
         viewModelScope.launch {
             updateState { it.copy(isLoading = true, errorMessage = null) }
             val result = authRepository.isTokenValid("", "10", "0")
-            withContext(Dispatchers.Main) {
-                result.onSuccess {
-                    _uiState.value = LoginUiState.Authenticated
-                }.onError { error ->
-                    updateState {
-                        it.copy(errorMessage = error.message)
-                    }
+            result.onSuccess {
+                _uiState.value = LoginUiState.Authenticated
+            }.onError { error ->
+                updateState {
+                    it.copy(errorMessage = error.message)
                 }
-
-                updateState { it.copy(isLoading = false) }
             }
+
+            updateState { it.copy(isLoading = false) }
         }
     }
 

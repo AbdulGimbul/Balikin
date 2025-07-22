@@ -18,7 +18,6 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
-import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Switch
@@ -45,26 +44,33 @@ import balikin.composeapp.generated.resources.ic_edit
 import balikin.composeapp.generated.resources.ic_profile_contact
 import balikin.composeapp.generated.resources.ic_profile_email
 import balikin.composeapp.generated.resources.ic_profile_faceid
-import balikin.composeapp.generated.resources.ic_profile_lock
 import balikin.composeapp.generated.resources.ic_profile_logout
 import balikin.composeapp.generated.resources.ic_profile_notif
 import balikin.composeapp.generated.resources.ic_profile_user
 import dev.balikin.poject.ui.navigation.Screen
 import dev.balikin.poject.ui.theme.primary_blue
+import multiplatform.network.cmptoast.showToast
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.ui.tooling.preview.Preview
 
 @Composable
 fun ProfileScreen(viewModel: ProfileViewModel, navController: NavController) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     if (uiState.isLogout) {
-        LaunchedEffect(uiState.isLogout) {
+        LaunchedEffect(Unit) {
             navController.navigate(Screen.Login.route) {
-                popUpTo(navController.graph.startDestinationId) {
+                popUpTo(0) {
                     inclusive = true
                 }
             }
+        }
+    }
+
+    uiState.errorMessage?.let {
+        LaunchedEffect(it) {
+            showToast(it)
         }
     }
 
@@ -85,39 +91,42 @@ fun Profile(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color.White)
             .padding(16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Spacer(modifier = Modifier.height(16.dp))
 
-        Box(contentAlignment = Alignment.BottomEnd) {
-            Image(
-                painter = painterResource(Res.drawable.agus),
-                contentDescription = "Profile Picture",
-                modifier = Modifier
-                    .size(100.dp)
-                    .clip(CircleShape)
-            )
-            Icon(
-                painter = painterResource(Res.drawable.ic_edit),
-                contentDescription = "Edit",
-                tint = primary_blue,
-                modifier = Modifier
-                    .offset(x = (-8).dp, y = (-8).dp)
-                    .size(24.dp)
-                    .background(Color(0XFFE3E6FF), CircleShape)
-                    .padding(4.dp)
+        Column(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Box(contentAlignment = Alignment.BottomEnd) {
+                Image(
+                    painter = painterResource(Res.drawable.agus),
+                    contentDescription = "Profile Picture",
+                    modifier = Modifier
+                        .size(100.dp)
+                        .clip(CircleShape)
+                )
+                Icon(
+                    painter = painterResource(Res.drawable.ic_edit),
+                    contentDescription = "Edit",
+                    tint = primary_blue,
+                    modifier = Modifier
+                        .offset(x = (-8).dp, y = (-8).dp)
+                        .size(24.dp)
+                        .background(Color(0XFFE3E6FF), CircleShape)
+                        .padding(4.dp)
+                )
+            }
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            Text(
+                text = uiState.userData?.name.toString(),
+                fontSize = 20.sp,
+                fontWeight = FontWeight.SemiBold
             )
         }
-
-        Spacer(modifier = Modifier.height(8.dp))
-
-        Text(
-            text = uiState.userData?.name.toString(),
-            fontSize = 20.sp,
-            fontWeight = FontWeight.SemiBold
-        )
 
         Spacer(modifier = Modifier.height(24.dp))
 
@@ -129,13 +138,19 @@ fun Profile(
                 .fillMaxWidth()
                 .background(Color(0xFFF7F8F9), RoundedCornerShape(16.dp))
         ) {
-            ProfileInfoCard(icon = Res.drawable.ic_profile_user, label = uiState.userData?.name.toString())
+            ProfileInfoCard(
+                icon = Res.drawable.ic_profile_user,
+                label = uiState.userData?.name.toString()
+            )
             HorizontalDivider(
                 modifier = Modifier.padding(horizontal = 16.dp),
                 thickness = 1.dp,
                 color = Color.LightGray
             )
-            ProfileInfoCard(icon = Res.drawable.ic_profile_email, label = uiState.userData?.email.toString())
+            ProfileInfoCard(
+                icon = Res.drawable.ic_profile_email,
+                label = uiState.userData?.email.toString()
+            )
             HorizontalDivider(
                 modifier = Modifier.padding(horizontal = 16.dp),
                 thickness = 1.dp,
@@ -151,7 +166,7 @@ fun Profile(
 
         Spacer(modifier = Modifier.height(24.dp))
 
-        Text("PREFERENCES", color = Color.Gray, fontSize = 12.sp)
+        Text("Friends", color = Color.Gray, fontSize = 12.sp)
         Spacer(modifier = Modifier.height(8.dp))
 
         Column(
@@ -159,9 +174,6 @@ fun Profile(
                 .fillMaxWidth()
                 .background(Color(0xFFF7F8F9), RoundedCornerShape(16.dp))
         ) {
-
-            HorizontalDivider(thickness = 1.dp, color = Color.LightGray)
-            Spacer(modifier = Modifier.height(8.dp))
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -189,8 +201,8 @@ fun ProfileInfoCard(icon: DrawableResource, label: String, isPassword: Boolean =
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 16.dp)
-            .clickable { /* Handle click */ },
+            .clickable { /* Handle click */ }
+            .padding(horizontal = 16.dp, vertical = 16.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Image(painter = painterResource(icon), contentDescription = null)
@@ -228,4 +240,10 @@ fun PreferenceSwitch(label: String, isChecked: Boolean, onCheckedChange: (Boolea
         Text(text = label, modifier = Modifier.weight(1f))
         Switch(checked = isChecked, onCheckedChange = onCheckedChange)
     }
+}
+
+@Composable
+@Preview
+fun ProfilePreview() {
+    Profile(uiState = ProfileUiState(), onEvent = {})
 }
