@@ -31,8 +31,14 @@ import balikin.composeapp.generated.resources.agus
 import dev.balikin.poject.ui.theme.green
 import org.jetbrains.compose.resources.painterResource
 
+import dev.balikin.poject.features.friends.domain.FriendApiModel
+import dev.balikin.poject.features.friends.domain.FriendsApiData
+
 @Composable
-fun FriendsItem(modifier: Modifier = Modifier, isOnline: Boolean = false) {
+fun FriendsItem(
+    friend: FriendsApiData,
+    modifier: Modifier = Modifier
+) {
     Column(
         modifier = modifier
     ) {
@@ -41,7 +47,7 @@ fun FriendsItem(modifier: Modifier = Modifier, isOnline: Boolean = false) {
                 .fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            if (isOnline) {
+            if (friend.isOnline) {
                 Image(
                     painter = painterResource(Res.drawable.agus),
                     contentDescription = "User Avatar",
@@ -58,12 +64,12 @@ fun FriendsItem(modifier: Modifier = Modifier, isOnline: Boolean = false) {
             Spacer(modifier = Modifier.width(12.dp))
             Column {
                 Text(
-                    text = "name",
+                    text = friend.name,
                     fontWeight = FontWeight.Medium,
                     fontSize = 16.sp
                 )
                 Text(
-                    text = "email",
+                    text = friend.email,
                     color = Color.Gray,
                     fontSize = 14.sp
                 )

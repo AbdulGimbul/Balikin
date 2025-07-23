@@ -5,6 +5,9 @@ import dev.balikin.poject.features.auth.data.AuthRepositoryImpl
 import dev.balikin.poject.features.auth.presentation.login.LoginViewModel
 import dev.balikin.poject.features.auth.presentation.profile.ProfileViewModel
 import dev.balikin.poject.features.auth.presentation.register.RegisterViewModel
+import dev.balikin.poject.features.friends.data.FriendsRepository
+import dev.balikin.poject.features.friends.data.FriendsRepositoryImpl
+import dev.balikin.poject.features.friends.presentation.FriendsViewModel
 import dev.balikin.poject.features.front_page.data.OnBoardingRepository
 import dev.balikin.poject.features.front_page.data.OnBoardingRepositoryImpl
 import dev.balikin.poject.features.front_page.presentation.OnBoardingViewModel
@@ -53,4 +56,11 @@ val provideHistoryRepositoryModule = module {
     viewModel {
         HistoryViewModel(historyRepository = get())
     }
+}
+
+val provideFriendsRepositoryModule = module {
+    single<FriendsRepositoryImpl> {
+        FriendsRepositoryImpl(requestHandler = get())
+    }.bind<FriendsRepository>()
+    viewModel { FriendsViewModel(friendsRepository = get()) }
 }

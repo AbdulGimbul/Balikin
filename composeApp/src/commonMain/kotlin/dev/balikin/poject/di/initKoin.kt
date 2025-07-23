@@ -13,6 +13,7 @@ fun initKoin(config: KoinAppDeclaration? = null) {
             provideHomeRepositoryModule,
             provideLocalStorageModule,
             provideHistoryRepositoryModule,
+            provideFriendsRepositoryModule,
             provideHttpClientModule,
             platformModule
         )

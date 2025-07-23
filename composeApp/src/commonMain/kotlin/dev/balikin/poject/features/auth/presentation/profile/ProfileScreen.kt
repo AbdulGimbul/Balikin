@@ -82,14 +82,16 @@ fun ProfileScreen(viewModel: ProfileViewModel, navController: NavController) {
 
     Profile(
         uiState = uiState,
-        onEvent = viewModel::onEvent
+        onEvent = viewModel::onEvent,
+        moveToFriends = { navController.navigate(Screen.Friends.route) }
     )
 }
 
 @Composable
 fun Profile(
     uiState: ProfileUiState,
-    onEvent: (ProfileUiEvent) -> Unit
+    onEvent: (ProfileUiEvent) -> Unit,
+    moveToFriends: () -> Unit
 ) {
     var notificationsEnabled by remember { mutableStateOf(true) }
     var faceIDEnabled by remember { mutableStateOf(false) }
@@ -181,7 +183,7 @@ fun Profile(
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             OutlinedButton(
-                onClick = { },
+                onClick = { moveToFriends() },
                 shape = RoundedCornerShape(18.dp),
                 border = BorderStroke(1.dp, primary_blue),
                 colors = ButtonDefaults.outlinedButtonColors(
@@ -208,7 +210,7 @@ fun Profile(
             }
 
             Button(
-                onClick = { },
+                onClick = { onEvent(ProfileUiEvent.Logout) },
                 shape = RoundedCornerShape(18.dp),
                 colors = ButtonDefaults.buttonColors(
                     contentColor = primary_blue,
@@ -279,5 +281,5 @@ fun PreferenceSwitch(label: String, isChecked: Boolean, onCheckedChange: (Boolea
 @Composable
 @Preview
 fun ProfilePreview() {
-    Profile(uiState = ProfileUiState(), onEvent = {})
+    Profile(uiState = ProfileUiState(), onEvent = {}, moveToFriends = {})
 }
