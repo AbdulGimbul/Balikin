@@ -74,6 +74,7 @@ import dev.balikin.poject.features.auth.presentation.reset_password.ResetPasswor
 import dev.balikin.poject.features.auth.presentation.reset_password.ResetPasswordViewModel
 import dev.balikin.poject.features.auth.presentation.set_password.SetNewPasswordScreen
 import dev.balikin.poject.features.auth.presentation.set_password.SetNewPasswordViewModel
+import dev.balikin.poject.features.friends.presentation.FriendsScreen
 import dev.balikin.poject.features.front_page.presentation.OnBoardingScreen
 import dev.balikin.poject.features.front_page.presentation.OnBoardingViewModel
 import dev.balikin.poject.features.history.presentation.HistoryScreen
@@ -255,6 +256,9 @@ fun NavHostContent(
         }
         composable(Screen.FilterHistory.route) {
             HistoryFilterScreen(viewModel = historyViewModel, navController = navController)
+        }
+        composable(Screen.Friends.route) {
+            FriendsScreen()
         }
     }
 }
