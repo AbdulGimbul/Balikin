@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -37,7 +38,10 @@ import dev.balikin.poject.features.friends.domain.FriendsApiData
 @Composable
 fun FriendsItem(
     friend: FriendsApiData,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onAddFriend: (String) -> Unit = {},
+    isAddingFriend: Boolean = false,
+    addingFriendEmail: String? = null
 ) {
     Column(
         modifier = modifier
@@ -75,19 +79,30 @@ fun FriendsItem(
                 )
             }
             Spacer(modifier = Modifier.weight(1f))
-            Text(
-                text = "Add",
-                modifier = Modifier
-                    .clip(RoundedCornerShape(10.dp))
-                    .clickable { }
-                    .background(
-                        color = green,
-                        shape = RoundedCornerShape(10.dp)
-                    )
-                    .padding(horizontal = 10.dp, vertical = 4.dp),
-                color = Color.White,
-                style = MaterialTheme.typography.labelLarge
-            )
+            
+            val isThisFriendLoading = isAddingFriend && addingFriendEmail == friend.email
+            
+            if (isThisFriendLoading) {
+                CircularProgressIndicator(
+                    modifier = Modifier.size(24.dp),
+                    color = green,
+                    strokeWidth = 2.dp
+                )
+            } else {
+                Text(
+                    text = "Add",
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(10.dp))
+                        .clickable { onAddFriend(friend.email) }
+                        .background(
+                            color = green,
+                            shape = RoundedCornerShape(10.dp)
+                        )
+                        .padding(horizontal = 10.dp, vertical = 4.dp),
+                    color = Color.White,
+                    style = MaterialTheme.typography.labelLarge
+                )
+            }
         }
         Spacer(modifier = Modifier.height(8.dp))
         HorizontalDivider()

@@ -1,5 +1,7 @@
 package dev.balikin.poject.features.friends.data
 
+import dev.balikin.poject.features.friends.domain.AddFriendRequest
+import dev.balikin.poject.features.friends.domain.AddFriendResponse
 import dev.balikin.poject.features.friends.domain.FriendApiModel
 import dev.balikin.poject.network.NetworkException
 import dev.balikin.poject.network.NetworkResult
@@ -20,6 +22,15 @@ class FriendsRepositoryImpl(
                 "limit" to limit,
                 "offset" to offset
             )
+        )
+    }
+    
+    override suspend fun addFriend(
+        friendEmail: String
+    ): NetworkResult<AddFriendResponse, NetworkException> {
+        return requestHandler.post<AddFriendRequest, AddFriendResponse>(
+            urlPathSegments = listOf("api", "v1", "following"),
+            body = AddFriendRequest(friendEmail = friendEmail)
         )
     }
 }

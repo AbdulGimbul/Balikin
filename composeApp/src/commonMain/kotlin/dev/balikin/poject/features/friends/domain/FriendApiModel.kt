@@ -28,3 +28,16 @@ data class FriendsApiMetaInfo(
     val offset: Int,
     val total: Int
 )
+
+@Serializable
+data class AddFriendRequest(
+    @SerialName("friend_email")
+    val friendEmail: String
+)
+
+@Serializable
+data class AddFriendResponse(
+    val status: Int,
+    val data: String?,
+    val message: String
+)

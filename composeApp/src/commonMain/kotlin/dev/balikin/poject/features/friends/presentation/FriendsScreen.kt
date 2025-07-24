@@ -26,6 +26,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -41,6 +42,7 @@ import dev.balikin.poject.ui.components.FriendsItem
 import dev.balikin.poject.ui.theme.primary_blue
 import dev.balikin.poject.ui.theme.primary_text
 import dev.balikin.poject.ui.theme.secondary_text
+import multiplatform.network.cmptoast.showToast
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
 @Composable
@@ -54,6 +56,12 @@ fun Friends(
     uiState: FriendsUiState,
     onEvent: (FriendsUiEvent) -> Unit
 ) {
+    uiState.addFriendMessage?.let { message ->
+        LaunchedEffect(message) {
+            showToast(message)
+        }
+    }
+    
     Column(
         modifier = Modifier.fillMaxWidth()
     ) {
@@ -132,7 +140,14 @@ fun Friends(
                     verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
                     items(uiState.friends) { friend ->
-                        FriendsItem(friend)
+                        FriendsItem(
+                            friend = friend,
+                            onAddFriend = { email ->
+                                onEvent(FriendsUiEvent.AddFriend(email))
+                            },
+                            isAddingFriend = uiState.isAddingFriend,
+                            addingFriendEmail = uiState.addingFriendEmail
+                        )
                     }
                 }
             }

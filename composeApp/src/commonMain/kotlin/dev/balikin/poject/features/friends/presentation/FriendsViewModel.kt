@@ -30,6 +30,9 @@ class FriendsViewModel(
                 _uiState.value = _uiState.value.copy(nameSearch = event.query)
                 searchFriends(event.query)
             }
+            is FriendsUiEvent.AddFriend -> {
+                addFriend(event.friendEmail)
+            }
         }
     }
 
@@ -55,6 +58,34 @@ class FriendsViewModel(
                 _uiState.value = _uiState.value.copy(
                     isLoading = false,
                     errorMessage = it.message
+                )
+            }
+        }
+    }
+    
+    private fun addFriend(friendEmail: String) {
+        viewModelScope.launch {
+            _uiState.value = _uiState.value.copy(
+                isAddingFriend = true,
+                addingFriendEmail = friendEmail,
+                addFriendMessage = null
+            )
+            
+            val result = friendsRepository.addFriend(friendEmail)
+            
+            result.onSuccess {
+                _uiState.value = _uiState.value.copy(
+                    isAddingFriend = false,
+                    addingFriendEmail = null,
+                    addFriendMessage = it.message
+                )
+                // Refresh the friends list to show updated data
+                searchFriends(_uiState.value.nameSearch)
+            }.onError {
+                _uiState.value = _uiState.value.copy(
+                    isAddingFriend = false,
+                    addingFriendEmail = null,
+                    addFriendMessage = it.message
                 )
             }
         }

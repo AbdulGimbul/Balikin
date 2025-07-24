@@ -8,6 +8,9 @@ data class FriendsUiState(
     val isLoading: Boolean = false,
     val friends: List<FriendsApiData> = emptyList(),
     val errorMessage: String? = null,
+    val isAddingFriend: Boolean = false,
+    val addingFriendEmail: String? = null,
+    val addFriendMessage: String? = null
 )
 
 data class SearchFilters(
