@@ -68,10 +68,27 @@ class BalikinHttpClientBuilder(
             install(Auth) {
                 bearer {
                     loadTokens {
-                        BearerTokens(
-                            accessToken = sessionHandler.getToken().first(),
-                            refreshToken = ""
-                        )
+                        val token = sessionHandler.getToken().first()
+                        if (token.isNotEmpty()) {
+                            BearerTokens(
+                                accessToken = token,
+                                refreshToken = ""
+                            )
+                        } else {
+                            null
+                        }
+                    }
+                    
+                    refreshTokens {
+                        val token = sessionHandler.getToken().first()
+                        if (token.isNotEmpty()) {
+                            BearerTokens(
+                                accessToken = token,
+                                refreshToken = ""
+                            )
+                        } else {
+                            null
+                        }
                     }
                 }
             }

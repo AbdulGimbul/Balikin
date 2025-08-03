@@ -21,6 +21,7 @@ class FriendsViewModel(
     private var searchJob: Job? = null
 
     init {
+        loadFollowing()
         searchFriends("")
     }
 
@@ -32,6 +33,9 @@ class FriendsViewModel(
             }
             is FriendsUiEvent.AddFriend -> {
                 addFriend(event.friendEmail)
+            }
+            is FriendsUiEvent.ClearMessage -> {
+                _uiState.value = _uiState.value.copy(addFriendMessage = null)
             }
         }
     }
@@ -79,7 +83,8 @@ class FriendsViewModel(
                     addingFriendEmail = null,
                     addFriendMessage = it.message
                 )
-                // Refresh the friends list to show updated data
+                // Refresh the friends list and following data
+                loadFollowing()
                 searchFriends(_uiState.value.nameSearch)
             }.onError {
                 _uiState.value = _uiState.value.copy(
@@ -87,6 +92,27 @@ class FriendsViewModel(
                     addingFriendEmail = null,
                     addFriendMessage = it.message
                 )
+            }
+        }
+    }
+    
+    private fun loadFollowing() {
+        viewModelScope.launch {
+            _uiState.value = _uiState.value.copy(isLoadingFollowing = true)
+            
+            val result = friendsRepository.getFollowing()
+            
+            result.onSuccess { followingResponse ->
+                val followingEmails = followingResponse.data.map { it.followed.email }.toSet()
+                _uiState.value = _uiState.value.copy(
+                    isLoadingFollowing = false,
+                    followingEmails = followingEmails
+                )
+            }.onError {
+                _uiState.value = _uiState.value.copy(
+                    isLoadingFollowing = false
+                )
+                // Optionally handle error, but we don't want to show error message for this
             }
         }
     }

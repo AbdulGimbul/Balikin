@@ -16,6 +16,8 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -28,6 +30,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -53,6 +56,7 @@ import balikin.composeapp.generated.resources.ic_profile_faceid
 import balikin.composeapp.generated.resources.ic_profile_logout
 import balikin.composeapp.generated.resources.ic_profile_notif
 import balikin.composeapp.generated.resources.ic_profile_user
+import dev.balikin.poject.ui.components.ProfileFriendItem
 import dev.balikin.poject.ui.navigation.Screen
 import dev.balikin.poject.ui.theme.primary_blue
 import multiplatform.network.cmptoast.showToast
@@ -174,8 +178,56 @@ fun Profile(
 
         Spacer(modifier = Modifier.height(24.dp))
 
-        Text("Friends", color = Color.Gray, fontSize = 12.sp)
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text("Friends", color = Color.Gray, fontSize = 12.sp)
+            TextButton(onClick = { }) {
+                Text(
+                    text = "See all",
+                    color = primary_blue
+                )
+            }
+        }
         Spacer(modifier = Modifier.height(16.dp))
+
+        if (uiState.friends.isNotEmpty()) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(Color(0xFFF7F8F9), RoundedCornerShape(16.dp))
+                    .padding(16.dp)
+            ) {
+                LazyRow(
+                    horizontalArrangement = Arrangement.spacedBy(16.dp),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    items(uiState.friends.take(4)) { friend ->
+                        ProfileFriendItem(friend = friend)
+                    }
+                }
+            }
+        } else {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(Color(0xFFF7F8F9), RoundedCornerShape(16.dp))
+                    .padding(16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(
+                    text = "No friends yet",
+                    color = Color.Gray,
+                    fontSize = 14.sp
+                )
+            }
+        }
+
+        Spacer(modifier = Modifier.height(24.dp))
 
         Column(
             modifier = Modifier.fillMaxWidth(),

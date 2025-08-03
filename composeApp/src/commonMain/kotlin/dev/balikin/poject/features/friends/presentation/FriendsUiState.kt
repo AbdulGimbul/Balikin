@@ -10,7 +10,9 @@ data class FriendsUiState(
     val errorMessage: String? = null,
     val isAddingFriend: Boolean = false,
     val addingFriendEmail: String? = null,
-    val addFriendMessage: String? = null
+    val addFriendMessage: String? = null,
+    val followingEmails: Set<String> = emptySet(),
+    val isLoadingFollowing: Boolean = false
 )
 
 data class SearchFilters(

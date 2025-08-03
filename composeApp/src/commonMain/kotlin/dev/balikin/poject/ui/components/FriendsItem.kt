@@ -41,7 +41,8 @@ fun FriendsItem(
     modifier: Modifier = Modifier,
     onAddFriend: (String) -> Unit = {},
     isAddingFriend: Boolean = false,
-    addingFriendEmail: String? = null
+    addingFriendEmail: String? = null,
+    isAlreadyFriend: Boolean = false
 ) {
     Column(
         modifier = modifier
@@ -80,28 +81,31 @@ fun FriendsItem(
             }
             Spacer(modifier = Modifier.weight(1f))
             
-            val isThisFriendLoading = isAddingFriend && addingFriendEmail == friend.email
-            
-            if (isThisFriendLoading) {
-                CircularProgressIndicator(
-                    modifier = Modifier.size(24.dp),
-                    color = green,
-                    strokeWidth = 2.dp
-                )
-            } else {
-                Text(
-                    text = "Add",
-                    modifier = Modifier
-                        .clip(RoundedCornerShape(10.dp))
-                        .clickable { onAddFriend(friend.email) }
-                        .background(
-                            color = green,
-                            shape = RoundedCornerShape(10.dp)
-                        )
-                        .padding(horizontal = 10.dp, vertical = 4.dp),
-                    color = Color.White,
-                    style = MaterialTheme.typography.labelLarge
-                )
+            // Only show add button if not already friends
+            if (!isAlreadyFriend) {
+                val isThisFriendLoading = isAddingFriend && addingFriendEmail == friend.email
+                
+                if (isThisFriendLoading) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(24.dp),
+                        color = green,
+                        strokeWidth = 2.dp
+                    )
+                } else {
+                    Text(
+                        text = "Add",
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(10.dp))
+                            .clickable { onAddFriend(friend.email) }
+                            .background(
+                                color = green,
+                                shape = RoundedCornerShape(10.dp)
+                            )
+                            .padding(horizontal = 10.dp, vertical = 4.dp),
+                        color = Color.White,
+                        style = MaterialTheme.typography.labelLarge
+                    )
+                }
             }
         }
         Spacer(modifier = Modifier.height(8.dp))

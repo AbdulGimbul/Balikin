@@ -146,7 +146,8 @@ fun Friends(
                                 onEvent(FriendsUiEvent.AddFriend(email))
                             },
                             isAddingFriend = uiState.isAddingFriend,
-                            addingFriendEmail = uiState.addingFriendEmail
+                            addingFriendEmail = uiState.addingFriendEmail,
+                            isAlreadyFriend = friend.email in uiState.followingEmails
                         )
                     }
                 }

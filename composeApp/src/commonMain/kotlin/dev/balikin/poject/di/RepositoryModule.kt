@@ -35,7 +35,7 @@ val provideAuthRepositoryModule = module {
     }.bind<AuthRepository>()
     viewModel { RegisterViewModel() }
     viewModel { LoginViewModel(get(), get()) }
-    viewModel { ProfileViewModel(get()) }
+    viewModel { ProfileViewModel(get(), get()) }
 }
 
 val provideTransactionRepositoryModule = module {
