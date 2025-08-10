@@ -58,7 +58,7 @@ fun TransactionItem(transaction: TransactionEntity, modifier: Modifier = Modifie
                 )
             }
             Spacer(modifier = Modifier.width(12.dp))
-            Column {
+            Column(modifier = Modifier.weight(1f)) {
                 Text(
                     text = transaction.name,
                     fontWeight = FontWeight.Medium,
@@ -83,10 +83,10 @@ fun TransactionItem(transaction: TransactionEntity, modifier: Modifier = Modifie
                     )
                 }
             }
-            Spacer(modifier = Modifier.weight(1f))
+            Spacer(modifier = Modifier.width(8.dp))
             Column(horizontalAlignment = Alignment.End) {
                 Text(
-                    text = currencyFormat(transaction.amount.toDouble()),
+                    text = currencyFormat(transaction.amount),
                     fontWeight = FontWeight.Bold,
                     fontSize = 16.sp
                 )
