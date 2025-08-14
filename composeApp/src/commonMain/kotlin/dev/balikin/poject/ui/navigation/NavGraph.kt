@@ -200,11 +200,21 @@ fun NavHostContent(
 
     val sessionHandler: SessionHandler = koinInject()
     val isFirstTime by sessionHandler.isFirstTime().collectAsState(initial = true)
+    
+    // Check if user has a valid token
+    var hasValidToken by remember { mutableStateOf(false) }
+    var isCheckingToken by remember { mutableStateOf(true) }
+    
+    LaunchedEffect(Unit) {
+        hasValidToken = sessionHandler.hasValidToken()
+        isCheckingToken = false
+    }
 
-    val startDestination = if (isFirstTime) {
-        Screen.OnBoarding.route
-    } else {
-        Screen.Login.route
+    val startDestination = when {
+        isCheckingToken -> Screen.Login.route // Temporary, will be updated below
+        isFirstTime -> Screen.OnBoarding.route
+        hasValidToken -> Screen.Home.route
+        else -> Screen.Login.route
     }
 
     NavHost(

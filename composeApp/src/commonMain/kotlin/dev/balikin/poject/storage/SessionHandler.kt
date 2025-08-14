@@ -8,6 +8,7 @@ import androidx.datastore.preferences.core.emptyPreferences
 import androidx.datastore.preferences.core.stringPreferencesKey
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 
 class SessionHandler(private val dataStore: DataStore<Preferences>) {
@@ -31,6 +32,14 @@ class SessionHandler(private val dataStore: DataStore<Preferences>) {
     fun getName(): Flow<String> = getPreference(_name, "")
     fun getToken(): Flow<String> = getPreference(_userToken, "")
     fun isFirstTime(): Flow<Boolean> = getPreference(_isFirstTime, true)
+    
+    suspend fun getStoredToken(): String {
+        return getToken().first()
+    }
+    
+    suspend fun hasValidToken(): Boolean {
+        return getStoredToken().isNotEmpty()
+    }
 
     suspend fun setUserData(
         email: String,

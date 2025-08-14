@@ -25,9 +25,8 @@ class LoginViewModel(
 
     val loginUrl = "https://balikin.vercel.app/api/v1/auth/google"
 
-    init {
-        checkTokenValidity()
-    }
+    // Note: Token validation is now handled in NavGraph to avoid redundant API calls
+    // The NavGraph will directly navigate to Home if a valid token exists
 
     fun onEvent(uiEvent: LoginUiEvent) {
         when (uiEvent) {

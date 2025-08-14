@@ -68,7 +68,7 @@ class BalikinHttpClientBuilder(
             install(Auth) {
                 bearer {
                     loadTokens {
-                        val token = sessionHandler.getToken().first()
+                        val token = sessionHandler.getStoredToken()
                         if (token.isNotEmpty()) {
                             BearerTokens(
                                 accessToken = token,
@@ -80,15 +80,9 @@ class BalikinHttpClientBuilder(
                     }
                     
                     refreshTokens {
-                        val token = sessionHandler.getToken().first()
-                        if (token.isNotEmpty()) {
-                            BearerTokens(
-                                accessToken = token,
-                                refreshToken = ""
-                            )
-                        } else {
-                            null
-                        }
+                        // Clear the expired token and return null to force re-authentication
+                        sessionHandler.clearData()
+                        null
                     }
                 }
             }
