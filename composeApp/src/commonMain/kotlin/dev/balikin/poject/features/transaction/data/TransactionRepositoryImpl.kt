@@ -1,5 +1,11 @@
 package dev.balikin.poject.features.transaction.data
 
+import dev.balikin.poject.features.transaction.domain.CreateOnlineTransactionApiModel
+import dev.balikin.poject.features.transaction.domain.CreateOnlineTransactionRequest
+import dev.balikin.poject.features.transaction.domain.OnlineTransactionListApiModel
+import dev.balikin.poject.network.NetworkException
+import dev.balikin.poject.network.NetworkResult
+import dev.balikin.poject.network.RequestHandler
 import kotlinx.coroutines.flow.Flow
 import kotlinx.datetime.Clock
 import kotlinx.datetime.LocalDateTime
@@ -7,6 +13,7 @@ import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 
 class TransactionRepositoryImpl(
+    private val requestHandler: RequestHandler,
     private val transactionDao: TransactionDao
 ) : TransactionRepository {
     override suspend fun getAllTransactions(): Flow<List<TransactionEntity>> {
@@ -54,5 +61,29 @@ class TransactionRepositoryImpl(
 
     override fun searchTransactionsByName(query: String): Flow<List<TransactionEntity>> {
         return transactionDao.searchTransactionsByName(query)
+    }
+
+    override suspend fun createOnlineTransaction(
+        request: CreateOnlineTransactionRequest
+    ): NetworkResult<CreateOnlineTransactionApiModel, NetworkException> {
+        return requestHandler.post<CreateOnlineTransactionRequest, CreateOnlineTransactionApiModel>(
+            urlPathSegments = listOf("api", "v1", "receivable"),
+            body = request
+        )
+    }
+
+    override suspend fun getOnlineTransactions(
+        keyword: String,
+        limit: String,
+        offset: String
+    ): NetworkResult<OnlineTransactionListApiModel, NetworkException> {
+        return requestHandler.get<OnlineTransactionListApiModel>(
+            urlPathSegments = listOf("api", "v1", "receivable"),
+            queryParams = mapOf(
+                "keyword" to keyword,
+                "limit" to limit,
+                "offset" to offset
+            )
+        )
     }
 }

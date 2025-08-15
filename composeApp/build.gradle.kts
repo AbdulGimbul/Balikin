@@ -1,8 +1,5 @@
-import org.gradle.kotlin.dsl.api
 import org.gradle.kotlin.dsl.compose
 import org.gradle.kotlin.dsl.dependencies
-import org.gradle.kotlin.dsl.implementation
-import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
@@ -74,6 +71,7 @@ kotlin {
             api(libs.permissions.compose)
             implementation(libs.alarmee)
             implementation(libs.compose.webview)
+            implementation(libs.konnectivity)
         }
         nativeMain.dependencies {
             implementation(libs.ktor.client.darwin)

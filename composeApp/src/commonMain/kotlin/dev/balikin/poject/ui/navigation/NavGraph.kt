@@ -1,6 +1,8 @@
 package dev.balikin.poject.ui.navigation
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -10,8 +12,11 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
@@ -293,6 +298,25 @@ private fun AddTransactionBottomSheet(
     var date by remember { mutableStateOf<LocalDateTime>(getDefaultDueDate()) }
     var note by remember { mutableStateOf("") }
     var showDatePicker by remember { mutableStateOf(false) }
+    
+    // Collect UI state for friend suggestions
+    val uiState by viewModel.uiState.collectAsState()
+    var showFriendSuggestions by remember { mutableStateOf(false) }
+    
+    // Handle friend search with debouncing and selected friend check
+    LaunchedEffect(name, uiState.selectedFriend) {
+        // Don't search if a friend is already selected and name matches
+        val shouldSearch = name.length >= 2 && 
+                          (uiState.selectedFriend == null || name != uiState.selectedFriend!!.name)
+        
+        if (shouldSearch) {
+            viewModel.onEvent(dev.balikin.poject.features.home.presentation.HomeUiEvent.SearchFriends(name))
+            showFriendSuggestions = true
+        } else {
+            viewModel.onEvent(dev.balikin.poject.features.home.presentation.HomeUiEvent.ClearFriendSuggestions)
+            showFriendSuggestions = false
+        }
+    }
 
     Column(
         modifier = Modifier
@@ -311,16 +335,75 @@ private fun AddTransactionBottomSheet(
                 .padding(24.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            OutlinedTextField(
-                value = name,
-                onValueChange = { name = it },
-                label = { RequiredLabel("Nama") },
-                modifier = Modifier.fillMaxWidth(),
-                colors = OutlinedTextFieldDefaults.colors(
-                    unfocusedBorderColor = stroke,
-                    focusedBorderColor = primary_blue
+            Box {
+                OutlinedTextField(
+                    value = name,
+                    onValueChange = { 
+                        name = it
+                        // Clear selected friend when user types manually
+                        if (uiState.selectedFriend != null && it != uiState.selectedFriend!!.name) {
+                            viewModel.onEvent(dev.balikin.poject.features.home.presentation.HomeUiEvent.SelectFriend(null))
+                        }
+                    },
+                    label = { RequiredLabel("Nama") },
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = OutlinedTextFieldDefaults.colors(
+                        unfocusedBorderColor = stroke,
+                        focusedBorderColor = primary_blue
+                    )
                 )
-            )
+                
+                // Friend suggestions dropdown
+                if (showFriendSuggestions && uiState.friendSuggestions.isNotEmpty()) {
+                    LazyColumn(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .heightIn(max = 200.dp)
+                            .padding(top = 56.dp) // Offset to appear below text field
+                    ) {
+                        items(uiState.friendSuggestions) { friend ->
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .clickable {
+                                        println("🔥 Friend clicked: ${friend.name} (${friend.email})")
+                                        // Immediately update states to prevent double-click issue
+                                        showFriendSuggestions = false
+                                        name = friend.name
+                                        println("🔥 Before SelectFriend event")
+                                        viewModel.onEvent(dev.balikin.poject.features.home.presentation.HomeUiEvent.SelectFriend(friend))
+                                        println("🔥 After SelectFriend event")
+                                        viewModel.onEvent(dev.balikin.poject.features.home.presentation.HomeUiEvent.ClearFriendSuggestions)
+                                        println("🔥 After ClearFriendSuggestions event")
+                                    }
+                                    .padding(12.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Column(modifier = Modifier.weight(1f)) {
+                                    Text(
+                                        text = friend.name,
+                                        style = MaterialTheme.typography.bodyMedium,
+                                        fontWeight = FontWeight.Medium
+                                    )
+                                    Text(
+                                        text = friend.email,
+                                        style = MaterialTheme.typography.bodySmall,
+                                        color = secondary_text
+                                    )
+                                }
+                                if (friend.isOnline) {
+                                    Box(
+                                        modifier = Modifier
+                                            .size(8.dp)
+                                            .background(Color.Green, androidx.compose.foundation.shape.CircleShape)
+                                    )
+                                }
+                            }
+                            HorizontalDivider()
+                        }
+                    }
+                }
+            }
 
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -437,19 +520,63 @@ private fun AddTransactionBottomSheet(
                 )
             )
 
+            // Show selected friend info if any
+            if (uiState.selectedFriend != null) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(8.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        "Teman terpilih: ",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = secondary_text
+                    )
+                    Text(
+                        uiState.selectedFriend!!.name,
+                        style = MaterialTheme.typography.bodySmall,
+                        fontWeight = FontWeight.Medium,
+                        color = primary_blue
+                    )
+                    Text(
+                        " (Online Transaction)",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = Color.Green
+                    )
+                }
+            }
+            
+            // Show error messages
+            uiState.onlineTransactionError?.let { error ->
+                Text(
+                    text = error,
+                    color = red,
+                    style = MaterialTheme.typography.bodySmall,
+                    modifier = Modifier.padding(top = 8.dp)
+                )
+            }
+
             DefaultButton(
                 onClick = {
                     val rawAmount = amount.text
                     if (rawAmount.isNotBlank() && rawAmount.toDoubleOrNull() != 0.0 && name.isNotBlank()) {
-                        viewModel.addTransaction(
+                        viewModel.addTransactionWithFriendSupport(
                             name = name,
                             date = date.toString(),
                             note = note,
                             amount = rawAmount,
                             type = selectedType,
+                            selectedFriend = uiState.selectedFriend,
                             permissionsController = permissionsController,
                             alarmeeService = alarmeeService
                         )
+                        // Clear form after successful submission
+                        name = ""
+                        amount = TextFieldValue("")
+                        note = ""
+                        date = getDefaultDueDate()
+                        viewModel.onEvent(dev.balikin.poject.features.home.presentation.HomeUiEvent.ClearFriendSuggestions)
                         onSaveClicked()
                     } else {
                         showToast(
@@ -459,7 +586,8 @@ private fun AddTransactionBottomSheet(
                     }
                 },
                 modifier = Modifier.fillMaxWidth(),
-                text = "Simpan"
+                text = if (uiState.isCreatingOnlineTransaction) "Menyimpan..." else "Simpan",
+                enabled = !uiState.isCreatingOnlineTransaction
             )
         }
     }
@@ -505,27 +633,3 @@ fun DatePickerModal(
         DatePicker(state = datePickerState)
     }
 }
-
-
-//val navigationItems = listOf(
-//    BottomNavItem(
-//        title = "Home",
-//        icon = Icons.Outlined.Home,
-//        screen = Screen.Home
-//    ),
-//    BottomNavItem(
-//        title = "Transaksi",
-//        icon = Icons.Outlined.Payments,
-//        screen = Screen.Transaction
-//    ),
-//    BottomNavItem(
-//        title = "History",
-//        icon = Icons.Outlined.History,
-//        screen = Screen.History
-//    ),
-//    BottomNavItem(
-//        title = "Profile",
-//        icon = Icons.Outlined.AccountCircle,
-//        screen = Screen.Profile
-//    )
-//)

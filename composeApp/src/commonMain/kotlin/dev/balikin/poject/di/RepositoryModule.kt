@@ -40,13 +40,13 @@ val provideAuthRepositoryModule = module {
 
 val provideTransactionRepositoryModule = module {
     single<TransactionRepositoryImpl> {
-        TransactionRepositoryImpl(transactionDao = get())
+        TransactionRepositoryImpl(requestHandler = get(),transactionDao = get())
     }.bind<TransactionRepository>()
     viewModel { TransactionViewModel(transactionRepository = get()) }
 }
 
 val provideHomeRepositoryModule = module {
-    viewModel { HomeViewModel(authRepository = get(), transactionRepository = get()) }
+    viewModel { HomeViewModel(authRepository = get(), transactionRepository = get(), friendsRepository = get()) }
 }
 
 val provideHistoryRepositoryModule = module {

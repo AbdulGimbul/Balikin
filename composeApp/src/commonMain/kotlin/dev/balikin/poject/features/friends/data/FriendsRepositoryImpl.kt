@@ -25,7 +25,7 @@ class FriendsRepositoryImpl(
             )
         )
     }
-    
+
     override suspend fun addFriend(
         friendEmail: String
     ): NetworkResult<AddFriendResponse, NetworkException> {
@@ -34,10 +34,25 @@ class FriendsRepositoryImpl(
             body = AddFriendRequest(friendEmail = friendEmail)
         )
     }
-    
+
     override suspend fun getFollowing(): NetworkResult<FollowingApiModel, NetworkException> {
         return requestHandler.get<FollowingApiModel>(
             urlPathSegments = listOf("api", "v1", "following")
+        )
+    }
+
+    override suspend fun searchFollowing(
+        keyword: String,
+        limit: String,
+        offset: String
+    ): NetworkResult<FollowingApiModel, NetworkException> {
+        return requestHandler.get<FollowingApiModel>(
+            urlPathSegments = listOf("api", "v1", "following"),
+            queryParams = mapOf(
+                "keyword" to keyword,
+                "limit" to limit,
+                "offset" to offset
+            )
         )
     }
 }

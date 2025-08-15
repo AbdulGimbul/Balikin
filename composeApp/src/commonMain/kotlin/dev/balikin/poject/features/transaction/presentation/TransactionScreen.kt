@@ -112,7 +112,7 @@ fun Transaction(
             ),
             modifier = Modifier.fillMaxWidth()
                 .statusBarsPadding()
-                .padding(top = 24.dp),
+                .padding(top = 16.dp),
             textAlign = TextAlign.Center
         )
         HorizontalDivider(modifier = Modifier.padding(top = 16.dp, bottom = 8.dp))
@@ -188,7 +188,7 @@ fun BillCard(
         modifier = modifier,
         shape = RoundedCornerShape(16.dp),
     ) {
-        Column(modifier = Modifier.padding(16.dp)) {
+        Column(modifier = Modifier.background(Color.White).padding(16.dp)) {
 
             Row(verticalAlignment = Alignment.Top) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
@@ -281,7 +281,7 @@ fun BillCard(
                             )
                         )
                         Text(
-                            text = currencyFormat(transaction.amount.toDouble()),
+                            text = currencyFormat(transaction.amount),
                             style = MaterialTheme.typography.titleMedium.copy(
                                 fontWeight = FontWeight.SemiBold
                             )

@@ -1,6 +1,5 @@
 package dev.balikin.poject.features.friends.data
 
-import dev.balikin.poject.features.friends.domain.AddFriendRequest
 import dev.balikin.poject.features.friends.domain.AddFriendResponse
 import dev.balikin.poject.features.friends.domain.FollowingApiModel
 import dev.balikin.poject.features.friends.domain.FriendApiModel
@@ -13,10 +12,16 @@ interface FriendsRepository {
         limit: String,
         offset: String
     ): NetworkResult<FriendApiModel, NetworkException>
-    
+
     suspend fun addFriend(
         friendEmail: String
     ): NetworkResult<AddFriendResponse, NetworkException>
-    
+
     suspend fun getFollowing(): NetworkResult<FollowingApiModel, NetworkException>
+
+    suspend fun searchFollowing(
+        keyword: String,
+        limit: String = "10",
+        offset: String = "0"
+    ): NetworkResult<FollowingApiModel, NetworkException>
 }
