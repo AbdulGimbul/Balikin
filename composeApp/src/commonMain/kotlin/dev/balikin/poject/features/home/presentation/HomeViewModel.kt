@@ -26,10 +26,11 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlinx.datetime.Clock
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
+import kotlin.time.Clock
+import kotlin.time.ExperimentalTime
 
 class HomeViewModel(
     private val authRepository: AuthRepository,
@@ -65,15 +66,15 @@ class HomeViewModel(
             HomeUiEvent.LoadLatestTransactions -> {
                 getLatestTransactions()
             }
-            
+
             is HomeUiEvent.SearchFriends -> {
                 searchFriends(event.keyword)
             }
-            
+
             is HomeUiEvent.SelectFriend -> {
                 _uiState.update { it.copy(selectedFriend = event.friend) }
             }
-            
+
             HomeUiEvent.ClearFriendSuggestions -> {
                 _uiState.update { it.copy(friendSuggestions = emptyList()) }
             }
@@ -96,6 +97,7 @@ class HomeViewModel(
         }
     }
 
+    @OptIn(ExperimentalTime::class)
     fun addTransaction(
         name: String,
         date: String,
@@ -161,32 +163,32 @@ class HomeViewModel(
             getTotalAmountByType(currentUiType)
         }
     }
-    
+
     fun searchFriends(keyword: String) {
         if (keyword.isBlank()) {
             _uiState.update { it.copy(friendSuggestions = emptyList()) }
             return
         }
-        
+
         viewModelScope.launch {
             _uiState.update { it.copy(isLoadingFriends = true) }
-            
+
             val result = friendsRepository.searchFollowing(
                 keyword = keyword,
                 limit = "10",
                 offset = "0"
             )
-            
+
             result.onSuccess { followingResponse ->
                 val friends = followingResponse.data.map { it.followed }
-                _uiState.update { 
+                _uiState.update {
                     it.copy(
                         friendSuggestions = friends,
                         isLoadingFriends = false
                     )
                 }
             }.onError {
-                _uiState.update { 
+                _uiState.update {
                     it.copy(
                         friendSuggestions = emptyList(),
                         isLoadingFriends = false
@@ -195,7 +197,7 @@ class HomeViewModel(
             }
         }
     }
-    
+
     fun addTransactionWithFriendSupport(
         name: String,
         date: String,
@@ -206,30 +208,30 @@ class HomeViewModel(
         permissionsController: PermissionsController,
         alarmeeService: AlarmeeService,
     ) {
-        
-        _uiState.update { 
+
+        _uiState.update {
             it.copy(
-                permissionError = null, 
+                permissionError = null,
                 onlineTransactionError = null,
                 isCreatingOnlineTransaction = false
-            ) 
+            )
         }
 
         viewModelScope.launch {
             // Check if user is logged in and has selected a friend
             val currentUser = _uiState.value.user
             val shouldCreateOnline = currentUser != null && selectedFriend != null
-            
+
             if (shouldCreateOnline) {
                 // Create online transaction
                 _uiState.update { it.copy(isCreatingOnlineTransaction = true) }
-                
+
                 val kategori = when (type.uppercase()) {
                     "UTANG" -> "UTANG"
                     "PIUTANG" -> "PIUTANG"
                     else -> "PIUTANG"
                 }
-                
+
                 val request = CreateOnlineTransactionRequest(
                     email = selectedFriend!!.email,
                     nominal = amount,
@@ -237,7 +239,7 @@ class HomeViewModel(
                     desc = note,
                     date = date
                 )
-                
+
                 val result = transactionRepository.createOnlineTransaction(request)
 
                 result.onSuccess { response ->
@@ -247,18 +249,18 @@ class HomeViewModel(
                             onlineTransactionError = null
                         )
                     }
-                    
+
                     // Refresh latest transactions after successful online creation
                     getLatestTransactions()
                     loadUnifiedTransactions() // Also refresh unified transactions
-                    
+
                     val currentUiType = when (_uiState.value.selectedTab.lowercase()) {
                         "utang" -> TransactionType.Utang
                         "piutang" -> TransactionType.Piutang
                         else -> TransactionType.Piutang
                     }
                     getTotalAmountByType(currentUiType)
-                    
+
                 }.onError { error ->
                     _uiState.update {
                         it.copy(
@@ -266,17 +268,34 @@ class HomeViewModel(
                             onlineTransactionError = "Failed to create online transaction: ${error.message}"
                         )
                     }
-                    
+
                     // Fallback to local storage if online fails
-                    createLocalTransaction(name, date, note, amount, type, permissionsController, alarmeeService)
+                    createLocalTransaction(
+                        name,
+                        date,
+                        note,
+                        amount,
+                        type,
+                        permissionsController,
+                        alarmeeService
+                    )
                 }
             } else {
                 // Create local transaction (existing logic)
-                createLocalTransaction(name, date, note, amount, type, permissionsController, alarmeeService)
+                createLocalTransaction(
+                    name,
+                    date,
+                    note,
+                    amount,
+                    type,
+                    permissionsController,
+                    alarmeeService
+                )
             }
         }
     }
-    
+
+    @OptIn(ExperimentalTime::class)
     private suspend fun createLocalTransaction(
         name: String,
         date: String,
@@ -310,7 +329,8 @@ class HomeViewModel(
         try {
 
             // Check current permission status first
-            val isProvided = permissionsController.isPermissionGranted(Permission.REMOTE_NOTIFICATION)
+            val isProvided =
+                permissionsController.isPermissionGranted(Permission.REMOTE_NOTIFICATION)
 
             if (!isProvided) {
                 permissionsController.providePermission(Permission.REMOTE_NOTIFICATION)
@@ -348,53 +368,58 @@ class HomeViewModel(
 
         getTotalAmountByType(currentUiType)
     }
-    
+
     fun loadUnifiedTransactions() {
         viewModelScope.launch {
-            _uiState.update { it.copy(isLoadingOnlineTransactions = true, onlineTransactionListError = null) }
-            
+            _uiState.update {
+                it.copy(
+                    isLoadingOnlineTransactions = true,
+                    onlineTransactionListError = null
+                )
+            }
+
             // Load local transactions
             val localTransactionsResult = kotlin.runCatching {
                 transactionRepository.getAllTransactions().first()
             }
-            
+
             val localTransactions = localTransactionsResult.getOrElse { emptyList() }
-            
+
             // Load online transactions if user is logged in
             val currentUser = _uiState.value.user
             if (currentUser != null) {
                 val onlineResult = transactionRepository.getOnlineTransactions()
-                
+
                 onlineResult.onSuccess { response ->
                     // Convert local transactions to unified
-                    val localUnified = localTransactions.map { 
-                        UnifiedTransaction.fromLocal(it, currentUser.email) 
+                    val localUnified = localTransactions.map {
+                        UnifiedTransaction.fromLocal(it, currentUser.email)
                     }
-                    
+
                     // Convert online transactions to unified
-                    val onlineUnified = response.data.map { 
-                        UnifiedTransaction.fromOnline(it, currentUser.email) 
+                    val onlineUnified = response.data.map {
+                        UnifiedTransaction.fromOnline(it, currentUser.email)
                     }
-                    
+
                     // Combine and sort by date (newest first)
                     val allTransactions = (localUnified + onlineUnified)
                         .sortedByDescending { it.date }
-                    
-                    _uiState.update { 
+
+                    _uiState.update {
                         it.copy(
                             unifiedTransactions = allTransactions,
                             isLoadingOnlineTransactions = false,
                             onlineTransactionListError = null
                         )
                     }
-                    
+
                 }.onError { error ->
                     // If online fails, still show local transactions
-                    val localUnified = localTransactions.map { 
-                        UnifiedTransaction.fromLocal(it, currentUser.email) 
+                    val localUnified = localTransactions.map {
+                        UnifiedTransaction.fromLocal(it, currentUser.email)
                     }
-                    
-                    _uiState.update { 
+
+                    _uiState.update {
                         it.copy(
                             unifiedTransactions = localUnified,
                             isLoadingOnlineTransactions = false,
@@ -404,11 +429,11 @@ class HomeViewModel(
                 }
             } else {
                 // User not logged in, show only local transactions
-                val localUnified = localTransactions.map { 
-                    UnifiedTransaction.fromLocal(it) 
+                val localUnified = localTransactions.map {
+                    UnifiedTransaction.fromLocal(it)
                 }
-                
-                _uiState.update { 
+
+                _uiState.update {
                     it.copy(
                         unifiedTransactions = localUnified,
                         isLoadingOnlineTransactions = false,

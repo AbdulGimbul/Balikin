@@ -1,6 +1,5 @@
 package dev.balikin.poject.ui.navigation
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -8,10 +7,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -66,7 +62,6 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import balikin.composeapp.generated.resources.Res
 import balikin.composeapp.generated.resources.ic_calendar
-import balikin.composeapp.generated.resources.offline_profile
 import com.tweener.alarmee.AlarmeeService
 import com.tweener.alarmee.rememberAlarmeeService
 import dev.balikin.poject.features.auth.presentation.forgot_password.ForgotPasswordScreen
@@ -96,7 +91,6 @@ import dev.balikin.poject.features.transaction.presentation.filter.TransFilterSc
 import dev.balikin.poject.storage.SessionHandler
 import dev.balikin.poject.ui.components.DefaultButton
 import dev.balikin.poject.ui.theme.primary_blue
-import dev.balikin.poject.ui.theme.primary_text
 import dev.balikin.poject.ui.theme.red
 import dev.balikin.poject.ui.theme.secondary_text
 import dev.balikin.poject.ui.theme.stroke
@@ -117,6 +111,7 @@ import multiplatform.network.cmptoast.showToast
 import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
+import kotlin.time.ExperimentalTime
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
 @Composable
@@ -206,21 +201,21 @@ fun NavHostContent(
 
     val sessionHandler: SessionHandler = koinInject()
     val isFirstTime by sessionHandler.isFirstTime().collectAsState(initial = true)
-    
+
     // Get current route
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
-    
+
     // Check if user has a valid token
     var hasValidToken by remember { mutableStateOf(false) }
     var isCheckingToken by remember { mutableStateOf(true) }
-    
+
     LaunchedEffect(Unit) {
         hasValidToken = sessionHandler.hasValidToken()
         isCheckingToken = false
         println("NavGraph: Token validation - hasValidToken: $hasValidToken")
     }
-    
+
     // Re-check token validity when navigating to protected screens
     LaunchedEffect(currentRoute) {
         // Check token when navigating to protected screens
@@ -231,7 +226,7 @@ fun NavHostContent(
             Screen.Profile.route,
             Screen.Friends.route
         )
-        
+
         if (currentRoute in protectedRoutes) {
             val isTokenValid = sessionHandler.hasValidToken()
             if (!isTokenValid) {
@@ -295,7 +290,10 @@ fun NavHostContent(
             TransFilterScreen(viewModel = transactionViewModel, navController = navController)
         }
         composable(Screen.Profile.route) {
-            ProfileScreen(viewModel = koinViewModel<ProfileViewModel>(), navController = navController)
+            ProfileScreen(
+                viewModel = koinViewModel<ProfileViewModel>(),
+                navController = navController
+            )
         }
         composable(Screen.History.route) {
             HistoryScreen(viewModel = historyViewModel, navController = navController)
@@ -310,7 +308,7 @@ fun NavHostContent(
 }
 
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalTime::class)
 @Composable
 private fun AddTransactionBottomSheet(
     viewModel: HomeViewModel,
@@ -326,19 +324,23 @@ private fun AddTransactionBottomSheet(
     var date by remember { mutableStateOf<LocalDateTime>(getDefaultDueDate()) }
     var note by remember { mutableStateOf("") }
     var showDatePicker by remember { mutableStateOf(false) }
-    
+
     // Collect UI state for friend suggestions
     val uiState by viewModel.uiState.collectAsState()
     var showFriendSuggestions by remember { mutableStateOf(false) }
-    
+
     // Handle friend search with debouncing and selected friend check
     LaunchedEffect(name, uiState.selectedFriend) {
         // Don't search if a friend is already selected and name matches
-        val shouldSearch = name.length >= 2 && 
-                          (uiState.selectedFriend == null || name != uiState.selectedFriend!!.name)
-        
+        val shouldSearch = name.length >= 2 &&
+                (uiState.selectedFriend == null || name != uiState.selectedFriend!!.name)
+
         if (shouldSearch) {
-            viewModel.onEvent(dev.balikin.poject.features.home.presentation.HomeUiEvent.SearchFriends(name))
+            viewModel.onEvent(
+                dev.balikin.poject.features.home.presentation.HomeUiEvent.SearchFriends(
+                    name
+                )
+            )
             showFriendSuggestions = true
         } else {
             viewModel.onEvent(dev.balikin.poject.features.home.presentation.HomeUiEvent.ClearFriendSuggestions)
@@ -366,11 +368,15 @@ private fun AddTransactionBottomSheet(
             Box {
                 OutlinedTextField(
                     value = name,
-                    onValueChange = { 
+                    onValueChange = {
                         name = it
                         // Clear selected friend when user types manually
                         if (uiState.selectedFriend != null && it != uiState.selectedFriend!!.name) {
-                            viewModel.onEvent(dev.balikin.poject.features.home.presentation.HomeUiEvent.SelectFriend(null))
+                            viewModel.onEvent(
+                                dev.balikin.poject.features.home.presentation.HomeUiEvent.SelectFriend(
+                                    null
+                                )
+                            )
                         }
                     },
                     label = { RequiredLabel("Nama") },
@@ -380,7 +386,7 @@ private fun AddTransactionBottomSheet(
                         focusedBorderColor = primary_blue
                     )
                 )
-                
+
                 // Friend suggestions dropdown
                 if (showFriendSuggestions && uiState.friendSuggestions.isNotEmpty()) {
                     LazyColumn(
@@ -399,7 +405,11 @@ private fun AddTransactionBottomSheet(
                                         showFriendSuggestions = false
                                         name = friend.name
                                         println("🔥 Before SelectFriend event")
-                                        viewModel.onEvent(dev.balikin.poject.features.home.presentation.HomeUiEvent.SelectFriend(friend))
+                                        viewModel.onEvent(
+                                            dev.balikin.poject.features.home.presentation.HomeUiEvent.SelectFriend(
+                                                friend
+                                            )
+                                        )
                                         println("🔥 After SelectFriend event")
                                         viewModel.onEvent(dev.balikin.poject.features.home.presentation.HomeUiEvent.ClearFriendSuggestions)
                                         println("🔥 After ClearFriendSuggestions event")
@@ -423,7 +433,10 @@ private fun AddTransactionBottomSheet(
                                     Box(
                                         modifier = Modifier
                                             .size(8.dp)
-                                            .background(Color.Green, androidx.compose.foundation.shape.CircleShape)
+                                            .background(
+                                                Color.Green,
+                                                androidx.compose.foundation.shape.CircleShape
+                                            )
                                     )
                                 }
                             }
@@ -574,7 +587,7 @@ private fun AddTransactionBottomSheet(
                     )
                 }
             }
-            
+
             // Show error messages
             uiState.onlineTransactionError?.let { error ->
                 Text(

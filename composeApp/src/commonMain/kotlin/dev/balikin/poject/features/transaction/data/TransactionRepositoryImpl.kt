@@ -7,10 +7,11 @@ import dev.balikin.poject.network.NetworkException
 import dev.balikin.poject.network.NetworkResult
 import dev.balikin.poject.network.RequestHandler
 import kotlinx.coroutines.flow.Flow
-import kotlinx.datetime.Clock
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
+import kotlin.time.Clock
+import kotlin.time.ExperimentalTime
 
 class TransactionRepositoryImpl(
     private val requestHandler: RequestHandler,
@@ -50,6 +51,7 @@ class TransactionRepositoryImpl(
         return transactionDao.countFilteredTransactions(type, startDate, endDate)
     }
 
+    @OptIn(ExperimentalTime::class)
     override suspend fun markTransactionAsPaid(transactionId: Long) {
         val currentTime = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
         transactionDao.markTransactionAsPaid(

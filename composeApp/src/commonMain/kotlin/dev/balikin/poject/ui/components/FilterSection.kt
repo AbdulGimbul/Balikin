@@ -31,13 +31,14 @@ import androidx.compose.ui.unit.dp
 import dev.balikin.poject.ui.theme.primary
 import dev.balikin.poject.ui.theme.red
 import dev.balikin.poject.utils.formatDate
-import kotlinx.datetime.Clock
-import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import multiplatform.network.cmptoast.ToastDuration
 import multiplatform.network.cmptoast.showToast
+import kotlin.time.Clock
+import kotlin.time.ExperimentalTime
+import kotlin.time.Instant
 
 @Composable
 fun FilterSection(
@@ -174,7 +175,7 @@ fun DateFilterChips(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalTime::class)
 @Composable
 fun CustomDatePickerDialog(
     isEndDate: Boolean = false,
