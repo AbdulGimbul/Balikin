@@ -232,7 +232,8 @@ class HomeViewModel(
                     email = selectedFriend!!.email,
                     nominal = amount,
                     kategori = kategori,
-                    desc = note
+                    desc = note,
+                    date = date
                 )
                 
                 val result = transactionRepository.createOnlineTransaction(request)

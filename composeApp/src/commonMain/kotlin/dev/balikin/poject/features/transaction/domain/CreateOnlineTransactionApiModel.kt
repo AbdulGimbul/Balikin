@@ -14,5 +14,6 @@ data class CreateOnlineTransactionRequest(
     val email: String,
     val nominal: String,
     val kategori: String, // "UTANG" or "PIUTANG"
-    val desc: String
+    val desc: String,
+    val date: String
 )

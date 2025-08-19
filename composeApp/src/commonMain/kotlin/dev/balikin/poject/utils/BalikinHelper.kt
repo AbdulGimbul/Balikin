@@ -78,6 +78,13 @@ fun formatDate(date: LocalDateTime): String {
     return "$day $month $year"
 }
 
+fun formatDateToYYYYMMDD(date: LocalDateTime): String {
+    val day = date.dayOfMonth.toString().padStart(2, '0')
+    val month = date.monthNumber.toString().padStart(2, '0')
+    val year = date.year
+    return "$year-$month-$day"
+}
+
 fun getLastWeekDate(): LocalDateTime {
     val now = Clock.System.now()
     val lastWeekInstant = now.minus(

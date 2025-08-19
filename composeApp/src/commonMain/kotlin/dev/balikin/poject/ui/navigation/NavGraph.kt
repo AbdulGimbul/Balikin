@@ -103,6 +103,7 @@ import dev.balikin.poject.ui.theme.stroke
 import dev.balikin.poject.utils.ThousandSeparatorVisualTransformation
 import dev.balikin.poject.utils.createAlarmeePlatformConfiguration
 import dev.balikin.poject.utils.formatDate
+import dev.balikin.poject.utils.formatDateToYYYYMMDD
 import dev.balikin.poject.utils.getDefaultDueDate
 import dev.icerock.moko.permissions.PermissionsController
 import dev.icerock.moko.permissions.compose.BindEffect
@@ -590,7 +591,7 @@ private fun AddTransactionBottomSheet(
                     if (rawAmount.isNotBlank() && rawAmount.toDoubleOrNull() != 0.0 && name.isNotBlank()) {
                         viewModel.addTransactionWithFriendSupport(
                             name = name,
-                            date = date.toString(),
+                            date = formatDateToYYYYMMDD(date),
                             note = note,
                             amount = rawAmount,
                             type = selectedType,
