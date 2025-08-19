@@ -69,18 +69,25 @@ class BalikinHttpClientBuilder(
                 bearer {
                     loadTokens {
                         val token = sessionHandler.getStoredToken()
-                        if (token.isNotEmpty()) {
+                        // Check if token exists and is not expired
+                        if (token.isNotEmpty() && sessionHandler.hasValidToken()) {
                             BearerTokens(
                                 accessToken = token,
                                 refreshToken = ""
                             )
                         } else {
+                            // Clear expired or invalid token
+                            if (token.isNotEmpty()) {
+                                println("JWT: Token expired or invalid, clearing session data")
+                                sessionHandler.clearData()
+                            }
                             null
                         }
                     }
                     
                     refreshTokens {
                         // Clear the expired token and return null to force re-authentication
+                        println("JWT: Refresh tokens called - clearing session and forcing re-authentication")
                         sessionHandler.clearData()
                         null
                     }

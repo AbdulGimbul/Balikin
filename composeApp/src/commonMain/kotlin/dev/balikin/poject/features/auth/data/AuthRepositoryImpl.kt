@@ -7,6 +7,8 @@ import dev.balikin.poject.network.NetworkException
 import dev.balikin.poject.network.NetworkResult
 import dev.balikin.poject.network.RequestHandler
 import dev.balikin.poject.storage.SessionHandler
+import io.ktor.client.plugins.auth.authProvider
+import io.ktor.client.plugins.auth.providers.BearerAuthProvider
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 
@@ -55,7 +57,17 @@ class AuthRepositoryImpl(
 
     override suspend fun logout(): Result<Unit> {
         return runCatching {
+            // Clear stored session data
             sessionHandler.clearData()
+            
+            // Clear HTTP client bearer tokens cache
+            try {
+                requestHandler.httpClient.authProvider<BearerAuthProvider>()?.clearToken()
+                println("Auth: HTTP client bearer tokens cleared")
+            } catch (e: Exception) {
+                println("Auth: Failed to clear HTTP client tokens: ${e.message}")
+                // Don't fail logout if we can't clear client tokens
+            }
         }
     }
 }

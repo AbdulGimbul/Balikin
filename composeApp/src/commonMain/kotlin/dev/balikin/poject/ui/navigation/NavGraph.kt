@@ -206,6 +206,10 @@ fun NavHostContent(
     val sessionHandler: SessionHandler = koinInject()
     val isFirstTime by sessionHandler.isFirstTime().collectAsState(initial = true)
     
+    // Get current route
+    val navBackStackEntry by navController.currentBackStackEntryAsState()
+    val currentRoute = navBackStackEntry?.destination?.route
+    
     // Check if user has a valid token
     var hasValidToken by remember { mutableStateOf(false) }
     var isCheckingToken by remember { mutableStateOf(true) }
@@ -213,6 +217,29 @@ fun NavHostContent(
     LaunchedEffect(Unit) {
         hasValidToken = sessionHandler.hasValidToken()
         isCheckingToken = false
+        println("NavGraph: Token validation - hasValidToken: $hasValidToken")
+    }
+    
+    // Re-check token validity when navigating to protected screens
+    LaunchedEffect(currentRoute) {
+        // Check token when navigating to protected screens
+        val protectedRoutes = listOf(
+            Screen.Home.route,
+            Screen.Transaction.route,
+            Screen.History.route,
+            Screen.Profile.route,
+            Screen.Friends.route
+        )
+        
+        if (currentRoute in protectedRoutes) {
+            val isTokenValid = sessionHandler.hasValidToken()
+            if (!isTokenValid) {
+                println("NavGraph: Token expired or invalid, navigating to login")
+                navController.navigate(Screen.Login.route) {
+                    popUpTo(0) { inclusive = true }
+                }
+            }
+        }
     }
 
     val startDestination = when {

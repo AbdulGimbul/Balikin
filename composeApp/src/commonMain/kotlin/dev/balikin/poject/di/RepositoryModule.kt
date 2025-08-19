@@ -34,7 +34,7 @@ val provideAuthRepositoryModule = module {
         AuthRepositoryImpl(sessionHandler = get(), requestHandler = get())
     }.bind<AuthRepository>()
     viewModel { RegisterViewModel() }
-    viewModel { LoginViewModel(get(), get()) }
+    viewModel { LoginViewModel(get(), get(), get()) }
     viewModel { ProfileViewModel(get(), get()) }
 }
 

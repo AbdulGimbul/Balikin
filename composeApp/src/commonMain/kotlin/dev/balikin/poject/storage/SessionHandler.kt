@@ -10,6 +10,13 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
+import kotlinx.datetime.Clock
+import kotlinx.datetime.Instant
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.jsonObject
+import kotlinx.serialization.json.jsonPrimitive
+import kotlin.io.encoding.Base64
+import kotlin.io.encoding.ExperimentalEncodingApi
 
 class SessionHandler(private val dataStore: DataStore<Preferences>) {
 
@@ -38,7 +45,45 @@ class SessionHandler(private val dataStore: DataStore<Preferences>) {
     }
     
     suspend fun hasValidToken(): Boolean {
-        return getStoredToken().isNotEmpty()
+        val token = getStoredToken()
+        return token.isNotEmpty() && !isTokenExpired(token)
+    }
+    
+    @OptIn(ExperimentalEncodingApi::class)
+    private fun isTokenExpired(token: String): Boolean {
+        return try {
+            // JWT format: header.payload.signature
+            val parts = token.split(".")
+            if (parts.size != 3) return true
+            
+            // Decode the payload (second part)
+            val payload = parts[1]
+            // Add padding if needed for Base64 decoding
+            val paddedPayload = payload + "=".repeat((4 - payload.length % 4) % 4)
+            val decodedBytes = Base64.decode(paddedPayload)
+            val payloadJson = decodedBytes.decodeToString()
+            
+            // Parse JSON to get expiration time
+            val json = Json.parseToJsonElement(payloadJson).jsonObject
+            val exp = json["exp"]?.jsonPrimitive?.content?.toLongOrNull()
+            
+            if (exp == null) {
+                // If no expiration time, consider it expired for safety
+                println("JWT: No expiration time found, considering expired")
+                return true
+            }
+            
+            val expirationTime = Instant.fromEpochSeconds(exp)
+            val currentTime = Clock.System.now()
+            val isExpired = currentTime >= expirationTime
+            
+            println("JWT: Current time: $currentTime, Expiration: $expirationTime, Expired: $isExpired")
+            isExpired
+        } catch (e: Exception) {
+            println("JWT: Error parsing token: ${e.message}")
+            // If we can't parse the token, consider it expired
+            true
+        }
     }
 
     suspend fun setUserData(

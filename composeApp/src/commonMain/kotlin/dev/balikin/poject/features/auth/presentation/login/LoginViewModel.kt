@@ -6,7 +6,10 @@ import dev.balikin.poject.features.auth.data.AuthRepository
 import dev.balikin.poject.features.auth.domain.LoginApiModel
 import dev.balikin.poject.network.onError
 import dev.balikin.poject.network.onSuccess
+import dev.balikin.poject.network.RequestHandler
 import dev.balikin.poject.storage.SessionHandler
+import io.ktor.client.plugins.auth.authProvider
+import io.ktor.client.plugins.auth.providers.BearerAuthProvider
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -17,7 +20,8 @@ import kotlinx.serialization.json.Json
 
 class LoginViewModel(
     private val authRepository: AuthRepository,
-    private val sessionHandler: SessionHandler
+    private val sessionHandler: SessionHandler,
+    private val requestHandler: RequestHandler
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow<LoginUiState>(LoginUiState.NotAuthenticated())
@@ -86,6 +90,15 @@ class LoginViewModel(
                     nama = userData.name,
                     token = loginResponse.token
                 )
+                
+                // Clear HTTP client auth cache to ensure fresh token is used
+                try {
+                    requestHandler.httpClient.authProvider<BearerAuthProvider>()?.clearToken()
+                    println("Login: HTTP client bearer tokens cleared after successful login")
+                } catch (e: Exception) {
+                    println("Login: Failed to clear HTTP client tokens: ${e.message}")
+                    // Don't fail login if we can't clear client tokens
+                }
 
                 _uiState.value = LoginUiState.Authenticated
             } catch (e: Exception) {
