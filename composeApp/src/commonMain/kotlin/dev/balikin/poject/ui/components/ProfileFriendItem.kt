@@ -3,6 +3,7 @@ package dev.balikin.poject.ui.components
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
@@ -54,7 +55,7 @@ fun ProfileFriendItem(
             textAlign = TextAlign.Center,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
-            modifier = Modifier.size(width = 70.dp, height = 16.dp)
+            modifier = Modifier.width(70.dp)
         )
     }
 }
