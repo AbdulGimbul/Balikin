@@ -1,6 +1,5 @@
 package dev.balikin.poject.ui.components
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.size
@@ -8,7 +7,6 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -20,10 +18,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import balikin.composeapp.generated.resources.Res
-import balikin.composeapp.generated.resources.agus
 import dev.balikin.poject.features.friends.domain.FollowedUser
-import org.jetbrains.compose.resources.painterResource
 
 @Composable
 fun ProfileFriendItem(
@@ -35,19 +30,17 @@ fun ProfileFriendItem(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         if (friend.isOnline) {
-            Image(
-                painter = painterResource(Res.drawable.agus),
-                contentDescription = "User Avatar",
-                modifier = Modifier
-                    .size(60.dp)
-                    .clip(CircleShape),
+            AvatarImage(
+                name = friend.name,
+                modifier = Modifier.clip(CircleShape),
+                size = 48.dp
             )
         } else {
             Icon(
                 imageVector = Icons.Default.AccountCircle,
                 contentDescription = "Offline Indicator",
                 modifier = Modifier
-                    .size(60.dp)
+                    .size(48.dp)
                     .background(Color.LightGray, CircleShape)
                     .clip(CircleShape),
                 tint = Color.Gray

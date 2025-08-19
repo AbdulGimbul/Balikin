@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
@@ -52,6 +53,7 @@ import balikin.composeapp.generated.resources.trans_utang
 import com.tweener.alarmee.rememberAlarmeeService
 import dev.balikin.poject.features.transaction.data.TransactionEntity
 import dev.balikin.poject.features.transaction.data.TransactionType
+import dev.balikin.poject.ui.components.AvatarImage
 import dev.balikin.poject.ui.components.FilterButton
 import dev.balikin.poject.ui.components.FilterTags
 import dev.balikin.poject.ui.navigation.Screen
@@ -192,21 +194,11 @@ fun BillCard(
 
             Row(verticalAlignment = Alignment.Top) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    if (isOnline) {
-                        Image(
-                            painter = painterResource(Res.drawable.agus),
-                            contentDescription = "User Avatar",
-                            modifier = Modifier.size(48.dp),
-                        )
-                    } else {
-                        Icon(
-                            imageVector = Icons.Default.AccountCircle,
-                            contentDescription = "Offline Indicator",
-                            modifier = Modifier.size(48.dp),
-                            tint = Color.Gray
-                        )
-                    }
-
+                    AvatarImage(
+                        name = transaction.name,
+                        modifier = Modifier.clip(CircleShape),
+                        size = 42.dp
+                    )
 
                     Spacer(modifier = Modifier.width(8.dp))
 

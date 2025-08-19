@@ -58,6 +58,7 @@ import balikin.composeapp.generated.resources.ic_profile_faceid
 import balikin.composeapp.generated.resources.ic_profile_logout
 import balikin.composeapp.generated.resources.ic_profile_notif
 import balikin.composeapp.generated.resources.ic_profile_user
+import dev.balikin.poject.ui.components.AvatarImage
 import dev.balikin.poject.ui.components.ProfileFriendItem
 import dev.balikin.poject.ui.navigation.Screen
 import dev.balikin.poject.ui.theme.primary_blue
@@ -115,13 +116,13 @@ fun Profile(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Box(contentAlignment = Alignment.BottomEnd) {
-                Image(
-                    painter = painterResource(Res.drawable.agus),
-                    contentDescription = "Profile Picture",
-                    modifier = Modifier
-                        .size(100.dp)
-                        .clip(CircleShape)
-                )
+                uiState.userData?.name?.let {
+                    AvatarImage(
+                        name = it,
+                        modifier = Modifier.clip(CircleShape),
+                        size = 100.dp
+                    )
+                }
                 Icon(
                     painter = painterResource(Res.drawable.ic_edit),
                     contentDescription = "Edit",
@@ -206,7 +207,7 @@ fun Profile(
                     .padding(16.dp)
             ) {
                 LazyRow(
-                    horizontalArrangement = Arrangement.spacedBy(16.dp),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     items(uiState.friends.take(4)) { friend ->

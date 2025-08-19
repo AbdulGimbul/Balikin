@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
@@ -52,20 +53,11 @@ fun FriendsItem(
                 .fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            if (friend.isOnline) {
-                Image(
-                    painter = painterResource(Res.drawable.agus),
-                    contentDescription = "User Avatar",
-                    modifier = Modifier.size(40.dp),
-                )
-            } else {
-                Icon(
-                    imageVector = Icons.Default.AccountCircle,
-                    contentDescription = "Offline Indicator",
-                    modifier = Modifier.size(40.dp),
-                    tint = Color.Gray
-                )
-            }
+            AvatarImage(
+                name = friend.name,
+                modifier = Modifier.clip(CircleShape),
+                size = 40.dp
+            )
             Spacer(modifier = Modifier.width(12.dp))
             Column {
                 Text(
