@@ -44,10 +44,12 @@ class HomeViewModel(
         viewModelScope.launch {
             authRepository.userInfo().collect { user ->
                 _uiState.update { it.copy(user = user, isLoading = false) }
+                if (user != null) {
+                    getLatestTransactions()
+                    loadUnifiedTransactions()
+                }
             }
         }
-        getLatestTransactions()
-        loadUnifiedTransactions()
     }
 
     fun onEvent(event: HomeUiEvent) {

@@ -183,7 +183,7 @@ fun Home(
         LazyColumn(
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            items(uiState.latestTransactions) { transaction ->
+            items(uiState.unifiedTransactions) { transaction ->
                 TransactionItem(transaction)
             }
         }

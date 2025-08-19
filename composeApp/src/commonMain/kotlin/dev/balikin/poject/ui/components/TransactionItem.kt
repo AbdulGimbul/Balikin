@@ -25,16 +25,16 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import balikin.composeapp.generated.resources.Res
 import balikin.composeapp.generated.resources.agus
-import dev.balikin.poject.features.transaction.data.TransactionEntity
 import dev.balikin.poject.features.transaction.data.TransactionType
+import dev.balikin.poject.features.transaction.domain.UnifiedTransaction
 import dev.balikin.poject.ui.theme.green
 import dev.balikin.poject.ui.theme.red
 import dev.balikin.poject.utils.currencyFormat
-import dev.balikin.poject.utils.formatDateCreated
+import dev.balikin.poject.utils.formatDate
 import org.jetbrains.compose.resources.painterResource
 
 @Composable
-fun TransactionItem(transaction: TransactionEntity, modifier: Modifier = Modifier, isOnline: Boolean = false) {
+fun TransactionItem(transaction: UnifiedTransaction, modifier: Modifier = Modifier) {
     Column(
         modifier = modifier
     ) {
@@ -43,7 +43,7 @@ fun TransactionItem(transaction: TransactionEntity, modifier: Modifier = Modifie
                 .fillMaxWidth(),
             verticalAlignment = Alignment.Top,
         ) {
-            if (isOnline) {
+            if (transaction.isOnline) {
                 Image(
                     painter = painterResource(Res.drawable.agus),
                     contentDescription = "User Avatar",
@@ -65,7 +65,7 @@ fun TransactionItem(transaction: TransactionEntity, modifier: Modifier = Modifie
                     fontSize = 16.sp
                 )
                 Text(
-                    text = formatDateCreated(transaction.createdAt),
+                    text = formatDate(transaction.date),
                     color = Color.Gray,
                     fontSize = 14.sp
                 )

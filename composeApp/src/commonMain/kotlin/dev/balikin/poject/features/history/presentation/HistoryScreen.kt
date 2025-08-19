@@ -122,9 +122,9 @@ fun History(
                 verticalArrangement = Arrangement.spacedBy(16.dp),
                 modifier = Modifier.padding(top = 16.dp)
             ) {
-                items(uiState.transactions) { trans ->
-                    TransactionItem(trans)
-                }
+//                items(uiState.transactions) { trans ->
+//                    TransactionItem(trans)
+//                }
             }
         }
     }
