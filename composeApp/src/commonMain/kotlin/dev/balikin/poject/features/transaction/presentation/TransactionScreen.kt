@@ -288,7 +288,7 @@ fun BillCard(
                             )
                         )
                         Text(
-                            text = currencyFormat(transaction.amount.toDouble()),
+                            text = currencyFormat(transaction.amount),
                             style = MaterialTheme.typography.titleMedium.copy(
                                 fontWeight = FontWeight.SemiBold
                             )
