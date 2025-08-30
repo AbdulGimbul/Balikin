@@ -113,7 +113,7 @@ fun Transaction(
             ),
             modifier = Modifier.fillMaxWidth()
                 .statusBarsPadding()
-                .padding(top = 24.dp),
+                .padding(top = 16.dp),
             textAlign = TextAlign.Center
         )
         HorizontalDivider(modifier = Modifier.padding(top = 16.dp, bottom = 8.dp))
