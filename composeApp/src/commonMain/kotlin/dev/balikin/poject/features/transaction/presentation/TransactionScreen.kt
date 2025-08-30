@@ -42,6 +42,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -193,7 +194,8 @@ fun BillCard(
         Column(modifier = Modifier.background(Color.White).padding(16.dp)) {
 
             Row(verticalAlignment = Alignment.Top) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
+                Row(verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.weight(1f)) {
                     AvatarImage(
                         name = transaction.name,
                         modifier = Modifier.clip(CircleShape),
@@ -207,7 +209,9 @@ fun BillCard(
                             text = transaction.name,
                             style = MaterialTheme.typography.titleMedium.copy(
                                 fontWeight = FontWeight.SemiBold
-                            )
+                            ),
+                            maxLines = 2,
+                            overflow = TextOverflow.Ellipsis
                         )
                         Text(
                             text = formatDateCreated(transaction.createdAt),
@@ -218,7 +222,8 @@ fun BillCard(
                     }
                 }
 
-                Spacer(modifier = Modifier.weight(1f))
+                Spacer(modifier = Modifier.width(8.dp))
+
                 Row {
                     val roundedShape = RoundedCornerShape(50)
                     // This will be implemented in online mode
