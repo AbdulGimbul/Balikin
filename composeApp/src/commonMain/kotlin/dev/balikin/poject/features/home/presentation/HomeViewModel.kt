@@ -9,6 +9,7 @@ import com.tweener.alarmee.model.IosNotificationConfiguration
 import dev.balikin.poject.features.transaction.data.TransactionEntity
 import dev.balikin.poject.features.transaction.data.TransactionRepository
 import dev.balikin.poject.features.transaction.data.TransactionType
+import dev.balikin.poject.ui.components.TransactionData
 import dev.icerock.moko.permissions.DeniedAlwaysException
 import dev.icerock.moko.permissions.DeniedException
 import dev.icerock.moko.permissions.Permission
@@ -46,6 +47,32 @@ class HomeViewModel(
 
             HomeUiEvent.LoadLatestTransactions -> {
                 getLatestTransactions()
+            }
+            
+            is HomeUiEvent.ShowConfirmationDialog -> {
+                _uiState.value = _uiState.value.copy(
+                    showConfirmationDialog = true,
+                    pendingTransactionData = event.transactionData
+                )
+            }
+            
+            HomeUiEvent.DismissConfirmationDialog -> {
+                _uiState.value = _uiState.value.copy(
+                    showConfirmationDialog = false,
+                    pendingTransactionData = null
+                )
+            }
+            
+            HomeUiEvent.ConfirmTransaction -> {
+                _uiState.value.pendingTransactionData?.let { transactionData ->
+                    // Create transaction with the confirmed data
+                    createConfirmedTransaction(transactionData)
+                    // Hide dialog and clear pending data
+                    _uiState.value = _uiState.value.copy(
+                        showConfirmationDialog = false,
+                        pendingTransactionData = null
+                    )
+                }
             }
         }
     }
@@ -121,6 +148,40 @@ class HomeViewModel(
             } catch (denied: DeniedException) {
                 _uiState.update { it.copy(permissionError = "Izin notifikasi ditolak. Pengingat tidak akan aktif.") }
             }
+
+            val currentUiType = when (_uiState.value.selectedTab.lowercase()) {
+                "utang" -> TransactionType.Utang
+                "piutang" -> TransactionType.Piutang
+                else -> TransactionType.Piutang
+            }
+
+            getTotalAmountByType(currentUiType)
+        }
+    }
+    
+    private fun createConfirmedTransaction(transactionData: TransactionData) {
+        viewModelScope.launch {
+            val transactionType = when (transactionData.type.lowercase()) {
+                "utang" -> TransactionType.Utang
+                "piutang" -> TransactionType.Piutang
+                else -> TransactionType.Utang
+            }
+
+            val dueDate: LocalDateTime = try {
+                LocalDateTime.parse(transactionData.date)
+            } catch (e: Exception) {
+                Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
+            }
+
+            val transaction = TransactionEntity(
+                name = transactionData.name,
+                dueDate = dueDate,
+                note = transactionData.note,
+                amount = transactionData.amount.toDouble(),
+                type = transactionType
+            )
+            
+            transactionRepository.addTransaction(transaction)
 
             val currentUiType = when (_uiState.value.selectedTab.lowercase()) {
                 "utang" -> TransactionType.Utang

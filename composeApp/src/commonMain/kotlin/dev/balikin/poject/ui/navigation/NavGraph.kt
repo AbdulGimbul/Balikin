@@ -36,6 +36,7 @@ import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -92,6 +93,7 @@ import dev.balikin.poject.ui.theme.stroke
 import dev.balikin.poject.utils.ThousandSeparatorVisualTransformation
 import dev.balikin.poject.utils.createAlarmeePlatformConfiguration
 import dev.balikin.poject.utils.formatDate
+import dev.balikin.poject.utils.formatThousandSeparator
 import dev.balikin.poject.utils.getDefaultDueDate
 import dev.icerock.moko.permissions.PermissionsController
 import dev.icerock.moko.permissions.compose.BindEffect
@@ -103,8 +105,11 @@ import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import multiplatform.network.cmptoast.showToast
 import org.jetbrains.compose.resources.painterResource
+import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
-
+import dev.balikin.poject.ui.components.TransactionConfirmationDialog
+import dev.balikin.poject.ui.components.TransactionData
+import dev.balikin.poject.features.home.presentation.HomeUiEvent
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
 @Composable
 fun SetupNavHost(navController: NavHostController, onExitApp: () -> Unit) {
@@ -288,6 +293,7 @@ private fun AddTransactionBottomSheet(
     alarmeeService: AlarmeeService,
     onSaveClicked: () -> Unit = {}
 ) {
+    val uiState by viewModel.uiState.collectAsState()
     var name by remember { mutableStateOf("") }
     val transactionTypes = listOf("Utang", "Piutang")
     var expanded by remember { mutableStateOf(false) }
@@ -444,16 +450,16 @@ private fun AddTransactionBottomSheet(
                 onClick = {
                     val rawAmount = amount.text
                     if (rawAmount.isNotBlank() && rawAmount.toDoubleOrNull() != 0.0 && name.isNotBlank()) {
-                        viewModel.addTransaction(
+                        // Create transaction data for confirmation dialog
+                        val transactionData = TransactionData(
                             name = name,
-                            date = date.toString(),
-                            note = note,
-                            amount = rawAmount,
+                            amount = formatThousandSeparator(rawAmount),
                             type = selectedType,
-                            permissionsController = permissionsController,
-                            alarmeeService = alarmeeService
+                            date = formatDate(date),
+                            note = note
                         )
-                        onSaveClicked()
+                        // Show confirmation dialog instead of directly adding transaction
+                        viewModel.onEvent(HomeUiEvent.ShowConfirmationDialog(transactionData))
                     } else {
                         showToast(
                             message = "Data yang anda isi belum lengkap!",
@@ -464,6 +470,26 @@ private fun AddTransactionBottomSheet(
                 modifier = Modifier.fillMaxWidth(),
                 text = "Simpan"
             )
+            
+            // Show confirmation dialog if needed
+            val pendingTransaction = uiState.pendingTransactionData
+            if (uiState.showConfirmationDialog && pendingTransaction != null) {
+                TransactionConfirmationDialog(
+                    transactionData = pendingTransaction,
+                    onConfirm = {
+                        viewModel.onEvent(HomeUiEvent.ConfirmTransaction)
+                        // Clear form after confirmation
+                        name = ""
+                        amount = TextFieldValue("")
+                        note = ""
+                        date = getDefaultDueDate()
+                        onSaveClicked()
+                    },
+                    onDismiss = {
+                        viewModel.onEvent(HomeUiEvent.DismissConfirmationDialog)
+                    }
+                )
+            }
         }
     }
 }
