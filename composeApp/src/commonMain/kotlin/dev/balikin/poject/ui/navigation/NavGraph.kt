@@ -453,9 +453,9 @@ private fun AddTransactionBottomSheet(
                         // Create transaction data for confirmation dialog
                         val transactionData = TransactionData(
                             name = name,
-                            amount = formatThousandSeparator(rawAmount),
+                            amount = rawAmount,
                             type = selectedType,
-                            date = formatDate(date),
+                            date = date.toString(),
                             note = note
                         )
                         // Show confirmation dialog instead of directly adding transaction

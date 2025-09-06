@@ -3,6 +3,10 @@ package dev.balikin.poject.utils
 import com.tweener.alarmee.configuration.AlarmeeIosPlatformConfiguration
 import com.tweener.alarmee.configuration.AlarmeePlatformConfiguration
 import platform.Foundation.NSNumberFormatterCurrencyStyle
+import platform.Foundation.NSNumberFormatter
+import platform.Foundation.NSLocale
+import platform.Foundation.NSURL
+import platform.UIKit.UIApplication
 
 class IosBrowserHelper : BrowserHelper {
     override fun openBrowser(url: String) {
