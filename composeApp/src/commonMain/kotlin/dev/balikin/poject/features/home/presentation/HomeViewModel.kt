@@ -19,10 +19,11 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlinx.datetime.Clock
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
+import kotlin.time.Clock
+import kotlin.time.ExperimentalTime
 
 class HomeViewModel(
     private val transactionRepository: TransactionRepository
@@ -93,6 +94,7 @@ class HomeViewModel(
         }
     }
 
+    @OptIn(ExperimentalTime::class)
     fun addTransaction(
         name: String,
         date: String,
@@ -159,6 +161,7 @@ class HomeViewModel(
         }
     }
     
+    @OptIn(ExperimentalTime::class)
     private fun createConfirmedTransaction(transactionData: TransactionData) {
         viewModelScope.launch {
             val transactionType = when (transactionData.type.lowercase()) {

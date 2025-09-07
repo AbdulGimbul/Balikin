@@ -80,11 +80,14 @@ import dev.balikin.poject.features.history.presentation.HistoryScreen
 import dev.balikin.poject.features.history.presentation.HistoryViewModel
 import dev.balikin.poject.features.history.presentation.filter.HistoryFilterScreen
 import dev.balikin.poject.features.home.presentation.HomeScreen
+import dev.balikin.poject.features.home.presentation.HomeUiEvent
 import dev.balikin.poject.features.home.presentation.HomeViewModel
 import dev.balikin.poject.features.transaction.presentation.TransactionScreen
 import dev.balikin.poject.features.transaction.presentation.TransactionViewModel
 import dev.balikin.poject.features.transaction.presentation.filter.TransFilterScreen
 import dev.balikin.poject.ui.components.DefaultButton
+import dev.balikin.poject.ui.components.TransactionConfirmationDialog
+import dev.balikin.poject.ui.components.TransactionData
 import dev.balikin.poject.ui.theme.primary_blue
 import dev.balikin.poject.ui.theme.primary_text
 import dev.balikin.poject.ui.theme.red
@@ -93,23 +96,20 @@ import dev.balikin.poject.ui.theme.stroke
 import dev.balikin.poject.utils.ThousandSeparatorVisualTransformation
 import dev.balikin.poject.utils.createAlarmeePlatformConfiguration
 import dev.balikin.poject.utils.formatDate
-import dev.balikin.poject.utils.formatThousandSeparator
 import dev.balikin.poject.utils.getDefaultDueDate
 import dev.icerock.moko.permissions.PermissionsController
 import dev.icerock.moko.permissions.compose.BindEffect
 import dev.icerock.moko.permissions.compose.rememberPermissionsControllerFactory
 import kotlinx.coroutines.delay
-import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import multiplatform.network.cmptoast.showToast
 import org.jetbrains.compose.resources.painterResource
-import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
-import dev.balikin.poject.ui.components.TransactionConfirmationDialog
-import dev.balikin.poject.ui.components.TransactionData
-import dev.balikin.poject.features.home.presentation.HomeUiEvent
+import kotlin.time.ExperimentalTime
+import kotlin.time.Instant
+
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
 @Composable
 fun SetupNavHost(navController: NavHostController, onExitApp: () -> Unit) {
@@ -285,7 +285,7 @@ fun NavHostContent(
 }
 
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalTime::class)
 @Composable
 private fun AddTransactionBottomSheet(
     viewModel: HomeViewModel,
@@ -470,7 +470,7 @@ private fun AddTransactionBottomSheet(
                 modifier = Modifier.fillMaxWidth(),
                 text = "Simpan"
             )
-            
+
             // Show confirmation dialog if needed
             val pendingTransaction = uiState.pendingTransactionData
             if (uiState.showConfirmationDialog && pendingTransaction != null) {

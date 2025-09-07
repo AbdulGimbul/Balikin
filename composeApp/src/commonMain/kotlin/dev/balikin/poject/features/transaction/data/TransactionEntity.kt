@@ -2,14 +2,15 @@ package dev.balikin.poject.features.transaction.data
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import kotlinx.datetime.Clock
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
+import kotlin.time.Clock
+import kotlin.time.ExperimentalTime
 
 
 @Entity(tableName = "transactions")
-data class TransactionEntity(
+data class TransactionEntity @OptIn(ExperimentalTime::class) constructor(
     @PrimaryKey(autoGenerate = true) val id: Long = 0L,
     val name: String,
     val dueDate: LocalDateTime,

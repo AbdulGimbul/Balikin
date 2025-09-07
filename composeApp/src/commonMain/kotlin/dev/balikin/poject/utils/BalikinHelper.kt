@@ -5,13 +5,15 @@ import androidx.compose.ui.text.input.OffsetMapping
 import androidx.compose.ui.text.input.TransformedText
 import androidx.compose.ui.text.input.VisualTransformation
 import com.tweener.alarmee.configuration.AlarmeePlatformConfiguration
-import kotlinx.datetime.Clock
 import kotlinx.datetime.DateTimePeriod
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.atTime
 import kotlinx.datetime.minus
+import kotlinx.datetime.number
 import kotlinx.datetime.toLocalDateTime
+import kotlin.time.Clock
+import kotlin.time.ExperimentalTime
 
 expect fun currencyFormat(amount: Double): String
 
@@ -30,11 +32,12 @@ fun formattedDate(dateString: String): String {
         return ""
     }
 
-    return "${localDateTime.dayOfMonth.toString().padStart(2, '0')}/" +
-            "${localDateTime.monthNumber.toString().padStart(2, '0')}/" +
+    return "${localDateTime.day.toString().padStart(2, '0')}/" +
+            "${localDateTime.month.number.toString().padStart(2, '0')}/" +
             "${localDateTime.year}"
 }
 
+@OptIn(ExperimentalTime::class)
 fun getCurrentFormattedDateTime(): String {
     val currentMoment = Clock.System.now()
     val dateTime = currentMoment.toLocalDateTime(TimeZone.currentSystemDefault())
@@ -78,6 +81,7 @@ fun formatDate(date: LocalDateTime): String {
     return "$day $month $year"
 }
 
+@OptIn(ExperimentalTime::class)
 fun getLastWeekDate(): LocalDateTime {
     val now = Clock.System.now()
     val lastWeekInstant = now.minus(
@@ -87,6 +91,7 @@ fun getLastWeekDate(): LocalDateTime {
     return lastWeekInstant.toLocalDateTime(TimeZone.currentSystemDefault()).date.atTime(0, 0, 0)
 }
 
+@OptIn(ExperimentalTime::class)
 fun getCurrentDate(): LocalDateTime {
     return Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date.atTime(
         23,
@@ -95,6 +100,7 @@ fun getCurrentDate(): LocalDateTime {
     )
 }
 
+@OptIn(ExperimentalTime::class)
 fun getDefaultDueDate(): LocalDateTime {
     return Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date.atTime(
         9,

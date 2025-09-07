@@ -1,10 +1,11 @@
 package dev.balikin.poject.features.transaction.data
 
 import kotlinx.coroutines.flow.Flow
-import kotlinx.datetime.Clock
+import kotlin.time.Clock
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
+import kotlin.time.ExperimentalTime
 
 class TransactionRepositoryImpl(
     private val transactionDao: TransactionDao
@@ -43,6 +44,7 @@ class TransactionRepositoryImpl(
         return transactionDao.countFilteredTransactions(type, startDate, endDate)
     }
 
+    @OptIn(ExperimentalTime::class)
     override suspend fun markTransactionAsPaid(transactionId: Long) {
         val currentTime = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
         transactionDao.markTransactionAsPaid(
