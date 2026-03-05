@@ -3,20 +3,27 @@ package dev.balikin.poject.features.transaction.presentation
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.tweener.alarmee.AlarmeeService
+import dev.balikin.poject.features.auth.data.AuthRepository
+import dev.balikin.poject.features.transaction.data.TransactionEntity
 import dev.balikin.poject.features.transaction.data.TransactionRepository
 import dev.balikin.poject.features.transaction.data.TransactionType
+import dev.balikin.poject.features.transaction.domain.UnifiedTransaction
 import dev.balikin.poject.features.transaction.presentation.filter.TransFilterUiEvent
 import dev.balikin.poject.features.transaction.presentation.filter.TransFilterUiState
+import dev.balikin.poject.network.onError
+import dev.balikin.poject.network.onSuccess
 import dev.balikin.poject.utils.getCurrentDate
 import dev.balikin.poject.utils.getLastWeekDate
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.datetime.LocalDateTime
 
 class TransactionViewModel(
-    private val transactionRepository: TransactionRepository
+    private val transactionRepository: TransactionRepository,
+    private val authRepository: AuthRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(TransactionUiState())
@@ -28,8 +35,18 @@ class TransactionViewModel(
     private val defaultStartDate = getLastWeekDate()
     private val defaultEndDate = getCurrentDate()
 
+    private var currentUserEmail: String? = null
+
     init {
         getAllTransactions()
+        viewModelScope.launch {
+            authRepository.userInfo().collect { user ->
+                currentUserEmail = user?.email
+                if (user != null) {
+                    loadUnifiedTransactions()
+                }
+            }
+        }
     }
 
     fun onEvent(uiEvent: TransactionUiEvent) {
@@ -110,7 +127,75 @@ class TransactionViewModel(
             transactionRepository.getAllTransactions()
                 .collect { transactions ->
                     _uiState.value = _uiState.value.copy(transactions = transactions)
+                    updateUnifiedFromLocal(transactions)
                 }
+        }
+    }
+
+    private fun updateUnifiedFromLocal(localTransactions: List<TransactionEntity>) {
+        val email = currentUserEmail
+        val localUnified = localTransactions.map {
+            UnifiedTransaction.fromLocal(it, email)
+        }
+        val existingOnline = _uiState.value.unifiedTransactions.filter { it.isOnline }
+        val allTransactions = (localUnified + existingOnline).sortedByDescending { it.date }
+        _uiState.update { it.copy(unifiedTransactions = allTransactions) }
+    }
+
+    fun loadUnifiedTransactions() {
+        viewModelScope.launch {
+            _uiState.update { it.copy(isLoadingOnline = true, onlineError = null) }
+
+            val localTransactionsResult = kotlin.runCatching {
+                transactionRepository.getAllTransactions().first()
+            }
+            val localTransactions = localTransactionsResult.getOrElse { emptyList() }
+
+            val email = currentUserEmail
+            if (email != null) {
+                val onlineResult = transactionRepository.getOnlineTransactions()
+
+                onlineResult.onSuccess { response ->
+                    val localUnified = localTransactions.map {
+                        UnifiedTransaction.fromLocal(it, email)
+                    }
+                    val onlineUnified = response.data.map {
+                        UnifiedTransaction.fromOnline(it, email)
+                    }
+                    val allTransactions = (localUnified + onlineUnified)
+                        .sortedByDescending { it.date }
+
+                    _uiState.update {
+                        it.copy(
+                            unifiedTransactions = allTransactions,
+                            isLoadingOnline = false,
+                            onlineError = null
+                        )
+                    }
+                }.onError { error ->
+                    val localUnified = localTransactions.map {
+                        UnifiedTransaction.fromLocal(it, email)
+                    }
+                    _uiState.update {
+                        it.copy(
+                            unifiedTransactions = localUnified,
+                            isLoadingOnline = false,
+                            onlineError = "Failed to load online transactions: ${error.message}"
+                        )
+                    }
+                }
+            } else {
+                val localUnified = localTransactions.map {
+                    UnifiedTransaction.fromLocal(it)
+                }
+                _uiState.update {
+                    it.copy(
+                        unifiedTransactions = localUnified,
+                        isLoadingOnline = false,
+                        onlineError = null
+                    )
+                }
+            }
         }
     }
 
@@ -120,6 +205,7 @@ class TransactionViewModel(
                 .collect { transactions ->
                     _uiState.value =
                         _uiState.value.copy(transactions = transactions)
+                    updateUnifiedFromLocal(transactions)
                 }
         }
     }
@@ -163,6 +249,7 @@ class TransactionViewModel(
                         }
                     )
                 }
+                updateUnifiedFromLocal(transactions)
             }
         }
     }
@@ -213,6 +300,8 @@ class TransactionViewModel(
                     endDate = it.endDate
                 )
             } ?: getAllTransactions()
+
+            loadUnifiedTransactions()
         }
     }
 }

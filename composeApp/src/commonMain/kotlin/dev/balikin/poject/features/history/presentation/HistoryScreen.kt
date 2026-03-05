@@ -36,6 +36,7 @@ import androidx.navigation.NavController
 import dev.balikin.poject.ui.components.FilterButton
 import dev.balikin.poject.ui.components.FilterTags
 import dev.balikin.poject.ui.components.TransactionItem
+import dev.balikin.poject.features.transaction.domain.UnifiedTransaction
 import dev.balikin.poject.ui.navigation.Screen
 import dev.balikin.poject.ui.theme.primary_blue
 import dev.balikin.poject.ui.theme.primary_text
@@ -122,9 +123,11 @@ fun History(
                 verticalArrangement = Arrangement.spacedBy(16.dp),
                 modifier = Modifier.padding(top = 16.dp)
             ) {
-//                items(uiState.transactions) { trans ->
-//                    TransactionItem(trans)
-//                }
+                items(uiState.transactions) { trans ->
+                    TransactionItem(
+                        transaction = UnifiedTransaction.fromLocal(trans)
+                    )
+                }
             }
         }
     }

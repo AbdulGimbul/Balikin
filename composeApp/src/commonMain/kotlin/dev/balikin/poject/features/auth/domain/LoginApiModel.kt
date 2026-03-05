@@ -20,7 +20,7 @@ data class LoginDataApiModel(
     @SerialName("is_online")
     val isOnline: Boolean,
     @SerialName("last_online")
-    val lastOnline: String,
+    val lastOnline: String?,
     @SerialName("created_by")
     val createdBy: String?,
     @SerialName("updated_by")
@@ -30,5 +30,5 @@ data class LoginDataApiModel(
     @SerialName("created_at")
     val createdAt: String,
     @SerialName("updated_at")
-    val updatedAt: String
+    val updatedAt: String?
 )

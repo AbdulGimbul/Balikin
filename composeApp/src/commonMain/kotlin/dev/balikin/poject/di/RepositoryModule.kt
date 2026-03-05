@@ -42,7 +42,7 @@ val provideTransactionRepositoryModule = module {
     single<TransactionRepositoryImpl> {
         TransactionRepositoryImpl(requestHandler = get(),transactionDao = get())
     }.bind<TransactionRepository>()
-    viewModel { TransactionViewModel(transactionRepository = get()) }
+    viewModel { TransactionViewModel(transactionRepository = get(), authRepository = get()) }
 }
 
 val provideHomeRepositoryModule = module {

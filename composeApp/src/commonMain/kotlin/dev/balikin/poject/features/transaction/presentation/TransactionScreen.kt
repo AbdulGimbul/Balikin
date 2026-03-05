@@ -54,9 +54,11 @@ import balikin.composeapp.generated.resources.trans_utang
 import com.tweener.alarmee.rememberAlarmeeService
 import dev.balikin.poject.features.transaction.data.TransactionEntity
 import dev.balikin.poject.features.transaction.data.TransactionType
+import dev.balikin.poject.features.transaction.domain.UnifiedTransaction
 import dev.balikin.poject.ui.components.AvatarImage
 import dev.balikin.poject.ui.components.FilterButton
 import dev.balikin.poject.ui.components.FilterTags
+import dev.balikin.poject.ui.components.TransactionItem
 import dev.balikin.poject.ui.navigation.Screen
 import dev.balikin.poject.ui.theme.green
 import dev.balikin.poject.ui.theme.grey2
@@ -166,14 +168,30 @@ fun Transaction(
             LazyColumn(
                 modifier = Modifier.padding(top = 16.dp)
             ) {
-                items(uiState.transactions) { transaction ->
-                    BillCard(
-                        transaction = transaction,
-                        onPaid = { onEvent(TransactionUiEvent.OnPaidClicked(transaction.id)) },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = 4.dp)
-                    )
+                items(uiState.unifiedTransactions) { unified ->
+                    if (!unified.isOnline) {
+                        // Local transaction — find original entity for BillCard
+                        val localEntity = uiState.transactions.find {
+                            it.id.toString() == unified.id
+                        }
+                        if (localEntity != null) {
+                            BillCard(
+                                transaction = localEntity,
+                                onPaid = { onEvent(TransactionUiEvent.OnPaidClicked(localEntity.id)) },
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(vertical = 4.dp)
+                            )
+                        }
+                    } else {
+                        // Online transaction
+                        TransactionItem(
+                            transaction = unified,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 4.dp)
+                        )
+                    }
                 }
             }
         }
