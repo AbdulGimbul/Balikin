@@ -2,7 +2,12 @@ package dev.balikin.poject.utils
 
 import com.tweener.alarmee.configuration.AlarmeeIosPlatformConfiguration
 import com.tweener.alarmee.configuration.AlarmeePlatformConfiguration
+import platform.Foundation.NSLocale
+import platform.Foundation.NSNumberFormatter
 import platform.Foundation.NSNumberFormatterCurrencyStyle
+import platform.Foundation.NSNumber
+import platform.Foundation.NSURL
+import platform.UIKit.UIApplication
 
 class IosBrowserHelper : BrowserHelper {
     override fun openBrowser(url: String) {
@@ -20,7 +25,7 @@ actual fun currencyFormat(
         numberStyle = NSNumberFormatterCurrencyStyle
         locale = NSLocale("in_ID")
     }
-    return formatter.stringFromNumber(amount) ?: "$amount"
+    return formatter.stringFromNumber(NSNumber(double = amount)) ?: "$amount"
 }
 
 actual fun createAlarmeePlatformConfiguration(): AlarmeePlatformConfiguration {

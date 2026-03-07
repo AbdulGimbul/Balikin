@@ -1,6 +1,7 @@
 package dev.balikin.poject.di
 
 import dev.balikin.poject.storage.DatabaseFactory
+import dev.balikin.poject.storage.createDataStore
 import dev.icerock.moko.permissions.ios.PermissionsController
 import io.ktor.client.engine.darwin.Darwin
 import org.koin.core.module.Module
